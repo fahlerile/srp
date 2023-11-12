@@ -18,13 +18,21 @@ Renderer* NewRenderer(int width, int height, int flags)
 
 void SetColor(Renderer* this, Color color)
 {
-    SDL_SetRenderDrawColor(this->internal_renderer, color.r, color.g, color.b, color.a);
+    SDL_SetRenderDrawColor(this->internal_renderer,
+                           color.r, color.g, color.b, color.a);
 }
 
-void PutPixel(Renderer* this, int x, int y, Color color)
+void DrawPixel(Renderer* this, int x, int y, Color color)
 {
     SetColor(this, color);
     SDL_RenderDrawPoint(this->internal_renderer, x, y);
+}
+
+// vertices - array of `Vector3d`
+void DrawPolygon(Array* vertices)
+{
+    // loop over the bounding box
+    // determine if the current point is inside the polygon using the cross product test
 }
 
 void ClearBuffer(Renderer* this, Color color)
@@ -35,18 +43,18 @@ void ClearBuffer(Renderer* this, Color color)
 
 void Update(Renderer* this)
 {
-    Color color = {
-        .r = 255,
-        .g = 255,
-        .b = 255,
-        .a = 255
+    Vector3d data[3] = {
+        (Vector3d) { 0.,   0.5, 0.},
+        (Vector3d) {-0.5, -0.5, 0.},
+        (Vector3d) { 0.5, -0.5, 0.}
     };
 
-    for (int x = 100; x < 500; x++)
-    {
-        for (int y = 200; y < 400; y++)
-            PutPixel(this, x, y, color);
-    }
+    Array vertices = {
+        .data = data,
+        .n = 3
+    };
+
+    DrawPolygon(&vertices);
 }
 
 void SwapBuffer(Renderer* this)

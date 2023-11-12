@@ -15,10 +15,12 @@ Renderer* NewRenderer(int width, int height, int flags);
 
 void SetColor(Renderer* this, Color color);
 
-void PutPixel(Renderer* this, int x, int y, Color color);
+void DrawPixel(Renderer* this, int x, int y, Color color);
+
+// Takes an array of vertices in NDC (point is represented as `Vector3d`)
+// with amount of vertices
+void DrawPolygon(Array* vertices);
 
 void ClearBuffer(Renderer* this, Color color);
-
 void SwapBuffer(Renderer* this);
-
 void Update(Renderer* this);

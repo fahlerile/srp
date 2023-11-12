@@ -79,6 +79,7 @@
         "variant": "cpp",
         "sdl.h": "c",
         "errorcodes.h": "c",
-        "renderer.h": "c"
+        "renderer.h": "c",
+        "stdio.h": "c"
     }
 }

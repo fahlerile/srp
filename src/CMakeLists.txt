@@ -3,7 +3,7 @@ set(
   main.c
   Renderer/Renderer.c
   MainUtils/MainUtils.c
-  Utils/Utils.c
+  Utils/MemoryUtils/MemoryUtils.c
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
