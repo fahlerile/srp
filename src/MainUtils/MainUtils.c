@@ -1,0 +1,39 @@
+#include <stdbool.h>
+#include "SDL2/SDL.h"
+#include "Renderer/Renderer.h"
+#include "MainUtils.h"
+#include "Utils/Utils.h"
+#include "errorcodes.h"
+
+Renderer* Initialize(int width, int height, int flags)
+{
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    {
+        fprintf(stderr, "Failed to initialize SDL library: %s\n", SDL_GetError());
+        exit(SDL_INIT_FAIL);
+    }
+
+    Renderer* renderer = NewRenderer(width, height, flags);
+
+    if (renderer == NULL)
+    {
+        fprintf(stderr, "Failed to initialize SDL_Window or SDL_Renderer: %s\n", SDL_GetError());
+        exit(SDL_WINDOW_OR_RENDERER_INIT_FAIL);
+    }
+
+    return renderer;
+}
+
+void PollEvents(bool* running, SDL_Event* p_event)
+{
+    while (SDL_PollEvent(p_event) != 0)
+    {
+        if (p_event->type == SDL_QUIT)
+            *running = false;
+    }
+}
+
+void Deinitialize(Renderer* renderer)
+{
+    free(renderer);
+}
