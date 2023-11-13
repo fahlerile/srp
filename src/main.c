@@ -14,11 +14,13 @@ int main(int argc, char** argv)
     SDL_Event event;
     bool running = true;
 
+    // Draw once - loop forever
+    clearBuffer(renderer, (Color) {0, 0, 0, 255});
+    drawToBuffer(renderer);
+    swapBuffer(renderer);
     while (running)
     {
-        PollEvents(&running, &event);
-        clearBuffer(renderer, (Color) {0, 0, 0, 255});
-        updateBuffer(renderer);
+        pollEvents(&running, &event);
         swapBuffer(renderer);
     }
 

@@ -9,18 +9,21 @@ typedef struct
     SDL_Renderer* internal_renderer;
 } Renderer;
 
+#include "Polygon.h"  // circular dependency
+
 // May return NULL on error
-// Returned pointer should be `free`d
 Renderer* newRenderer(int width, int height, int flags);
+void freeRenderer(Renderer* this);
+
+Vector2i getWindowDimensions(Renderer* this);
 
 void setColor(Renderer* this, Color color);
 
-void drawPixel(Renderer* this, int x, int y, Color color);
+void drawPixel(Renderer* this, Vector2i point, Color color);
 
-// Takes an array of vertices in NDC (point is represented as `Vector3d`)
-// with amount of vertices
-void drawPolygon(Array* vertices);
+// `polygon` should have NDC vertices!
+void drawPolygon(Renderer* this, Polygon* polygon);
 
 void clearBuffer(Renderer* this, Color color);
 void swapBuffer(Renderer* this);
-void updateBuffer(Renderer* this);
+void drawToBuffer(Renderer* this);

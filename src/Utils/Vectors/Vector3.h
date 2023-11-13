@@ -7,10 +7,11 @@ typedef struct
 
 typedef struct
 {
-    float x, y, z;
-} Vector3f;
-
-typedef struct
-{
     double x, y, z;
 } Vector3d;
+
+double   MagnitudeVector3d(Vector3d a);
+Vector3d Vector3dAdd      (Vector3d a, Vector3d b);
+Vector3d Vector3dSubtract (Vector3d a, Vector3d b);
+double   Vector3dDot      (Vector3d a, Vector3d b);
+Vector3d Vector3dCross    (Vector3d a, Vector3d b);

@@ -24,7 +24,7 @@ Renderer* initialize(int width, int height, int flags)
     return renderer;
 }
 
-void PollEvents(bool* running, SDL_Event* p_event)
+void pollEvents(bool* running, SDL_Event* p_event)
 {
     while (SDL_PollEvent(p_event) != 0)
     {
@@ -35,5 +35,5 @@ void PollEvents(bool* running, SDL_Event* p_event)
 
 void deinitialize(Renderer* renderer)
 {
-    free(renderer);
+    freeRenderer(renderer);
 }

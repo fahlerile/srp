@@ -80,6 +80,9 @@
         "sdl.h": "c",
         "errorcodes.h": "c",
         "renderer.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "utils.h": "c",
+        "vector3.h": "c",
+        "vectors.h": "c"
     }
 }

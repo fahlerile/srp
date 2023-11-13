@@ -1,9 +1,18 @@
 set(
   SOURCES
+
   main.c
+
   Renderer/Renderer.c
   MainUtils/MainUtils.c
+
+  Polygon.c
+
   Utils/MemoryUtils/MemoryUtils.c
+  Utils/NDC.c
+  Utils/Array.c
+  Utils/Vectors/Vector2.c
+  Utils/Vectors/Vector3.c
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")

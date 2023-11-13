@@ -16,23 +16,45 @@ Renderer* newRenderer(int width, int height, int flags)
     return renderer;
 }
 
+void freeRenderer(Renderer* this)
+{
+    free(this);
+}
+
+Vector2i getWindowDimensions(Renderer* this)
+{
+    int x, y;
+    SDL_GetWindowSize(this->internal_window, &x, &y);
+    return (Vector2i) {x, y};
+}
+
 void setColor(Renderer* this, Color color)
 {
     SDL_SetRenderDrawColor(this->internal_renderer,
                            color.r, color.g, color.b, color.a);
 }
 
-void drawPixel(Renderer* this, int x, int y, Color color)
+void drawPixel(Renderer* this, Vector2i point, Color color)
 {
     setColor(this, color);
-    SDL_RenderDrawPoint(this->internal_renderer, x, y);
+    SDL_RenderDrawPoint(this->internal_renderer, point.x, point.y);
 }
 
-// vertices - array of `Vector3d` (NDC points)
-void drawPolygon(Array* vertices)
+// `polygon` should have NDC vertices!
+void drawPolygon(Renderer* this, Polygon* polygon)
 {
-    // loop over the bounding box
-    // determine if the current point is inside the polygon using the cross product test
+    NDCtoScreenSpacePolygon(this, polygon);
+    Vector3d minPoint, maxPoint;
+    getBoundingPointsPolygon(polygon, &minPoint, &maxPoint);
+
+    for (int x = minPoint.x; x < maxPoint.x; x++)
+    {
+        for (int y = minPoint.y; x < maxPoint.y; y++)
+        {
+            if (isPointInsidePolygon((Vector3d) {x, y, 0.}, polygon))
+                drawPixel(this, (Vector2i) {x, y}, (Color) {255, 255, 255, 255});
+        }
+    }
 }
 
 void clearBuffer(Renderer* this, Color color)
@@ -41,20 +63,16 @@ void clearBuffer(Renderer* this, Color color)
     SDL_RenderClear(this->internal_renderer);
 }
 
-void updateBuffer(Renderer* this)
+void drawToBuffer(Renderer* this)
 {
-    Vector3d data[3] = {
+    Vector3d vertices[3] = {
         (Vector3d) { 0.,   0.5, 0.},
         (Vector3d) {-0.5, -0.5, 0.},
         (Vector3d) { 0.5, -0.5, 0.}
     };
-
-    Array vertices = {
-        .data = data,
-        .n = 3
-    };
-
-    drawPolygon(&vertices);
+    Polygon* triangle = newPolygon(vertices, NULL, 3);
+    drawPolygon(this, triangle);
+    freePolygon(triangle);
 }
 
 void swapBuffer(Renderer* this)

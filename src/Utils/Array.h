@@ -1,8 +1,4 @@
 #pragma once
-#include <stdint.h>
+#include "Utils/Utils.h"
 
-typedef struct
-{
-    void* data;
-    size_t n;
-} Array;
+double sumOfArrayDouble(double* ptr, size_t n);
