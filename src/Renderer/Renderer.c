@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "Utils/Utils.h"
 
-Renderer* NewRenderer(int width, int height, int flags)
+Renderer* newRenderer(int width, int height, int flags)
 {
     SDL_Window* int_window;
     SDL_Renderer* int_renderer;
@@ -16,32 +16,32 @@ Renderer* NewRenderer(int width, int height, int flags)
     return renderer;
 }
 
-void SetColor(Renderer* this, Color color)
+void setColor(Renderer* this, Color color)
 {
     SDL_SetRenderDrawColor(this->internal_renderer,
                            color.r, color.g, color.b, color.a);
 }
 
-void DrawPixel(Renderer* this, int x, int y, Color color)
+void drawPixel(Renderer* this, int x, int y, Color color)
 {
-    SetColor(this, color);
+    setColor(this, color);
     SDL_RenderDrawPoint(this->internal_renderer, x, y);
 }
 
-// vertices - array of `Vector3d`
-void DrawPolygon(Array* vertices)
+// vertices - array of `Vector3d` (NDC points)
+void drawPolygon(Array* vertices)
 {
     // loop over the bounding box
     // determine if the current point is inside the polygon using the cross product test
 }
 
-void ClearBuffer(Renderer* this, Color color)
+void clearBuffer(Renderer* this, Color color)
 {
-    SetColor(this, color);
+    setColor(this, color);
     SDL_RenderClear(this->internal_renderer);
 }
 
-void Update(Renderer* this)
+void updateBuffer(Renderer* this)
 {
     Vector3d data[3] = {
         (Vector3d) { 0.,   0.5, 0.},
@@ -54,10 +54,10 @@ void Update(Renderer* this)
         .n = 3
     };
 
-    DrawPolygon(&vertices);
+    drawPolygon(&vertices);
 }
 
-void SwapBuffer(Renderer* this)
+void swapBuffer(Renderer* this)
 {
     SDL_RenderPresent(this->internal_renderer);
 }

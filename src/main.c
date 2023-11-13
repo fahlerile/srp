@@ -10,17 +10,17 @@
 
 int main(int argc, char** argv)
 {
-    Renderer* renderer = Initialize(800, 600, 0);
+    Renderer* renderer = initialize(800, 600, 0);
     SDL_Event event;
     bool running = true;
 
     while (running)
     {
         PollEvents(&running, &event);
-        ClearBuffer(renderer, (Color) {0, 0, 0, 255});
-        Update(renderer);
-        SwapBuffer(renderer);
+        clearBuffer(renderer, (Color) {0, 0, 0, 255});
+        updateBuffer(renderer);
+        swapBuffer(renderer);
     }
 
-    Deinitialize(renderer);
+    deinitialize(renderer);
 }

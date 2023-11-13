@@ -5,7 +5,7 @@
 #include "Utils/Utils.h"
 #include "errorcodes.h"
 
-Renderer* Initialize(int width, int height, int flags)
+Renderer* initialize(int width, int height, int flags)
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -13,7 +13,7 @@ Renderer* Initialize(int width, int height, int flags)
         exit(SDL_INIT_FAIL);
     }
 
-    Renderer* renderer = NewRenderer(width, height, flags);
+    Renderer* renderer = newRenderer(width, height, flags);
 
     if (renderer == NULL)
     {
@@ -33,7 +33,7 @@ void PollEvents(bool* running, SDL_Event* p_event)
     }
 }
 
-void Deinitialize(Renderer* renderer)
+void deinitialize(Renderer* renderer)
 {
     free(renderer);
 }

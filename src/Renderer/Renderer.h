@@ -11,16 +11,16 @@ typedef struct
 
 // May return NULL on error
 // Returned pointer should be `free`d
-Renderer* NewRenderer(int width, int height, int flags);
+Renderer* newRenderer(int width, int height, int flags);
 
-void SetColor(Renderer* this, Color color);
+void setColor(Renderer* this, Color color);
 
-void DrawPixel(Renderer* this, int x, int y, Color color);
+void drawPixel(Renderer* this, int x, int y, Color color);
 
 // Takes an array of vertices in NDC (point is represented as `Vector3d`)
 // with amount of vertices
-void DrawPolygon(Array* vertices);
+void drawPolygon(Array* vertices);
 
-void ClearBuffer(Renderer* this, Color color);
-void SwapBuffer(Renderer* this);
-void Update(Renderer* this);
+void clearBuffer(Renderer* this, Color color);
+void swapBuffer(Renderer* this);
+void updateBuffer(Renderer* this);
