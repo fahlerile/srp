@@ -6,7 +6,7 @@ typedef struct
     Vector3d* vertices;
     Vector3d* edgeVectors;
     Color* colors;
-    double area;
+    double areaX2;
     size_t n;
 } Polygon;
 

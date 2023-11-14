@@ -1,3 +1,4 @@
+#include <float.h>
 #include "Polygon.h"
 #include "Utils/NDC.h"
 #include "Utils/Array.h"
@@ -21,25 +22,24 @@ Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_
     for (size_t i = 0; i < n; i++)
         this->edgeVectors[i] = Vector3dSubtract(vertices[(i == n-1) ? 0 : i+1], vertices[i]);
 
-    // Calculate the area
+    // Calculate `areaX2`
     if (n == 3)
     {
-        this->area = Vector3dMagnitude(
+        this->areaX2 = Vector3dMagnitude(
             Vector3dCross(this->edgeVectors[0], Vector3dNegate(this->edgeVectors[2]))
-        ) / 2;
+        );
     }
     else  // NOT TESTED!
     {
-        double areaMultipliedByTwo = 0;
+        this->areaX2 = 0;
         for (size_t i = 2; i < n; i++)
         {
-            double areaOfThisSubtriangleMultipliedByTwo = Vector3dMagnitude(Vector3dCross(
+            double areaOfThisSubtriangleX2 = Vector3dMagnitude(Vector3dCross(
                 Vector3dSubtract(this->vertices[0], this->vertices[i]),
                 Vector3dNegate(this->edgeVectors[i-1])
             ));
-            areaMultipliedByTwo += areaOfThisSubtriangleMultipliedByTwo;
+            this->areaX2 += areaOfThisSubtriangleX2;
         }
-        this->area = areaMultipliedByTwo / 2;
     }
 
     return this;
@@ -53,7 +53,8 @@ void freePolygon(Polygon* this)
 
 void getBoundingPointsPolygon(Polygon* polygon, Vector3d* min, Vector3d* max)
 {
-    Vector3d res_min, res_max = {0};
+    Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
+    Vector3d res_max = {0};
 
     for (size_t i = 0; i < polygon->n; i++)
     {
@@ -78,21 +79,21 @@ void getBoundingPointsPolygon(Polygon* polygon, Vector3d* min, Vector3d* max)
 
 bool isPointInsidePolygon(Vector3d point, Polygon* polygon)
 {
-    double* barycentricCoordinatesMultipliedByTwo = allocate(polygon->n * sizeof(double));
+    double* barycentricCoordinatesX2 = allocate(polygon->n * sizeof(double));
     for (size_t i = 0; i < polygon->n; i++)
     {
         Vector3d toPoint = Vector3dSubtract(point, polygon->vertices[i]);
-        barycentricCoordinatesMultipliedByTwo[i] = Vector3dMagnitude(Vector3dCross(toPoint, polygon->edgeVectors[i]));
-        if (barycentricCoordinatesMultipliedByTwo[i] < 0)
+        barycentricCoordinatesX2[i] = Vector3dMagnitude(Vector3dCross(toPoint, polygon->edgeVectors[i]));
+        if (barycentricCoordinatesX2[i] < 0)
         {
-            free(barycentricCoordinatesMultipliedByTwo);
+            free(barycentricCoordinatesX2);
             return false;
         }
     }
 
-    double sum = sumOfArrayDouble(barycentricCoordinatesMultipliedByTwo, polygon->n);
-    free(barycentricCoordinatesMultipliedByTwo);
-    if (sum == polygon->area * 2)
+    double sum = sumOfArrayDouble(barycentricCoordinatesX2, polygon->n);
+    free(barycentricCoordinatesX2);
+    if (sum == polygon->areaX2)
         return true;
     return false;
 }
