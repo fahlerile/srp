@@ -8,5 +8,6 @@
 #include <assert.h>
 
 #include "Color.h"
+#include "Array.h"
 #include "Vectors/Vectors.h"
 #include "MemoryUtils/MemoryUtils.h"

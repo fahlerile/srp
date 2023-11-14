@@ -46,14 +46,18 @@ void drawPolygon(Renderer* this, Polygon* polygon)
     Vector3d minPoint, maxPoint;
     getBoundingPointsPolygon(polygon, &minPoint, &maxPoint);
 
+    double* barycentricCoordinatesX2 = allocate(polygon->n * sizeof(double));
     for (int x = minPoint.x; x < maxPoint.x; x++)
     {
-        for (int y = minPoint.y; x < maxPoint.y; y++)
+        for (int y = minPoint.y; y < maxPoint.y; y++)
         {
-            if (isPointInsidePolygon((Vector3d) {x, y, 0.}, polygon))
-                drawPixel(this, (Vector2i) {x, y}, (Color) {255, 255, 255, 255});
+            calculateBarycentricCoordinatesX2Polygon(polygon, (Vector3d) {x, y, 0.}, barycentricCoordinatesX2);
+            double sum = sumOfArrayDouble(barycentricCoordinatesX2, polygon->n);
+            if (sum == polygon->areaX2)
+                drawPixel(this, (Vector2i) {x, y}, polygon->colors[0]);
         }
     }
+    free(barycentricCoordinatesX2);
 }
 
 void clearBuffer(Renderer* this, Color color)

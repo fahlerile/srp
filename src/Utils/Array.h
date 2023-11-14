@@ -1,4 +1,4 @@
 #pragma once
-#include "Utils/Utils.h"
+#include <stdint.h>
 
 double sumOfArrayDouble(double* ptr, size_t n);

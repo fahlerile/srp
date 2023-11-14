@@ -18,6 +18,6 @@ void freePolygon(Polygon* this);
 
 // min = {min_x, min_y, min_z},
 // max = {max_x, max_y, max_z}
-void getBoundingPointsPolygon(Polygon* polygon, Vector3d* min, Vector3d* max);
+void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max);
 
-bool isPointInsidePolygon(Vector3d point, Polygon* polygon);
+void calculateBarycentricCoordinatesX2Polygon(Polygon* this, Vector3d point, double* barycentricCoordinatesX2);

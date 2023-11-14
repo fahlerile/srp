@@ -51,49 +51,37 @@ void freePolygon(Polygon* this)
     free(this);
 }
 
-void getBoundingPointsPolygon(Polygon* polygon, Vector3d* min, Vector3d* max)
+void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max)
 {
     Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
     Vector3d res_max = {0};
 
-    for (size_t i = 0; i < polygon->n; i++)
+    for (size_t i = 0; i < this->n; i++)
     {
-        if (polygon->vertices[i].x < res_min.x)
-            res_min.x = polygon->vertices[i].x;
-        if (polygon->vertices[i].y < res_min.y)
-            res_min.y = polygon->vertices[i].y;
-        if (polygon->vertices[i].z < res_min.z)
-            res_min.z = polygon->vertices[i].z;
+        if (this->vertices[i].x < res_min.x)
+            res_min.x = this->vertices[i].x;
+        if (this->vertices[i].y < res_min.y)
+            res_min.y = this->vertices[i].y;
+        if (this->vertices[i].z < res_min.z)
+            res_min.z = this->vertices[i].z;
 
-        if (polygon->vertices[i].x > res_max.x)
-            res_max.x = polygon->vertices[i].x;
-        if (polygon->vertices[i].y > res_max.y)
-            res_max.y = polygon->vertices[i].y;
-        if (polygon->vertices[i].z > res_max.z)
-            res_max.z = polygon->vertices[i].z;
+        if (this->vertices[i].x > res_max.x)
+            res_max.x = this->vertices[i].x;
+        if (this->vertices[i].y > res_max.y)
+            res_max.y = this->vertices[i].y;
+        if (this->vertices[i].z > res_max.z)
+            res_max.z = this->vertices[i].z;
     }
 
     *min = res_min;
     *max = res_max;
 }
 
-bool isPointInsidePolygon(Vector3d point, Polygon* polygon)
+void calculateBarycentricCoordinatesX2Polygon(Polygon* this, Vector3d point, double* barycentricCoordinatesX2)
 {
-    double* barycentricCoordinatesX2 = allocate(polygon->n * sizeof(double));
-    for (size_t i = 0; i < polygon->n; i++)
+    for (size_t i = 0; i < this->n; i++)
     {
-        Vector3d toPoint = Vector3dSubtract(point, polygon->vertices[i]);
-        barycentricCoordinatesX2[i] = Vector3dMagnitude(Vector3dCross(toPoint, polygon->edgeVectors[i]));
-        if (barycentricCoordinatesX2[i] < 0)
-        {
-            free(barycentricCoordinatesX2);
-            return false;
-        }
+        Vector3d vertexToPoint = Vector3dSubtract(point, this->vertices[i]);
+        barycentricCoordinatesX2[i] = Vector3dMagnitude(Vector3dCross(vertexToPoint, this->edgeVectors[i]));
     }
-
-    double sum = sumOfArrayDouble(barycentricCoordinatesX2, polygon->n);
-    free(barycentricCoordinatesX2);
-    if (sum == polygon->areaX2)
-        return true;
-    return false;
 }
