@@ -3,20 +3,44 @@
 #include "Utils/Array.h"
 #include "Utils/Utils.h"
 
-Polygon* newPolygon(Vector3d* vertices, Color* colors, size_t n)
+Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_t n)
 {
+    assert(n >= 3);
+
     Polygon* this = allocate(sizeof(Polygon));
+
     this->vertices = vertices;
+    for (size_t i = 0; i < n; i++)
+        this->vertices[i] = NDCtoScreenSpace(renderer, vertices[i]);
+
     this->edgeVectors = allocate(n * sizeof(Vector3d));
     this->colors = colors;
     this->n = n;
 
     // Calculate `edgeVectors`
     for (size_t i = 0; i < n; i++)
-        this->edgeVectors[i] = Vector3dSubtract(vertices[i+1], vertices[i]);
+        this->edgeVectors[i] = Vector3dSubtract(vertices[(i == n-1) ? 0 : i+1], vertices[i]);
 
     // Calculate the area
-
+    if (n == 3)
+    {
+        this->area = Vector3dMagnitude(
+            Vector3dCross(this->edgeVectors[0], Vector3dNegate(this->edgeVectors[2]))
+        ) / 2;
+    }
+    else  // NOT TESTED!
+    {
+        double areaMultipliedByTwo = 0;
+        for (size_t i = 2; i < n; i++)
+        {
+            double areaOfThisSubtriangleMultipliedByTwo = Vector3dMagnitude(Vector3dCross(
+                Vector3dSubtract(this->vertices[0], this->vertices[i]),
+                Vector3dNegate(this->edgeVectors[i-1])
+            ));
+            areaMultipliedByTwo += areaOfThisSubtriangleMultipliedByTwo;
+        }
+        this->area = areaMultipliedByTwo / 2;
+    }
 
     return this;
 }
@@ -25,12 +49,6 @@ void freePolygon(Polygon* this)
 {
     free(this->edgeVectors);
     free(this);
-}
-
-void NDCtoScreenSpacePolygon(Renderer* renderer, Polygon* polygon)
-{
-    for (size_t i = 0; i < polygon->n; i++)
-        polygon->vertices[i] = NDCtoScreenSpace(renderer, polygon->vertices[i]);
 }
 
 void getBoundingPointsPolygon(Polygon* polygon, Vector3d* min, Vector3d* max)
@@ -64,7 +82,7 @@ bool isPointInsidePolygon(Vector3d point, Polygon* polygon)
     for (size_t i = 0; i < polygon->n; i++)
     {
         Vector3d toPoint = Vector3dSubtract(point, polygon->vertices[i]);
-        barycentricCoordinatesMultipliedByTwo[i] = MagnitudeVector3d(Vector3dCross(toPoint, polygon->edgeVectors[i]));
+        barycentricCoordinatesMultipliedByTwo[i] = Vector3dMagnitude(Vector3dCross(toPoint, polygon->edgeVectors[i]));
         if (barycentricCoordinatesMultipliedByTwo[i] < 0)
         {
             free(barycentricCoordinatesMultipliedByTwo);

@@ -43,7 +43,6 @@ void drawPixel(Renderer* this, Vector2i point, Color color)
 // `polygon` should have NDC vertices!
 void drawPolygon(Renderer* this, Polygon* polygon)
 {
-    NDCtoScreenSpacePolygon(this, polygon);
     Vector3d minPoint, maxPoint;
     getBoundingPointsPolygon(polygon, &minPoint, &maxPoint);
 
@@ -67,10 +66,16 @@ void drawToBuffer(Renderer* this)
 {
     Vector3d vertices[3] = {
         (Vector3d) { 0.,   0.5, 0.},
-        (Vector3d) {-0.5, -0.5, 0.},
-        (Vector3d) { 0.5, -0.5, 0.}
+        (Vector3d) { 0.5, -0.5, 0.},
+        (Vector3d) {-0.5, -0.5, 0.}
     };
-    Polygon* triangle = newPolygon(vertices, NULL, 3);
+    Color colors[3] = {
+        (Color) {255, 255, 255, 255},
+        (Color) {255, 255, 255, 255},
+        (Color) {255, 255, 255, 255}
+    };
+
+    Polygon* triangle = newPolygon(vertices, colors, this, 3);
     drawPolygon(this, triangle);
     freePolygon(triangle);
 }

@@ -12,11 +12,9 @@ typedef struct
 
 #include "Renderer/Renderer.h"  // circular dependency
 
-Polygon* newPolygon(Vector3d* vertices, Color* colors, size_t n);
+// `vertices` must be NDC and clockwise!
+Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_t n);
 void freePolygon(Polygon* this);
-
-// Convert `Polygon` vertices from NDC to screen space IN-PLACE
-void NDCtoScreenSpacePolygon(Renderer* renderer, Polygon* polygon);
 
 // min = {min_x, min_y, min_z},
 // max = {max_x, max_y, max_z}
