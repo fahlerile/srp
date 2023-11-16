@@ -18,10 +18,11 @@ void freeRenderer(Renderer* this);
 Vector2i getWindowDimensions(Renderer* this);
 
 void setColor(Renderer* this, Color color);
-
 void drawPixel(Renderer* this, Vector2i point, Color color);
+
 void drawPolygon(Renderer* this, Polygon* polygon);
 
+// A function to put draw calls in
 void drawToBuffer(Renderer* this);
 // Save buffer as a BMP screenshot
 void saveBuffer(Renderer* this, const char* filename);

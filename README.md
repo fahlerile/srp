@@ -16,11 +16,14 @@ cd bin
 ```
 
 ## TODO
-- Triangle color shading
-- Triangle rasterization convention (no overlapping)
-- Polygon test
-- Polygon rasterization convention (no overlapping)
-- Textures
-- Lighting
-- Shadows
-- Transformation matrices
+- [x] Triangle color shading
+- [ ] Triangle rasterization convention (no overlapping)
+- [ ] Polygon test
+- [ ] Polygon rasterization convention (no overlapping)
+- [ ] Textures
+- [ ] Lighting
+- [ ] Shadows
+- [ ] Transformation matrices
+
+## Issues
+- SEGV if `-march=native` compiler flag is set (NULL dereferencing in the assembly of `mixColorsBaryCoordPolygon`)
