@@ -24,3 +24,5 @@ void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max);
 void calculateBarycentricCoordinatesPolygon(Polygon* this, Vector3d point, double* barycentricCoordinates);
 // Mix polygon's vertices' colors with weights (barycentrtic coordinates)
 Color mixColorsBaryCoordPolygon(Polygon* this, double* barycentricCoordinates);
+
+bool isEdgeFlatTopOrLeftPolygon(Vector3d edge);

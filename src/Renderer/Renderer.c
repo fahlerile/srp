@@ -50,13 +50,26 @@ void drawPolygon(Renderer* this, Polygon* polygon)
     {
         for (int y = minPoint.y; y < maxPoint.y; y++)
         {
-            calculateBarycentricCoordinatesPolygon(polygon, (Vector3d) {x, y, 0.}, barycentricCoordinates);
-            double sum = sumOfArrayDouble(barycentricCoordinates, polygon->n);
-            if (roughlyEqualD(sum, 1))
+            double sumBarycentric = 0;
+            for (size_t i = 0; i < polygon->n; i++)
             {
-                Color color = mixColorsBaryCoordPolygon(polygon, barycentricCoordinates);
-                drawPixel(this, (Vector2i) {x, y}, color);
+                size_t index = (i+1) % polygon->n;
+                Vector3d nextVertexToPoint = Vector3dSubtract((Vector3d) {x, y, 0}, polygon->vertices[index]);
+                nextVertexToPoint.z = 0;
+                Vector3d edge = polygon->edgeVectors[index];
+                edge.z = 0;
+                barycentricCoordinates[i] = Vector3dCross(edge, nextVertexToPoint).z / polygon->areaX2;
+
+                if (barycentricCoordinates[i] < 0 || (barycentricCoordinates[i] == 0 && !isEdgeFlatTopOrLeftPolygon(polygon->edgeVectors[index])))
+                    goto nextPixel;
+
+                sumBarycentric += barycentricCoordinates[i];
             }
+
+            if (roughlyEqualD(sumBarycentric, 1))
+                drawPixel(this, (Vector2i) {x, y}, mixColorsBaryCoordPolygon(polygon, barycentricCoordinates));
+
+            nextPixel:;
         }
     }
     free(barycentricCoordinates);
@@ -64,20 +77,30 @@ void drawPolygon(Renderer* this, Polygon* polygon)
 
 void drawToBuffer(Renderer* this)
 {
-    Vector3d vertices[3] = {
-        (Vector3d) { 0.7,  0.5, 0.},
-        (Vector3d) { 0.5, -0.5, 0.},
-        (Vector3d) {-0.5, -0.5, 0.}
-    };
-    Color colors[3] = {
-        (Color) {255,   0,   0, 255},
-        (Color) {  0, 255,   0, 255},
-        (Color) {  0,   0, 255, 255}
-    };
+    Color white = {255, 255, 255, 255};
+    Color red = {255, 0, 0, 255};
 
-    Polygon* triangle = newPolygon(vertices, colors, this, 3);
-    drawPolygon(this, triangle);
-    freePolygon(triangle);
+    Vector3d v0 = {-0.5, -0.5, 0.};
+    Vector3d v1 = {-0.5,  0.5, 0.};
+    Vector3d v2 = { 0.5,  0.5, 0.};
+    Vector3d v3 = { 0.5, -0.5, 0.};
+
+    Vector3d vertices1[3] = {v0, v1, v3};
+    Color colors1[3] = {white, white, white};
+
+    Vector3d vertices2[3] = {v1, v2, v3};
+    Color colors2[3] = {red, red, red};
+
+    Polygon* triangle1 = newPolygon(vertices1, colors1, this, 3);
+    Polygon* triangle2 = newPolygon(vertices2, colors2, this, 3);
+
+    drawPolygon(this, triangle1);
+    saveBuffer(this, "screenshot1.bmp");
+    drawPolygon(this, triangle2);
+    saveBuffer(this, "screenshot2.bmp");
+
+    freePolygon(triangle1);
+    freePolygon(triangle2);
 }
 
 void saveBuffer(Renderer* this, const char* filename)

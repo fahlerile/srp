@@ -99,3 +99,9 @@ Color mixColorsBaryCoordPolygon(Polygon* this, double* barycentricCoordinates)
     Color color = Vector4dToColor(resColorV);
     return color;
 }
+
+bool isEdgeFlatTopOrLeftPolygon(Vector3d edge)
+{
+    return ((edge.x > 0) && (edge.y == 0)) ||  // is top
+           (edge.y < 0);                       // is left
+}

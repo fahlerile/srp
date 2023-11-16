@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv)
 {
-    Renderer* renderer = initialize(512, 512, 0);
+    Renderer* renderer = initialize(32, 32, 0);
     SDL_Event event;
     bool running = true;
 

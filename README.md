@@ -20,12 +20,17 @@ cd bin
 - [x] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR TRIANGLES
     - Yes, everything should work fine for any vertices' direction IN A TRIANGLE
 - [x] Fix a precision bug (set a tolerance compare for equality of sum of barycentric coordinates and 1)
-- [ ] Test for different triangles (both clockwise and anticlockwise)
-- [ ] Triangle rasterization convention (no overlapping)
+- [x] Test for different triangles (both clockwise and anticlockwise)
+- [x] Add triangle rasterization rules ([top-left](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules))
+- [ ] Test triangle rasterization rules
+    - [ ] Left/right edges touch
+    - [ ] Top/botom edges touch
+- [ ] Incremental computation
+- [ ] Refactor/clean
 
 - [ ] Polygon test
-- [x] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR CONVEX POLYGONS
 - [ ] Polygon rasterization convention (no overlapping)
+- [ ] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR CONVEX POLYGONS
 
 - [ ] Textures
 - [ ] Lighting
