@@ -83,6 +83,9 @@
         "stdio.h": "c",
         "utils.h": "c",
         "vector3.h": "c",
-        "vectors.h": "c"
+        "vectors.h": "c",
+        "color.h": "c",
+        "assert.h": "c",
+        "polygon.h": "c"
     }
 }

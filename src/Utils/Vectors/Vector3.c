@@ -4,27 +4,61 @@
 
 double Vector3dMagnitude(Vector3d a)
 {
-    return sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+    return sqrt(a.x * a.x +
+                a.y * a.y +
+                a.z * a.z);
 }
 
 Vector3d Vector3dAdd(Vector3d a, Vector3d b)
 {
-    return (Vector3d) {a.x + b.x, a.y + b.y, a.z + b.z};
+    return (Vector3d) {
+        a.x + b.x,
+        a.y + b.y,
+        a.z + b.z
+    };
 }
 
 Vector3d Vector3dSubtract(Vector3d a, Vector3d b)
 {
-    return (Vector3d) {a.x - b.x, a.y - b.y, a.z - b.z};
+    return (Vector3d) {
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z
+    };
+}
+
+Vector3d Vector3dMultiplyD(Vector3d a, double b)
+{
+    return (Vector3d) {
+        a.x * b,
+        a.y * b,
+        a.z * b
+    };
+}
+
+Vector3d Vector3dDivideD(Vector3d a, double b)
+{
+    return (Vector3d) {
+        a.x / b,
+        a.y / b,
+        a.z / b
+    };
 }
 
 Vector3d Vector3dNegate(Vector3d a)
 {
-    return (Vector3d) {-a.x, -a.y, -a.z};
+    return (Vector3d) {
+        -a.x,
+        -a.y,
+        -a.z
+    };
 }
 
 double Vector3dDot(Vector3d a, Vector3d b)
 {
-    return a.x * b.x + a.y * b.y + a.z * b.z;
+    return a.x * b.x +
+           a.y * b.y +
+           a.z * b.z;
 }
 
 Vector3d Vector3dCross(Vector3d a, Vector3d b)

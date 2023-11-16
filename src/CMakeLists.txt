@@ -11,8 +11,10 @@ set(
   Utils/MemoryUtils/MemoryUtils.c
   Utils/NDC.c
   Utils/Array.c
+  Utils/Color.c
   Utils/Vectors/Vector2.c
   Utils/Vectors/Vector3.c
+  Utils/Vectors/Vector4.c
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")

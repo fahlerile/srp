@@ -40,30 +40,26 @@ void drawPixel(Renderer* this, Vector2i point, Color color)
     SDL_RenderDrawPoint(this->internal_renderer, point.x, point.y);
 }
 
-// `polygon` should have NDC vertices!
 void drawPolygon(Renderer* this, Polygon* polygon)
 {
     Vector3d minPoint, maxPoint;
     getBoundingPointsPolygon(polygon, &minPoint, &maxPoint);
 
-    double* barycentricCoordinatesX2 = allocate(polygon->n * sizeof(double));
+    double* barycentricCoordinates = allocate(polygon->n * sizeof(double));
     for (int x = minPoint.x; x < maxPoint.x; x++)
     {
         for (int y = minPoint.y; y < maxPoint.y; y++)
         {
-            calculateBarycentricCoordinatesX2Polygon(polygon, (Vector3d) {x, y, 0.}, barycentricCoordinatesX2);
-            double sum = sumOfArrayDouble(barycentricCoordinatesX2, polygon->n);
-            if (sum == polygon->areaX2)
-                drawPixel(this, (Vector2i) {x, y}, polygon->colors[0]);
+            calculateBarycentricCoordinatesPolygon(polygon, (Vector3d) {x, y, 0.}, barycentricCoordinates);
+            double sum = sumOfArrayDouble(barycentricCoordinates, polygon->n);
+            if (sum == 1)
+            {
+                Color color = mixColorsBaryCoordPolygon(polygon, barycentricCoordinates);
+                drawPixel(this, (Vector2i) {x, y}, color);
+            }
         }
     }
-    free(barycentricCoordinatesX2);
-}
-
-void clearBuffer(Renderer* this, Color color)
-{
-    setColor(this, color);
-    SDL_RenderClear(this->internal_renderer);
+    free(barycentricCoordinates);
 }
 
 void drawToBuffer(Renderer* this)
@@ -74,9 +70,9 @@ void drawToBuffer(Renderer* this)
         (Vector3d) {-0.5, -0.5, 0.}
     };
     Color colors[3] = {
-        (Color) {255, 255, 255, 255},
-        (Color) {255, 255, 255, 255},
-        (Color) {255, 255, 255, 255}
+        (Color) {255,   0,   0, 255},
+        (Color) {  0, 255,   0, 255},
+        (Color) {  0,   0, 255, 255}
     };
 
     Polygon* triangle = newPolygon(vertices, colors, this, 3);
@@ -84,7 +80,22 @@ void drawToBuffer(Renderer* this)
     freePolygon(triangle);
 }
 
+void saveBuffer(Renderer* this, const char* filename)
+{
+    Vector2i dimensions = getWindowDimensions(this);
+    SDL_Surface* shot = SDL_CreateRGBSurface(0, dimensions.x, dimensions.y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    SDL_RenderReadPixels(this->internal_renderer, NULL, SDL_PIXELFORMAT_ARGB8888, shot->pixels, shot->pitch);
+    SDL_SaveBMP(shot, filename);
+    SDL_FreeSurface(shot);
+}
+
 void swapBuffer(Renderer* this)
 {
     SDL_RenderPresent(this->internal_renderer);
+}
+
+void clearBuffer(Renderer* this, Color color)
+{
+    setColor(this, color);
+    SDL_RenderClear(this->internal_renderer);
 }

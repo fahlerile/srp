@@ -14,9 +14,10 @@ int main(int argc, char** argv)
     SDL_Event event;
     bool running = true;
 
-    // Draw once - loop forever
+    // Draw once & save - then loop forever
     clearBuffer(renderer, (Color) {0, 0, 0, 255});
     drawToBuffer(renderer);
+    saveBuffer(renderer, "screenshot.bmp");
     swapBuffer(renderer);
     while (running)
     {

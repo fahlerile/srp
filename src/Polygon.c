@@ -77,11 +77,25 @@ void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max)
     *max = res_max;
 }
 
-void calculateBarycentricCoordinatesX2Polygon(Polygon* this, Vector3d point, double* barycentricCoordinatesX2)
+void calculateBarycentricCoordinatesPolygon(Polygon* this, Vector3d point, double* barycentricCoordinates)
 {
     for (size_t i = 0; i < this->n; i++)
     {
-        Vector3d vertexToPoint = Vector3dSubtract(point, this->vertices[i]);
-        barycentricCoordinatesX2[i] = Vector3dMagnitude(Vector3dCross(vertexToPoint, this->edgeVectors[i]));
+        size_t index = (i+1 == this->n) ? 0 : i+1;
+        Vector3d vertexToPoint = Vector3dSubtract(point, this->vertices[index]);
+        barycentricCoordinates[i] = Vector3dMagnitude(Vector3dCross(vertexToPoint, this->edgeVectors[index])) / this->areaX2;
     }
+}
+
+Color mixColorsBaryCoordPolygon(Polygon* this, double* barycentricCoordinates)
+{
+    Vector4d resColorV = {0};  // result color vector
+    for (size_t i = 0; i < this->n; i++)
+    {
+        Vector4d curColorAsVector4d = ColorToVector4d(this->colors[i]);
+        Vector4d weighted = Vector4dMultiplyD(curColorAsVector4d, barycentricCoordinates[i]);
+        resColorV = Vector4dAdd(resColorV, weighted);
+    }
+    Color color = Vector4dToColor(resColorV);
+    return color;
 }

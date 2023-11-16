@@ -20,10 +20,10 @@ Vector2i getWindowDimensions(Renderer* this);
 void setColor(Renderer* this, Color color);
 
 void drawPixel(Renderer* this, Vector2i point, Color color);
-
-// `polygon` should have NDC vertices!
 void drawPolygon(Renderer* this, Polygon* polygon);
 
-void clearBuffer(Renderer* this, Color color);
-void swapBuffer(Renderer* this);
 void drawToBuffer(Renderer* this);
+// Save buffer as a BMP screenshot
+void saveBuffer(Renderer* this, const char* filename);
+void swapBuffer(Renderer* this);
+void clearBuffer(Renderer* this, Color color);

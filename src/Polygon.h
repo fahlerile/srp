@@ -20,4 +20,5 @@ void freePolygon(Polygon* this);
 // max = {max_x, max_y, max_z}
 void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max);
 
-void calculateBarycentricCoordinatesX2Polygon(Polygon* this, Vector3d point, double* barycentricCoordinatesX2);
+void calculateBarycentricCoordinatesPolygon(Polygon* this, Vector3d point, double* barycentricCoordinatesX2);
+Color mixColorsBaryCoordPolygon(Polygon* this, double* barycentricCoordinatesX2);
