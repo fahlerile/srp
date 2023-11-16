@@ -65,7 +65,7 @@ void drawPolygon(Renderer* this, Polygon* polygon)
 void drawToBuffer(Renderer* this)
 {
     Vector3d vertices[3] = {
-        (Vector3d) { 0.,   0.5, 0.},
+        (Vector3d) { 0.7,  0.5, 0.},
         (Vector3d) { 0.5, -0.5, 0.},
         (Vector3d) {-0.5, -0.5, 0.}
     };

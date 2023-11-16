@@ -1,6 +1,7 @@
 #pragma once
 #include "Utils/Utils.h"
 
+// Should be convex
 typedef struct
 {
     Vector3d* vertices;

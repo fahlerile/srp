@@ -20,13 +20,13 @@ Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_
 
     // Calculate `edgeVectors`
     for (size_t i = 0; i < n; i++)
-        this->edgeVectors[i] = Vector3dSubtract(vertices[(i == n-1) ? 0 : i+1], vertices[i]);
+        this->edgeVectors[i] = Vector3dSubtract(vertices[(i+1 == n) ? 0 : i+1], vertices[i]);
 
     // Calculate `areaX2`
     if (n == 3)
     {
         this->areaX2 = Vector3dMagnitude(
-            Vector3dCross(this->edgeVectors[0], Vector3dNegate(this->edgeVectors[2]))
+            Vector3dCross(this->edgeVectors[0], this->edgeVectors[2])
         );
     }
     else  // NOT TESTED!
@@ -36,7 +36,7 @@ Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_
         {
             double areaOfThisSubtriangleX2 = Vector3dMagnitude(Vector3dCross(
                 Vector3dSubtract(this->vertices[0], this->vertices[i]),
-                Vector3dNegate(this->edgeVectors[i-1])
+                this->edgeVectors[i-1]
             ));
             this->areaX2 += areaOfThisSubtriangleX2;
         }
@@ -82,8 +82,8 @@ void calculateBarycentricCoordinatesPolygon(Polygon* this, Vector3d point, doubl
     for (size_t i = 0; i < this->n; i++)
     {
         size_t index = (i+1 == this->n) ? 0 : i+1;
-        Vector3d vertexToPoint = Vector3dSubtract(point, this->vertices[index]);
-        barycentricCoordinates[i] = Vector3dMagnitude(Vector3dCross(vertexToPoint, this->edgeVectors[index])) / this->areaX2;
+        Vector3d nextVertexToPoint = Vector3dSubtract(point, this->vertices[index]);
+        barycentricCoordinates[i] = Vector3dMagnitude(Vector3dCross(nextVertexToPoint, this->edgeVectors[index])) / this->areaX2;
     }
 }
 

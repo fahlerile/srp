@@ -17,9 +17,15 @@ cd bin
 
 ## TODO
 - [x] Triangle color shading
+- [x] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR TRIANGLES
+    - Yes, everything should work fine for any vertices' direction IN A TRIANGLE
+- [ ] Test for different triangles (both clockwise and anticlockwise), fix precision bugs
 - [ ] Triangle rasterization convention (no overlapping)
+
 - [ ] Polygon test
+- [x] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR CONVEX POLYGONS
 - [ ] Polygon rasterization convention (no overlapping)
+
 - [ ] Textures
 - [ ] Lighting
 - [ ] Shadows
