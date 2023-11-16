@@ -9,5 +9,6 @@
 
 #include "Color.h"
 #include "Array.h"
+#include "compares.h"
+#include "MemoryUtils.h"
 #include "Vectors/Vectors.h"
-#include "MemoryUtils/MemoryUtils.h"

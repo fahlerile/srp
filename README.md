@@ -19,7 +19,8 @@ cd bin
 - [x] Triangle color shading
 - [x] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR TRIANGLES
     - Yes, everything should work fine for any vertices' direction IN A TRIANGLE
-- [ ] Test for different triangles (both clockwise and anticlockwise), fix precision bugs
+- [x] Fix a precision bug (set a tolerance compare for equality of sum of barycentric coordinates and 1)
+- [ ] Test for different triangles (both clockwise and anticlockwise)
 - [ ] Triangle rasterization convention (no overlapping)
 
 - [ ] Polygon test

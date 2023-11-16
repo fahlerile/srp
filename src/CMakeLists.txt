@@ -8,10 +8,11 @@ set(
 
   Polygon.c
 
-  Utils/MemoryUtils/MemoryUtils.c
+  Utils/MemoryUtils.c
   Utils/NDC.c
   Utils/Array.c
   Utils/Color.c
+  Utils/compares.c
   Utils/Vectors/Vector2.c
   Utils/Vectors/Vector3.c
   Utils/Vectors/Vector4.c

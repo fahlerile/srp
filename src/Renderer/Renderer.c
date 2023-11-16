@@ -52,7 +52,7 @@ void drawPolygon(Renderer* this, Polygon* polygon)
         {
             calculateBarycentricCoordinatesPolygon(polygon, (Vector3d) {x, y, 0.}, barycentricCoordinates);
             double sum = sumOfArrayDouble(barycentricCoordinates, polygon->n);
-            if (sum == 1)
+            if (roughlyEqualD(sum, 1))
             {
                 Color color = mixColorsBaryCoordPolygon(polygon, barycentricCoordinates);
                 drawPixel(this, (Vector2i) {x, y}, color);
