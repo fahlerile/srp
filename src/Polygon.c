@@ -39,19 +39,22 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Renderer* renderer)
             Vector3dZeroZ(Vector3dNegate(this->vertices[0]))
         ).z
     };
+    this->baryCoordsZero = Vector3dDivideD(this->baryCoordsZero, this->areaX2);
 
     // Calculate `baryDelta`'s
     this->baryDeltaX = (Vector3d) {
         this->vertices[1].y - this->vertices[2].y,
         this->vertices[2].y - this->vertices[0].y,
-        this->vertices[1].y - this->vertices[1].y
+        this->vertices[0].y - this->vertices[1].y
     };
+    this->baryDeltaX = Vector3dDivideD(this->baryDeltaX, this->areaX2);
 
     this->baryDeltaY = (Vector3d) {
         this->vertices[2].x - this->vertices[1].x,
         this->vertices[0].x - this->vertices[2].x,
         this->vertices[1].x - this->vertices[0].x
     };
+    this->baryDeltaY = Vector3dDivideD(this->baryDeltaY, this->areaX2);
 
     return this;
 }

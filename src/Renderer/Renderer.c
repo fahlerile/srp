@@ -54,9 +54,9 @@ void drawTriangle(Renderer* this, Triangle* tri)
         Vector3dMultiplyD(tri->baryDeltaY, minPoint.y)
     );
 
-    for (int x = minPoint.x; x < maxPoint.x; x++)
+    for (int y = minPoint.y; y < maxPoint.y; y++)
     {
-        for (int y = minPoint.y; y < maxPoint.y; y++)
+        for (int x = minPoint.x; x < maxPoint.x; x++)
         {
             double sumBarycentric = 0;
             for (size_t i = 0; i < 3; i++)
@@ -74,9 +74,10 @@ void drawTriangle(Renderer* this, Triangle* tri)
                 drawPixel(this, (Vector2i) {x, y}, mixColorsBaryCoordTriangle(tri, barycentricCoordinates));
 
             nextPixel:
-            barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaY);
+            barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaX);
         }
-        barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaX);
+        barycentricCoordinates = Vector3dSubtract(barycentricCoordinates, Vector3dMultiplyD(tri->baryDeltaX, maxPoint.x - minPoint.x));
+        barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaY);
     }
 }
 
