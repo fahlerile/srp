@@ -45,22 +45,13 @@ void drawTriangle(Renderer* this, Triangle* tri)
     Vector3d minPoint, maxPoint;
     getBoundingPointsTriangle(tri, &minPoint, &maxPoint);
     // We want to loop over CENTERS of the pixels
-    minPoint.x += 0.5;
-    minPoint.y += 0.5;
-    maxPoint.x += 0.5;
-    maxPoint.y += 0.5;
-
-    // Set initial barycentric coordinates
-    Vector3d barycentricCoordinates = Vector3dAdd(
-        Vector3dAdd(
-            tri->baryCoordsZero,
-            Vector3dMultiplyD(tri->baryDeltaX, minPoint.x)
-        ),
-        Vector3dMultiplyD(tri->baryDeltaY, minPoint.y)
-    );
+    minPoint = Vector3dAdd(minPoint, (Vector3d) {0.5, 0.5, 0});
+    maxPoint = Vector3dAdd(maxPoint, (Vector3d) {0.5, 0.5, 0});
+    Vector3d barycentricCoordinates = initializeBarycentricCoordinatesTriangle(tri, minPoint);
 
     for (double y = minPoint.y; y < maxPoint.y; y += 1.0)
     {
+        Vector3d bCoordsAtBeginningOfRow = barycentricCoordinates;
         for (double x = minPoint.x; x < maxPoint.x; x += 1.0)
         {
             double sumBarycentric = 0;
@@ -81,7 +72,7 @@ void drawTriangle(Renderer* this, Triangle* tri)
             nextPixel:
             barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaX);
         }
-        barycentricCoordinates = Vector3dSubtract(barycentricCoordinates, Vector3dMultiplyD(tri->baryDeltaX, maxPoint.x - minPoint.x));
+        barycentricCoordinates = bCoordsAtBeginningOfRow;
         barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaY);
     }
 }

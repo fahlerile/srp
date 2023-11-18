@@ -25,12 +25,8 @@ cd bin
 - [x] Test triangle rasterization rules
     - [x] Left/right edges touch
     - [x] Top/botom edges touch
-- [ ] Incremental computation
+- [x] Incremental computation
 - [ ] Refactor/clean
-
-- [ ] Polygon test
-- [ ] Polygon rasterization convention (no overlapping)
-- [ ] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR CONVEX POLYGONS
 
 - [ ] Textures
 - [ ] Lighting

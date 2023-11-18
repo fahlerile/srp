@@ -29,3 +29,5 @@ void getBoundingPointsTriangle(Triangle* this, Vector3d* min, Vector3d* max);
 Color mixColorsBaryCoordTriangle(Triangle* this, Vector3d barycentricCoordinates);
 
 bool isEdgeFlatTopOrLeftTriangle(Vector3d edge);
+
+Vector3d initializeBarycentricCoordinatesTriangle(Triangle* this, Vector3d point);

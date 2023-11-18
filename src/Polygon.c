@@ -109,3 +109,14 @@ bool isEdgeFlatTopOrLeftTriangle(Vector3d edge)
     return ((edge.x > 0) && (edge.y == 0)) ||  // is top
            (edge.y < 0);                       // is left
 }
+
+Vector3d initializeBarycentricCoordinatesTriangle(Triangle* this, Vector3d point)
+{
+    return Vector3dAdd(
+        Vector3dAdd(
+            this->baryCoordsZero,
+            Vector3dMultiplyD(this->baryDeltaX, point.x)
+        ),
+        Vector3dMultiplyD(this->baryDeltaY, point.y)
+    );
+}
