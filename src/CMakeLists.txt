@@ -6,7 +6,8 @@ set(
   Renderer/Renderer.c
   MainUtils/MainUtils.c
 
-  Polygon.c
+  Triangle.c
+  Texture.c
 
   Utils/MemoryUtils.c
   Utils/NDC.c

@@ -26,7 +26,7 @@ cd bin
     - [x] Left/right edges touch
     - [x] Top/botom edges touch
 - [x] Incremental computation
-- [ ] Refactor/clean
+- [x] Refactor/clean
 
 - [ ] Textures
 - [ ] Lighting

@@ -86,6 +86,8 @@
         "vectors.h": "c",
         "color.h": "c",
         "assert.h": "c",
-        "polygon.h": "c"
+        "polygon.h": "c",
+        "array.h": "c",
+        "triangle.h": "c"
     }
 }

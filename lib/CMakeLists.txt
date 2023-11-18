@@ -14,3 +14,5 @@ target_link_libraries(
 
 target_include_directories(${EXECUTABLE_NAME} PUBLIC SDL2/include)
 file(COPY SDL2/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR}/bin/)  # copy .dll to bin directory
+
+target_include_directories(${EXECUTABLE_NAME} PUBLIC include)

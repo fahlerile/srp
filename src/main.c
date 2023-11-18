@@ -15,14 +15,14 @@ int main(int argc, char** argv)
     bool running = true;
 
     // Draw once & save - then loop forever
-    clearBuffer(renderer, (Color) {0, 0, 0, 255});
-    drawToBuffer(renderer);
-    saveBuffer(renderer, "screenshot.bmp");
-    swapBuffer(renderer);
+    rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});
+    rendererDrawToBuffer(renderer);
+    rendererSaveBuffer(renderer, "screenshot.bmp");
+    rendererSwapBuffer(renderer);
     while (running)
     {
         pollEvents(&running, &event);
-        swapBuffer(renderer);
+        rendererSwapBuffer(renderer);
     }
 
     deinitialize(renderer);

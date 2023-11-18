@@ -9,22 +9,22 @@ typedef struct
     SDL_Renderer* internal_renderer;
 } Renderer;
 
-#include "Polygon.h"  // circular dependency
+#include "Triangle.h"  // circular dependency
 
 // May return NULL on error
 Renderer* newRenderer(int width, int height, int flags);
 void freeRenderer(Renderer* this);
 
-Vector2i getWindowDimensions(Renderer* this);
+Vector2i rendererGetWindowDimensions(Renderer* this);
 
-void setColor(Renderer* this, Color color);
-void drawPixel(Renderer* this, Vector2i point, Color color);
+void rendererSetColor(Renderer* this, Color color);
+void rendererDrawPixel(Renderer* this, Vector2i point, Color color);
 
-void drawTriangle(Renderer* this, Triangle* polygon);
+void rendererDrawTriangle(Renderer* this, Triangle* tri);
 
 // A function to put draw calls in
-void drawToBuffer(Renderer* this);
+void rendererDrawToBuffer(Renderer* this);
 // Save buffer as a BMP screenshot
-void saveBuffer(Renderer* this, const char* filename);
-void swapBuffer(Renderer* this);
-void clearBuffer(Renderer* this, Color color);
+void rendererSaveBuffer(Renderer* this, const char* filename);
+void rendererSwapBuffer(Renderer* this);
+void rendererClearBuffer(Renderer* this, Color color);

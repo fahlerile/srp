@@ -1,10 +1,11 @@
 #include <float.h>
-#include "Polygon.h"
+#include "Triangle.h"
 #include "Utils/NDC.h"
 #include "Utils/Array.h"
 #include "Utils/Utils.h"
 
-Triangle* newTriangle(Vector3d* vertices, Color* colors, Renderer* renderer)
+Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV,
+                      TriangleType type, Renderer* renderer)
 {
     Triangle* this = allocate(sizeof(Triangle));
 
@@ -14,6 +15,9 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Renderer* renderer)
 
     this->edgeVectors = allocate(3 * sizeof(Vector3d));
     this->colors = colors;
+    this->texture = texture;
+    this->UV = UV;
+    this->type = type;
 
     // Calculate `edgeVectors`
     for (size_t i = 0; i < 3; i++)
@@ -65,7 +69,7 @@ void freeTriangle(Triangle* this)
     free(this);
 }
 
-void getBoundingPointsTriangle(Triangle* this, Vector3d* min, Vector3d* max)
+void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* max)
 {
     Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
     Vector3d res_max = {0};
@@ -91,7 +95,7 @@ void getBoundingPointsTriangle(Triangle* this, Vector3d* min, Vector3d* max)
     *max = res_max;
 }
 
-Color mixColorsBaryCoordTriangle(Triangle* this, Vector3d barycentricCoordinates)
+Color triangleInterpolateColor(Triangle* this, Vector3d barycentricCoordinates)
 {
     Vector4d resColorV = {0};  // result color vector
     for (size_t i = 0; i < 3; i++)
@@ -104,13 +108,24 @@ Color mixColorsBaryCoordTriangle(Triangle* this, Vector3d barycentricCoordinates
     return color;
 }
 
-bool isEdgeFlatTopOrLeftTriangle(Vector3d edge)
+Vector2d triangleInterpolateUV(Triangle* this, Vector3d barycentricCoordinates)
+{
+    Vector2d resUV = {0};
+    for (size_t i = 0; i < 3; i++)
+    {
+        Vector2d weighted = Vector2dMultiplyD(this->UV[i], Vector3dIndex(barycentricCoordinates, i));
+        resUV = Vector2dAdd(resUV, weighted);
+    }
+    return resUV;
+}
+
+bool triangleIsEdgeFlatTopOrLeft(Vector3d edge)
 {
     return ((edge.x > 0) && (edge.y == 0)) ||  // is top
            (edge.y < 0);                       // is left
 }
 
-Vector3d initializeBarycentricCoordinatesTriangle(Triangle* this, Vector3d point)
+Vector3d triangleInitializeBarycentricCoordinates(Triangle* this, Vector3d point)
 {
     return Vector3dAdd(
         Vector3dAdd(
