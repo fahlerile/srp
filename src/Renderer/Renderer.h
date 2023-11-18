@@ -20,7 +20,7 @@ Vector2i getWindowDimensions(Renderer* this);
 void setColor(Renderer* this, Color color);
 void drawPixel(Renderer* this, Vector2i point, Color color);
 
-void drawPolygon(Renderer* this, Polygon* polygon);
+void drawTriangle(Renderer* this, Triangle* polygon);
 
 // A function to put draw calls in
 void drawToBuffer(Renderer* this);

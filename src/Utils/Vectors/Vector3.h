@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 typedef struct
 {
@@ -18,3 +19,8 @@ Vector3d Vector3dDivideD  (Vector3d a, double b);
 Vector3d Vector3dNegate   (Vector3d a);
 double   Vector3dDot      (Vector3d a, Vector3d b);
 Vector3d Vector3dCross    (Vector3d a, Vector3d b);
+
+double Vector3dIndex(Vector3d a, size_t i);
+
+// Return (Vector3d) {a.x, a.y, 0}
+Vector3d Vector3dZeroZ(Vector3d a);

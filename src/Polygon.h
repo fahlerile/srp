@@ -8,21 +8,24 @@ typedef struct
     Vector3d* edgeVectors;
     Color* colors;
     double areaX2;
-    size_t n;
-} Polygon;
+    // Barycentric coordinates for point (0, 0), used for incremental computation
+    Vector3d baryCoordsZero;
+    // Delta values for incremental computation of barycentric coordinates
+    Vector3d baryDeltaX;
+    Vector3d baryDeltaY;
+} Triangle;
 
 #include "Renderer/Renderer.h"  // circular dependency
 
 // `vertices` must be NDC and clockwise!
-Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_t n);
-void freePolygon(Polygon* this);
+Triangle* newTriangle(Vector3d* vertices, Color* colors, Renderer* renderer);
+void freeTriangle(Triangle* this);
 
 // min = {min_x, min_y, min_z},
 // max = {max_x, max_y, max_z}
-void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max);
+void getBoundingPointsTriangle(Triangle* this, Vector3d* min, Vector3d* max);
 
-void calculateBarycentricCoordinatesPolygon(Polygon* this, Vector3d point, double* barycentricCoordinates);
 // Mix polygon's vertices' colors with weights (barycentrtic coordinates)
-Color mixColorsBaryCoordPolygon(Polygon* this, double* barycentricCoordinates);
+Color mixColorsBaryCoordTriangle(Triangle* this, Vector3d barycentricCoordinates);
 
-bool isEdgeFlatTopOrLeftPolygon(Vector3d edge);
+bool isEdgeFlatTopOrLeftTriangle(Vector3d edge);

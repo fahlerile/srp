@@ -78,3 +78,20 @@ Color Vector4dToColor(Vector4d a)
         (a.w > 255) ? 255 : a.w
     };
 }
+
+double Vector4dIndex(Vector4d a, size_t i)
+{
+    switch (i)
+    {
+        case 0:
+            return a.x;
+        case 1:
+            return a.y;
+        case 2:
+            return a.z;
+        case 3:
+            return a.w;
+        default:
+            assert(false);
+    }
+}

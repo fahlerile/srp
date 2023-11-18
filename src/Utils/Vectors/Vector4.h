@@ -21,3 +21,5 @@ Vector4d Vector4dNegate   (Vector4d a);
 double   Vector4dDot      (Vector4d a, Vector4d b);
 
 Color Vector4dToColor(Vector4d a);
+
+double Vector4dIndex(Vector4d a, size_t i);

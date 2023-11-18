@@ -22,9 +22,9 @@ cd bin
 - [x] Fix a precision bug (set a tolerance compare for equality of sum of barycentric coordinates and 1)
 - [x] Test for different triangles (both clockwise and anticlockwise)
 - [x] Add triangle rasterization rules ([top-left](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules))
-- [ ] Test triangle rasterization rules
-    - [ ] Left/right edges touch
-    - [ ] Top/botom edges touch
+- [x] Test triangle rasterization rules
+    - [x] Left/right edges touch
+    - [x] Top/botom edges touch
 - [ ] Incremental computation
 - [ ] Refactor/clean
 

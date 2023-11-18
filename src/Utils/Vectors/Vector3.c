@@ -69,3 +69,25 @@ Vector3d Vector3dCross(Vector3d a, Vector3d b)
         a.x * b.y - a.y * b.x
     };
 }
+
+double Vector3dIndex(Vector3d a, size_t i)
+{
+    switch (i)
+    {
+        case 0:
+            return a.x;
+        case 1:
+            return a.y;
+        case 2:
+            return a.z;
+        default:
+            assert(false);
+    }
+}
+
+Vector3d Vector3dZeroZ(Vector3d a)
+{
+    return (Vector3d) {
+        a.x, a.y, 0
+    };
+}

@@ -50,3 +50,16 @@ double Vector2dDot(Vector2d a, Vector2d b)
     return a.x * b.x +
            a.y * b.y;
 }
+
+double Vector2dIndex(Vector2d a, size_t i)
+{
+    switch (i)
+    {
+        case 0:
+            return a.x;
+        case 1:
+            return a.y;
+        default:
+            assert(false);
+    }
+}

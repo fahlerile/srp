@@ -40,67 +40,65 @@ void drawPixel(Renderer* this, Vector2i point, Color color)
     SDL_RenderDrawPoint(this->internal_renderer, point.x, point.y);
 }
 
-void drawPolygon(Renderer* this, Polygon* polygon)
+void drawTriangle(Renderer* this, Triangle* tri)
 {
     Vector3d minPoint, maxPoint;
-    getBoundingPointsPolygon(polygon, &minPoint, &maxPoint);
+    getBoundingPointsTriangle(tri, &minPoint, &maxPoint);
 
-    double* barycentricCoordinates = allocate(polygon->n * sizeof(double));
+    // Set initial barycentric coordinates
+    Vector3d barycentricCoordinates = Vector3dAdd(
+        Vector3dAdd(
+            tri->baryCoordsZero,
+            Vector3dMultiplyD(tri->baryDeltaX, minPoint.x)
+        ),
+        Vector3dMultiplyD(tri->baryDeltaY, minPoint.y)
+    );
+
     for (int x = minPoint.x; x < maxPoint.x; x++)
     {
         for (int y = minPoint.y; y < maxPoint.y; y++)
         {
             double sumBarycentric = 0;
-            for (size_t i = 0; i < polygon->n; i++)
+            for (size_t i = 0; i < 3; i++)
             {
-                size_t index = (i+1) % polygon->n;
-                Vector3d nextVertexToPoint = Vector3dSubtract((Vector3d) {x, y, 0}, polygon->vertices[index]);
-                nextVertexToPoint.z = 0;
-                Vector3d edge = polygon->edgeVectors[index];
-                edge.z = 0;
-                barycentricCoordinates[i] = Vector3dCross(edge, nextVertexToPoint).z / polygon->areaX2;
-
-                if (barycentricCoordinates[i] < 0 || (barycentricCoordinates[i] == 0 && !isEdgeFlatTopOrLeftPolygon(polygon->edgeVectors[index])))
+                size_t edgeIndex = (i+1) % 3;  // index of edge in front of current vertex
+                bool isWrongHalfPlane = Vector3dIndex(barycentricCoordinates, i) < 0;
+                bool doesLieOnEdgeNotFlatTopOrLeft = Vector3dIndex(barycentricCoordinates, i) == 0 && \
+                                                     !isEdgeFlatTopOrLeftTriangle(tri->edgeVectors[edgeIndex]);
+                if (isWrongHalfPlane || doesLieOnEdgeNotFlatTopOrLeft)
                     goto nextPixel;
-
-                sumBarycentric += barycentricCoordinates[i];
+                sumBarycentric += Vector3dIndex(barycentricCoordinates, i);
             }
 
             if (roughlyEqualD(sumBarycentric, 1))
-                drawPixel(this, (Vector2i) {x, y}, mixColorsBaryCoordPolygon(polygon, barycentricCoordinates));
+                drawPixel(this, (Vector2i) {x, y}, mixColorsBaryCoordTriangle(tri, barycentricCoordinates));
 
-            nextPixel:;
+            nextPixel:
+            barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaY);
         }
+        barycentricCoordinates = Vector3dAdd(barycentricCoordinates, tri->baryDeltaX);
     }
-    free(barycentricCoordinates);
 }
 
 void drawToBuffer(Renderer* this)
 {
     Color white = {255, 255, 255, 255};
-    Color red = {255, 0, 0, 255};
 
     Vector3d v0 = {-0.5, -0.5, 0.};
-    Vector3d v1 = {-0.5,  0.5, 0.};
-    Vector3d v2 = { 0.5,  0.5, 0.};
-    Vector3d v3 = { 0.5, -0.5, 0.};
+    Vector3d v1 = { 0.,   0.5, 0.};
+    Vector3d v2 = { 0.5, -0.5, 0.};
 
-    Vector3d vertices1[3] = {v0, v1, v3};
-    Color colors1[3] = {white, white, white};
+    Vector3d vertices[3] = {v0, v1, v2};
+    Color colors[3] = {
+        {255,   0,   0, 255},
+        {  0, 255,   0, 255},
+        {  0,   0, 255, 255}
+    };
 
-    Vector3d vertices2[3] = {v1, v2, v3};
-    Color colors2[3] = {red, red, red};
+    Triangle* triangle = newTriangle(vertices, colors, this);
 
-    Polygon* triangle1 = newPolygon(vertices1, colors1, this, 3);
-    Polygon* triangle2 = newPolygon(vertices2, colors2, this, 3);
-
-    drawPolygon(this, triangle1);
-    saveBuffer(this, "screenshot1.bmp");
-    drawPolygon(this, triangle2);
-    saveBuffer(this, "screenshot2.bmp");
-
-    freePolygon(triangle1);
-    freePolygon(triangle2);
+    drawTriangle(this, triangle);
+    freeTriangle(triangle);
 }
 
 void saveBuffer(Renderer* this, const char* filename)

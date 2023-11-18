@@ -4,59 +4,70 @@
 #include "Utils/Array.h"
 #include "Utils/Utils.h"
 
-Polygon* newPolygon(Vector3d* vertices, Color* colors, Renderer* renderer, size_t n)
+Triangle* newTriangle(Vector3d* vertices, Color* colors, Renderer* renderer)
 {
-    assert(n >= 3);
-
-    Polygon* this = allocate(sizeof(Polygon));
+    Triangle* this = allocate(sizeof(Triangle));
 
     this->vertices = vertices;
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < 3; i++)
         this->vertices[i] = NDCtoScreenSpace(renderer, vertices[i]);
 
-    this->edgeVectors = allocate(n * sizeof(Vector3d));
+    this->edgeVectors = allocate(3 * sizeof(Vector3d));
     this->colors = colors;
-    this->n = n;
 
     // Calculate `edgeVectors`
-    for (size_t i = 0; i < n; i++)
-        this->edgeVectors[i] = Vector3dSubtract(vertices[(i+1 == n) ? 0 : i+1], vertices[i]);
+    for (size_t i = 0; i < 3; i++)
+        this->edgeVectors[i] = Vector3dSubtract(vertices[(i+1 == 3) ? 0 : i+1], vertices[i]);
 
     // Calculate `areaX2`
-    if (n == 3)
-    {
-        this->areaX2 = Vector3dMagnitude(
-            Vector3dCross(this->edgeVectors[0], this->edgeVectors[2])
-        );
-    }
-    else  // NOT TESTED!
-    {
-        this->areaX2 = 0;
-        for (size_t i = 2; i < n; i++)
-        {
-            double areaOfThisSubtriangleX2 = Vector3dMagnitude(Vector3dCross(
-                Vector3dSubtract(this->vertices[0], this->vertices[i]),
-                this->edgeVectors[i-1]
-            ));
-            this->areaX2 += areaOfThisSubtriangleX2;
-        }
-    }
+    this->areaX2 = Vector3dMagnitude(
+        Vector3dCross(this->edgeVectors[0], this->edgeVectors[2])
+    );
+
+    // Calculate `baryCoordsZero`
+    this->baryCoordsZero = (Vector3d) {
+        Vector3dCross(
+            Vector3dZeroZ(this->edgeVectors[1]),
+            Vector3dZeroZ(Vector3dNegate(this->vertices[1]))
+        ).z,
+        Vector3dCross(
+            Vector3dZeroZ(this->edgeVectors[2]),
+            Vector3dZeroZ(Vector3dNegate(this->vertices[2]))
+        ).z,
+        Vector3dCross(
+            Vector3dZeroZ(this->edgeVectors[0]),
+            Vector3dZeroZ(Vector3dNegate(this->vertices[0]))
+        ).z
+    };
+
+    // Calculate `baryDelta`'s
+    this->baryDeltaX = (Vector3d) {
+        this->vertices[1].y - this->vertices[2].y,
+        this->vertices[2].y - this->vertices[0].y,
+        this->vertices[1].y - this->vertices[1].y
+    };
+
+    this->baryDeltaY = (Vector3d) {
+        this->vertices[2].x - this->vertices[1].x,
+        this->vertices[0].x - this->vertices[2].x,
+        this->vertices[1].x - this->vertices[0].x
+    };
 
     return this;
 }
 
-void freePolygon(Polygon* this)
+void freeTriangle(Triangle* this)
 {
     free(this->edgeVectors);
     free(this);
 }
 
-void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max)
+void getBoundingPointsTriangle(Triangle* this, Vector3d* min, Vector3d* max)
 {
     Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
     Vector3d res_max = {0};
 
-    for (size_t i = 0; i < this->n; i++)
+    for (size_t i = 0; i < 3; i++)
     {
         if (this->vertices[i].x < res_min.x)
             res_min.x = this->vertices[i].x;
@@ -77,30 +88,20 @@ void getBoundingPointsPolygon(Polygon* this, Vector3d* min, Vector3d* max)
     *max = res_max;
 }
 
-void calculateBarycentricCoordinatesPolygon(Polygon* this, Vector3d point, double* barycentricCoordinates)
-{
-    for (size_t i = 0; i < this->n; i++)
-    {
-        size_t index = (i+1 == this->n) ? 0 : i+1;
-        Vector3d nextVertexToPoint = Vector3dSubtract(point, this->vertices[index]);
-        barycentricCoordinates[i] = Vector3dMagnitude(Vector3dCross(nextVertexToPoint, this->edgeVectors[index])) / this->areaX2;
-    }
-}
-
-Color mixColorsBaryCoordPolygon(Polygon* this, double* barycentricCoordinates)
+Color mixColorsBaryCoordTriangle(Triangle* this, Vector3d barycentricCoordinates)
 {
     Vector4d resColorV = {0};  // result color vector
-    for (size_t i = 0; i < this->n; i++)
+    for (size_t i = 0; i < 3; i++)
     {
         Vector4d curColorAsVector4d = ColorToVector4d(this->colors[i]);
-        Vector4d weighted = Vector4dMultiplyD(curColorAsVector4d, barycentricCoordinates[i]);
+        Vector4d weighted = Vector4dMultiplyD(curColorAsVector4d, Vector3dIndex(barycentricCoordinates, i));
         resColorV = Vector4dAdd(resColorV, weighted);
     }
     Color color = Vector4dToColor(resColorV);
     return color;
 }
 
-bool isEdgeFlatTopOrLeftPolygon(Vector3d edge)
+bool isEdgeFlatTopOrLeftTriangle(Vector3d edge)
 {
     return ((edge.x > 0) && (edge.y == 0)) ||  // is top
            (edge.y < 0);                       // is left
