@@ -6,38 +6,21 @@
 Texture* newTexture(const char* filename)
 {
     Texture* this = allocate(sizeof(Texture));
-
     int w, h, n;
-    unsigned char *data = stbi_load(filename, &w, &h, &n, 0);
-    if (data == NULL)
+    this->data = (Color*) stbi_load(filename, &w, &h, &n, 0);
+    if (this->data == NULL)
     {
         fprintf(stderr, "Failed to open %s, aborting...\n", filename);
         abort();
     }
-    assert(n == 3 || n == 4);
-
+    assert(n == 4);
     this->dimensions = (Vector2i) {w, h};
-    int nBytes = w * h * n;
-    this->data = allocate(w * h * sizeof(Color));
-
-    for (int i = 0, pixelIndex = 0; i < nBytes; i += n, pixelIndex++)
-    {
-        Color color = (Color) {
-            data[i],
-            data[i+1],
-            data[i+2],
-            (n == 3) ? 255 : data[i+3]
-        };
-        this->data[pixelIndex] = color;
-    }
-    stbi_image_free(this->data);
-
     return this;
 }
 
 void freeTexture(Texture* this)
 {
-    free(this->data);
+    stbi_image_free(this->data);
     free(this);
 }
 

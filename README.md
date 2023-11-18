@@ -27,11 +27,8 @@ cd bin
     - [x] Top/botom edges touch
 - [x] Incremental computation
 - [x] Refactor/clean
-
-- [ ] Textures
-- [ ] Lighting
-- [ ] Shadows
-- [ ] Transformation matrices
+- [x] Textures
+- [ ] Think of a way to structure and convert to NDC space world space meshes
 
 ## Issues
 - SEGV if `-march=native` compiler flag is set (NULL dereferencing in the assembly of `mixColorsBaryCoordPolygon`)
