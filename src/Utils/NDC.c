@@ -1,5 +1,5 @@
 #include "NDC.h"
-#include "Renderer/Renderer.h"
+#include "Renderer.h"
 
 Vector3d NDCtoScreenSpace(Renderer* renderer, Vector3d NDC)
 {

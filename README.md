@@ -1,6 +1,6 @@
 # rasterizer
 
-A rasterizer in C. Is able to draw shaded triangles in screen-space for now.
+A rasterizer in C. Is able to draw shaded or textured triangles in screen-space for now.
 
 ## Building
 
@@ -28,7 +28,13 @@ cd bin
 - [x] Incremental computation
 - [x] Refactor/clean
 - [x] Textures
-- [ ] Think of a way to structure and convert to NDC space world space meshes
+- [ ] Think of a way to structure world space meshes
+- [ ] Vertex data parser (.obj?)
+- [ ] Matrices
+- [ ] Perspective projection
+- [ ] Depth buffer
+- [ ] Lighting
+- [ ] Shadows
 
 ## Issues
 - SEGV if `-march=native` compiler flag is set (NULL dereferencing in the assembly of `mixColorsBaryCoordPolygon`)

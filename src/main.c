@@ -1,11 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
+#include "Utils/Utils.h"
 #define SDL_MAIN_HANDLED
 #include "SDL2/SDL.h"
-
-#include "Renderer/Renderer.h"
+#include "Renderer.h"
 #include "MainUtils/MainUtils.h"
 
 int main(int argc, char** argv)

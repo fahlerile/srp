@@ -26,7 +26,7 @@ typedef struct
     Vector3d baryDeltaY;
 } Triangle;
 
-#include "Renderer/Renderer.h"  // circular dependency
+#include "Renderer.h"  // circular dependency
 
 // `vertices` must be NDC and clockwise!
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV,

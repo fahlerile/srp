@@ -88,6 +88,12 @@
         "assert.h": "c",
         "polygon.h": "c",
         "array.h": "c",
-        "triangle.h": "c"
+        "triangle.h": "c",
+        "memoryutils.h": "c",
+        "vector4.h": "c",
+        "matrix.h": "c",
+        "stdint.h": "c",
+        "math.h": "c",
+        "mainutils.h": "c"
     }
 }

@@ -2,16 +2,15 @@ set(
   SOURCES
 
   main.c
-
-  Renderer/Renderer.c
   MainUtils/MainUtils.c
+  Renderer.c
 
   Triangle.c
   Texture.c
 
   Utils/MemoryUtils.c
   Utils/NDC.c
-  Utils/Array.c
+  Utils/Matrix.c
   Utils/Color.c
   Utils/compares.c
   Utils/Vectors/Vector2.c

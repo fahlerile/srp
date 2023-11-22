@@ -1,6 +1,9 @@
 #include <math.h>
+#include <stdbool.h>
+#include <assert.h>
+
 #include "Vector4.h"
-#include "Utils/Utils.h"
+#include "Utils/Color.h"
 
 double Vector4dMagnitude(Vector4d a)
 {

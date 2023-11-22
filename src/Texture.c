@@ -7,13 +7,12 @@ Texture* newTexture(const char* filename)
 {
     Texture* this = allocate(sizeof(Texture));
     int w, h, n;
-    this->data = (Color*) stbi_load(filename, &w, &h, &n, 0);
+    this->data = (Color*) stbi_load(filename, &w, &h, &n, 4);
     if (this->data == NULL)
     {
         fprintf(stderr, "Failed to open %s, aborting...\n", filename);
         abort();
     }
-    assert(n == 4);
     this->dimensions = (Vector2i) {w, h};
     return this;
 }
@@ -24,12 +23,12 @@ void freeTexture(Texture* this)
     free(this);
 }
 
-size_t texturePointToIndex(Texture* this, Vector2i point)
+size_t texturePixelToIndex(Texture* this, Vector2i point)
 {
     return point.y * this->dimensions.x + point.x;
 }
 
-Vector2i textureUVToPoint(Texture* this, Vector2d uvPoint)
+Vector2i textureUVToPixel(Texture* this, Vector2d uvPoint)
 {
     return (Vector2i) {
         this->dimensions.x * uvPoint.x,
@@ -39,12 +38,12 @@ Vector2i textureUVToPoint(Texture* this, Vector2d uvPoint)
 
 size_t textureUVToIndex(Texture* this, Vector2d uvPoint)
 {
-    return texturePointToIndex(this, textureUVToPoint(this, uvPoint));
+    return texturePixelToIndex(this, textureUVToPixel(this, uvPoint));
 }
 
-Color textureGetColorAtPoint(Texture* this, Vector2i point)
+Color textureGetColorAtPixel(Texture* this, Vector2i point)
 {
-    return this->data[texturePointToIndex(this, point)];
+    return this->data[texturePixelToIndex(this, point)];
 }
 
 Color textureGetColorAtUV(Texture* this, Vector2d uvPoint)

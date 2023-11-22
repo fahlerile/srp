@@ -1,6 +1,5 @@
-#include <stdbool.h>
 #include "SDL2/SDL.h"
-#include "Renderer/Renderer.h"
+#include "Renderer.h"
 #include "MainUtils.h"
 #include "Utils/Utils.h"
 #include "errorcodes.h"
