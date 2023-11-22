@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    double data[16];
+    double data[4][4];
 } Matrix4;
 
 static inline Vector4d Matrix4GetColumn(Matrix4* a, size_t i);

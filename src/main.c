@@ -11,6 +11,11 @@ int main(int argc, char** argv)
     SDL_Event event;
     bool running = true;
 
+    // Scene* world = newScene(viewMatrix);
+    // Model* teapot = newModel("res/models/utah_teapot.obj");
+    // modelAddInstance(teapot, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0});
+    // sceneAddModel(world, teapot);
+
     // Draw once & save - then loop forever
     rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});
     rendererDrawToBuffer(renderer);
