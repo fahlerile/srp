@@ -3,6 +3,8 @@
 #define SDL_MAIN_HANDLED
 #include "SDL2/SDL.h"
 #include "Renderer.h"
+#include "Scene.h"
+#include "Model.h"
 #include "MainUtils/MainUtils.h"
 
 int main(int argc, char** argv)
@@ -11,10 +13,14 @@ int main(int argc, char** argv)
     SDL_Event event;
     bool running = true;
 
-    // Scene* world = newScene(viewMatrix);
-    // Model* teapot = newModel("res/models/utah_teapot.obj");
-    // modelAddInstance(teapot, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0});
-    // sceneAddModel(world, teapot);
+    Matrix4 viewMatrix = Matrix4ConstructView((Vector3d) {0, 0, 0},
+                                              (Vector3d) {0, 0, 0},
+                                              (Vector3d) {0, 0, 0});
+    Scene* world = newScene(viewMatrix);
+    Model* teapot = newModel("res/models/utah_teapot.obj");
+    modelAddInstance(teapot, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0});
+    sceneAddModel(world, teapot);
+    freeSceneAndModels(world);
 
     // Draw once & save - then loop forever
     rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});

@@ -28,10 +28,11 @@ cd bin
 - [x] Incremental computation
 - [x] Refactor/clean
 - [x] Textures
-- [ ] Разобраться с хэдерами
 - [ ] Think of a way to structure world space meshes
     - [ ] I need a neat way to use dynamic-sized array, that is, some "`std::vector` alternative"
 - [ ] Vertex data parser (.obj?)
+- [ ] `Scene` struct
+- [ ] `Model` struct
 - [x] Matrices
 - [ ] Perspective projection
 - [ ] Depth buffer

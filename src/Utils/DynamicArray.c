@@ -50,6 +50,6 @@ void* indexDynamicArray(DynamicArray* this, size_t i)
 
 void freeDynamicArray(DynamicArray* this)
 {
-    free(this->data);
-    free(this);
+    xfree(this->data);
+    xfree(this);
 }

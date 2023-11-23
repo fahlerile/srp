@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "Utils/Utils.h"
 
 void* xmalloc(size_t n)
 {
@@ -9,6 +8,7 @@ void* xmalloc(size_t n)
         fprintf(stderr, "Failed to malloc %zu bytes, aborting\n", n);
         abort();
     }
+    LOGM("malloc(%zu) = %p\n", n, p);
     return p;
 }
 
@@ -20,6 +20,7 @@ void* xrealloc(void* ptr, size_t new_n)
         fprintf(stderr, "Failed to realloc for %zu bytes for %p, aborting\n", new_n, ptr);
         abort();
     }
+    LOGM("realloc(%p, %zu) = %p\n", ptr, new_n, p);
     return p;
 }
 
@@ -32,5 +33,12 @@ void* xcalloc(size_t n_elem, size_t n_bytes)
                 n_bytes, n_elem, n_bytes * n_elem);
         abort();
     }
+    LOGM("calloc(%zu, %zu) = %p\n", n_elem, n_bytes, p);
     return p;
+}
+
+void xfree(void* ptr)
+{
+    LOGM("free(%p)\n", ptr);
+    free(ptr);
 }

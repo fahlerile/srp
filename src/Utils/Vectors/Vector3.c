@@ -1,4 +1,3 @@
-#include <math.h>
 #include "Vector3.h"
 #include "Utils/Utils.h"
 
@@ -81,7 +80,8 @@ double Vector3dIndex(Vector3d a, size_t i)
         case 2:
             return a.z;
         default:
-            assert(false);
+            LOGE("Vector3d invalid index %zu", i);
+            abort();
     }
 }
 

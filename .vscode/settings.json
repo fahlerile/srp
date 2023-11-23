@@ -95,6 +95,9 @@
         "stdint.h": "c",
         "math.h": "c",
         "mainutils.h": "c",
-        "dynamicarray.h": "c"
+        "dynamicarray.h": "c",
+        "stdbool.h": "c",
+        "compares.h": "c",
+        "model.h": "c"
     }
 }

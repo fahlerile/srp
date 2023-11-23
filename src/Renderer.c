@@ -18,7 +18,7 @@ Renderer* newRenderer(int width, int height, int flags)
 
 void freeRenderer(Renderer* this)
 {
-    free(this);
+    xfree(this);
 }
 
 Vector2i rendererGetWindowDimensions(Renderer* this)
@@ -98,10 +98,11 @@ void rendererDrawToBuffer(Renderer* this)
     };
 
     Texture* texture = newTexture("minecraftBricks.png");
-    Triangle* triangle = newTriangle(vertices, NULL, texture, UV, TriangleTextured, this);
+    Triangle* triangle = newTriangle(vertices, NULL, texture, UV, this);
 
     rendererDrawTriangle(this, triangle);
     freeTriangle(triangle);
+    freeTexture(texture);
 }
 
 void rendererSaveBuffer(Renderer* this, const char* filename)

@@ -34,12 +34,12 @@ Vector4d Matrix4MultiplyVector4d(Matrix4* a, Vector4d b)
     return res;
 }
 
-Matrix4 Matrix4MultiplyMatrix4(Matrix4* a, Matrix4* b)
+Matrix4 Matrix4MultiplyMatrix4(Matrix4 a, Matrix4 b)
 {
     Matrix4 res = {0};
     for (size_t i = 0; i < 4; i++)
     {
-        Vector4d column = Matrix4MultiplyVector4d(a, Matrix4GetColumn(b, i));
+        Vector4d column = Matrix4MultiplyVector4d(&a, Matrix4GetColumn(&b, i));
         Matrix4SetColumn(&res, column, i);
     }
     return res;
@@ -58,50 +58,66 @@ Matrix4 Matrix4ConstructIdentity()
     return res;
 }
 
-Matrix4 Matrix4ConstructScale(double scaleX, double scaleY, double scaleZ)
+Matrix4 Matrix4ConstructScale(Vector3d scale)
 {
     Matrix4 res = {
         .data = {
-            {scaleX,      0,      0, 0},
-            {     0, scaleY,      0, 0},
-            {     0,      0, scaleZ, 0},
-            {     0,      0,    0,   1}
+            {scale.x,       0,       0, 0},
+            {      0, scale.y,       0, 0},
+            {      0,       0, scale.z, 0},
+            {      0,       0,       0, 1}
         }
     };
     return res;
 }
 
-Matrix4 Matrix4ConstructTranslate(double transX, double transY, double transZ)
+Matrix4 Matrix4ConstructTranslate(Vector3d trans)
 {
     Matrix4 res = {
         .data = {
-            {1, 0, 0, transX},
-            {0, 1, 0, transY},
-            {0, 0, 1, transZ},
-            {0, 0, 0,      1}
+            {1, 0, 0, trans.x},
+            {0, 1, 0, trans.y},
+            {0, 0, 1, trans.z},
+            {0, 0, 0,       1}
         }
     };
     return res;
 }
 
-Matrix4 Matrix4ConstructRotate(double rotX, double rotY, double rotZ)
+Matrix4 Matrix4ConstructRotate(Vector3d rot)
 {
     Matrix4 res = {0};
-    res.data[0][0] = cos(rotY) * cos(rotZ);
-    res.data[0][1] = sin(rotX) * sin(rotY) * cos(rotZ) - cos(rotX) * sin(rotZ);
-    res.data[0][2] = cos(rotX) * sin(rotY) * cos(rotZ) + sin(rotX) * sin(rotZ);
+    res.data[0][0] = cos(rot.y) * cos(rot.z);
+    res.data[0][1] = sin(rot.x) * sin(rot.y) * cos(rot.z) - cos(rot.x) * sin(rot.z);
+    res.data[0][2] = cos(rot.x) * sin(rot.y) * cos(rot.z) + sin(rot.x) * sin(rot.z);
     res.data[0][3] = 0;
-    res.data[1][0] = cos(rotY) * sin(rotZ);
-    res.data[1][1] = sin(rotX) * sin(rotY) * sin(rotZ) + cos(rotX) * cos(rotZ);
-    res.data[1][2] = cos(rotX) * sin(rotY) * sin(rotZ) - sin(rotX) * cos(rotZ);
+    res.data[1][0] = cos(rot.y) * sin(rot.z);
+    res.data[1][1] = sin(rot.x) * sin(rot.y) * sin(rot.z) + cos(rot.x) * cos(rot.z);
+    res.data[1][2] = cos(rot.x) * sin(rot.y) * sin(rot.z) - sin(rot.x) * cos(rot.z);
     res.data[1][3] = 0;
-    res.data[2][0] = -sin(rotY);
-    res.data[2][1] = sin(rotX) * cos(rotY);
-    res.data[2][2] = cos(rotX) * cos(rotY);
+    res.data[2][0] = -sin(rot.y);
+    res.data[2][1] = sin(rot.x) * cos(rot.y);
+    res.data[2][2] = cos(rot.x) * cos(rot.y);
     res.data[2][3] = 0;
     res.data[3][0] = 0;
     res.data[3][1] = 0;
     res.data[3][2] = 0;
     res.data[3][3] = 1;
     return res;
+}
+
+Matrix4 Matrix4ConstructTRS(Vector3d trans, Vector3d rot, Vector3d scale)
+{
+    return Matrix4MultiplyMatrix4(
+        Matrix4ConstructTranslate(trans),
+        Matrix4MultiplyMatrix4(
+            Matrix4ConstructRotate(rot),
+            Matrix4ConstructScale(scale)
+        )
+    );
+}
+
+Matrix4 Matrix4ConstructView(Vector3d trans, Vector3d rot, Vector3d scale)
+{
+    return Matrix4ConstructTRS(Vector3dNegate(trans), Vector3dNegate(rot), scale);
 }
