@@ -142,3 +142,47 @@ Vector3d triangleInitializeBarycentricCoordinates(Triangle* this, Vector3d point
         Vector3dMultiplyD(this->baryDeltaY, point.y)
     );
 }
+
+void triangleDraw(Triangle* this, Renderer* renderer)
+{
+    Vector3d minPoint, maxPoint;
+    triangleGetBoundingPoints(this, &minPoint, &maxPoint);
+    // We want to loop over CENTERS of the pixels
+    minPoint = Vector3dAdd(minPoint, (Vector3d) {0.5, 0.5, 0});
+    maxPoint = Vector3dAdd(maxPoint, (Vector3d) {0.5, 0.5, 0});
+    Vector3d barycentricCoordinates = triangleInitializeBarycentricCoordinates(this, minPoint);
+
+    for (double y = minPoint.y; y < maxPoint.y; y += 1.0)
+    {
+        Vector3d bCoordsAtBeginningOfRow = barycentricCoordinates;
+        for (double x = minPoint.x; x < maxPoint.x; x += 1.0)
+        {
+            double sumBarycentric = 0;
+            for (size_t i = 0; i < 3; i++)
+            {
+                size_t edgeIndex = (i+1) % 3;  // index of edge in front of current vertex
+                bool isWrongHalfPlane = Vector3dIndex(barycentricCoordinates, i) < 0;
+                bool doesLieOnEdgeNotFlatTopOrLeft = Vector3dIndex(barycentricCoordinates, i) == 0 && \
+                                                     !triangleIsEdgeFlatTopOrLeft(this->edgeVectors[edgeIndex]);
+                if (isWrongHalfPlane || doesLieOnEdgeNotFlatTopOrLeft)
+                    goto nextPixel;
+                sumBarycentric += Vector3dIndex(barycentricCoordinates, i);
+            }
+
+            if (roughlyEqualD(sumBarycentric, 1))
+            {
+                Color color;
+                if (this->type == TriangleTextured)
+                    color = textureGetColorAtUV(this->texture, triangleInterpolateUV(this, barycentricCoordinates));
+                else
+                    color = triangleInterpolateColor(this, barycentricCoordinates);
+                rendererDrawPixel(renderer, (Vector2i) {x, y}, color);
+            }
+
+            nextPixel:
+            barycentricCoordinates = Vector3dAdd(barycentricCoordinates, this->baryDeltaX);
+        }
+        barycentricCoordinates = bCoordsAtBeginningOfRow;
+        barycentricCoordinates = Vector3dAdd(barycentricCoordinates, this->baryDeltaY);
+    }
+}

@@ -39,13 +39,11 @@ typedef struct
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer);
 void freeTriangle(Triangle* this);
 
-// min = {min_x, min_y, min_z},
-// max = {max_x, max_y, max_z}
 void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* max);
+bool triangleIsEdgeFlatTopOrLeft(Vector3d edge);
+Vector3d triangleInitializeBarycentricCoordinates(Triangle* this, Vector3d point);
 
 Color triangleInterpolateColor(Triangle* this, Vector3d barycentricCoordinates);
 Vector2d triangleInterpolateUV(Triangle* this, Vector3d barycentricCoordinates);
 
-bool triangleIsEdgeFlatTopOrLeft(Vector3d edge);
-
-Vector3d triangleInitializeBarycentricCoordinates(Triangle* this, Vector3d point);
+void triangleDraw(Triangle* this, Renderer* renderer);

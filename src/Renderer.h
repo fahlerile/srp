@@ -20,8 +20,6 @@ Vector2i rendererGetWindowDimensions(Renderer* this);
 void rendererSetColor(Renderer* this, Color color);
 void rendererDrawPixel(Renderer* this, Vector2i point, Color color);
 
-void rendererDrawTriangle(Renderer* this, Triangle* tri);
-
 // A function to put draw calls in
 void rendererDrawToBuffer(Renderer* this);
 // Save buffer as a BMP screenshot
