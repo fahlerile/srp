@@ -34,6 +34,8 @@ Rendering models:
 
 Documentation/testing:
 - [ ] Start documenting the code
+    - [ ] Triangle (computation, algorithm, etc.)
+    - [ ] DynamicArray (why & how it works)
 - [ ] Unit testing (for utilities)
     - [ ] Matrix
     - [ ] Vectors
@@ -46,6 +48,15 @@ Documentation/testing:
     - [ ] Color
 - [ ] Integration testing
     - ???
+
+Refactoring:
+- Triangle:
+    - [ ] Change barycentric coordinates' type to just array, not `Vector3d`
+    - [ ] Split up `triangleDraw` into multiple functions
+    - [ ] Split up `newTriangle` into multiple functions
+        - I might need them if I decide to add "editing" functionality (construct a `Triangle` once - use a million times by changing vertices/UV/texture)
+- Matrix:
+    - [ ] Pass-by-pointer VS pass-by-value
 
 ## Issues
 - SEGV if `-march=native` compiler flag is set (NULL dereferencing in the assembly of `mixColorsBaryCoordPolygon`)

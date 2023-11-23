@@ -23,21 +23,18 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vecto
     }
     else
     {
-        LOGE("newTriangle invalid call (see docs)");
+        LOGE("newTriangle() invalid call");
         abort();
     }
 
-    // Calculate `edgeVectors`
     for (size_t i = 0; i < 3; i++)
         this->edgeVectors[i] = Vector3dSubtract(this->vertices[(i+1 == 3) ? 0 : i+1], this->vertices[i]);
 
-    // Calculate `areaX2`
-    this->areaX2 = Vector3dMagnitude(
+    double areaX2 = Vector3dMagnitude(
         Vector3dCross(this->edgeVectors[0], this->edgeVectors[2])
     );
 
-    // Calculate `baryCoordsZero`
-    this->baryCoordsZero = (Vector3d) {
+    Vector3d baryCoordsZero = (Vector3d) {
         Vector3dCross(
             Vector3dZeroZ(this->edgeVectors[1]),
             Vector3dZeroZ(Vector3dNegate(this->vertices[1]))
@@ -51,22 +48,26 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vecto
             Vector3dZeroZ(Vector3dNegate(this->vertices[0]))
         ).z
     };
-    this->baryCoordsZero = Vector3dDivideD(this->baryCoordsZero, this->areaX2);
+    baryCoordsZero = Vector3dDivideD(baryCoordsZero, areaX2);
 
-    // Calculate `baryDelta`'s
     this->baryDeltaX = (Vector3d) {
         this->vertices[1].y - this->vertices[2].y,
         this->vertices[2].y - this->vertices[0].y,
         this->vertices[0].y - this->vertices[1].y
     };
-    this->baryDeltaX = Vector3dDivideD(this->baryDeltaX, this->areaX2);
+    this->baryDeltaX = Vector3dDivideD(this->baryDeltaX, areaX2);
 
     this->baryDeltaY = (Vector3d) {
         this->vertices[2].x - this->vertices[1].x,
         this->vertices[0].x - this->vertices[2].x,
         this->vertices[1].x - this->vertices[0].x
     };
-    this->baryDeltaY = Vector3dDivideD(this->baryDeltaY, this->areaX2);
+    this->baryDeltaY = Vector3dDivideD(this->baryDeltaY, areaX2);
+
+    triangleGetBoundingPoints(this, &this->minBoundingPoint, &this->maxBoundingPoint);
+    this->minBoundingPoint = Vector3dAdd(this->minBoundingPoint, (Vector3d) {0.5, 0.5, 0});
+    this->maxBoundingPoint = Vector3dAdd(this->maxBoundingPoint, (Vector3d) {0.5, 0.5, 0});
+    this->baryCoordsInitial = triangleInitializeBarycentricCoordinates(this, baryCoordsZero, this->minBoundingPoint);
 
     return this;
 }
@@ -76,35 +77,9 @@ void freeTriangle(Triangle* this)
     xfree(this);
 }
 
-void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* max)
-{
-    Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
-    Vector3d res_max = {0};
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        if (this->vertices[i].x < res_min.x)
-            res_min.x = this->vertices[i].x;
-        if (this->vertices[i].y < res_min.y)
-            res_min.y = this->vertices[i].y;
-        if (this->vertices[i].z < res_min.z)
-            res_min.z = this->vertices[i].z;
-
-        if (this->vertices[i].x > res_max.x)
-            res_max.x = this->vertices[i].x;
-        if (this->vertices[i].y > res_max.y)
-            res_max.y = this->vertices[i].y;
-        if (this->vertices[i].z > res_max.z)
-            res_max.z = this->vertices[i].z;
-    }
-
-    *min = res_min;
-    *max = res_max;
-}
-
 Color triangleInterpolateColor(Triangle* this, Vector3d barycentricCoordinates)
 {
-    Vector4d resColorV = {0};  // result color vector
+    Vector4d resColorV = {0};  // result color as Vector4d
     for (size_t i = 0; i < 3; i++)
     {
         Vector4d curColorAsVector4d = ColorToVector4d(this->colors[i]);
@@ -126,36 +101,14 @@ Vector2d triangleInterpolateUV(Triangle* this, Vector3d barycentricCoordinates)
     return resUV;
 }
 
-bool triangleIsEdgeFlatTopOrLeft(Vector3d edge)
-{
-    return ((edge.x > 0) && (edge.y == 0)) ||  // is top
-           (edge.y < 0);                       // is left
-}
-
-Vector3d triangleInitializeBarycentricCoordinates(Triangle* this, Vector3d point)
-{
-    return Vector3dAdd(
-        Vector3dAdd(
-            this->baryCoordsZero,
-            Vector3dMultiplyD(this->baryDeltaX, point.x)
-        ),
-        Vector3dMultiplyD(this->baryDeltaY, point.y)
-    );
-}
-
 void triangleDraw(Triangle* this, Renderer* renderer)
 {
-    Vector3d minPoint, maxPoint;
-    triangleGetBoundingPoints(this, &minPoint, &maxPoint);
-    // We want to loop over CENTERS of the pixels
-    minPoint = Vector3dAdd(minPoint, (Vector3d) {0.5, 0.5, 0});
-    maxPoint = Vector3dAdd(maxPoint, (Vector3d) {0.5, 0.5, 0});
-    Vector3d barycentricCoordinates = triangleInitializeBarycentricCoordinates(this, minPoint);
+    Vector3d barycentricCoordinates = this->baryCoordsInitial;
 
-    for (double y = minPoint.y; y < maxPoint.y; y += 1.0)
+    for (double y = this->minBoundingPoint.y; y < this->maxBoundingPoint.y; y += 1.0)
     {
         Vector3d bCoordsAtBeginningOfRow = barycentricCoordinates;
-        for (double x = minPoint.x; x < maxPoint.x; x += 1.0)
+        for (double x = this->minBoundingPoint.x; x < this->maxBoundingPoint.x; x += 1.0)
         {
             double sumBarycentric = 0;
             for (size_t i = 0; i < 3; i++)
@@ -185,4 +138,47 @@ void triangleDraw(Triangle* this, Renderer* renderer)
         barycentricCoordinates = bCoordsAtBeginningOfRow;
         barycentricCoordinates = Vector3dAdd(barycentricCoordinates, this->baryDeltaY);
     }
+}
+
+static void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* max)
+{
+    Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
+    Vector3d res_max = {0};
+
+    for (size_t i = 0; i < 3; i++)
+    {
+        if (this->vertices[i].x < res_min.x)
+            res_min.x = this->vertices[i].x;
+        if (this->vertices[i].y < res_min.y)
+            res_min.y = this->vertices[i].y;
+        if (this->vertices[i].z < res_min.z)
+            res_min.z = this->vertices[i].z;
+
+        if (this->vertices[i].x > res_max.x)
+            res_max.x = this->vertices[i].x;
+        if (this->vertices[i].y > res_max.y)
+            res_max.y = this->vertices[i].y;
+        if (this->vertices[i].z > res_max.z)
+            res_max.z = this->vertices[i].z;
+    }
+
+    *min = res_min;
+    *max = res_max;
+}
+
+static bool triangleIsEdgeFlatTopOrLeft(Vector3d edge)
+{
+    return ((edge.x > 0) && (edge.y == 0)) ||  // is top
+           (edge.y < 0);                       // is left
+}
+
+static Vector3d triangleInitializeBarycentricCoordinates(Triangle* this, Vector3d baryCoordsZero, Vector3d point)
+{
+    return Vector3dAdd(
+        Vector3dAdd(
+            baryCoordsZero,
+            Vector3dMultiplyD(this->baryDeltaX, point.x)
+        ),
+        Vector3dMultiplyD(this->baryDeltaY, point.y)
+    );
 }
