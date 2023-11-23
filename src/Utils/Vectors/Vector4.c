@@ -1,9 +1,5 @@
-#include <math.h>
-#include <stdbool.h>
-#include <assert.h>
-
 #include "Vector4.h"
-#include "Utils/Color.h"
+#include "Utils/Utils.h"
 
 double Vector4dMagnitude(Vector4d a)
 {
@@ -95,6 +91,7 @@ double Vector4dIndex(Vector4d a, size_t i)
         case 3:
             return a.w;
         default:
-            assert(false);
+            LOGE("Vector4d invalid index %zu", i);
+            abort();
     }
 }

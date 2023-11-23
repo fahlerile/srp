@@ -1,4 +1,3 @@
-#include <math.h>
 #include "Vector2.h"
 #include "Utils/Utils.h"
 
@@ -60,6 +59,7 @@ double Vector2dIndex(Vector2d a, size_t i)
         case 1:
             return a.y;
         default:
-            assert(false);
+            LOGE("Vector2d invalid index %zu", i);
+            abort();
     }
 }

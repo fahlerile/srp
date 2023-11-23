@@ -7,6 +7,8 @@ set(
 
   Triangle.c
   Texture.c
+  Model.c
+  Scene.c
 
   Utils/MemoryUtils.c
   Utils/NDC.c

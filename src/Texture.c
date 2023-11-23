@@ -20,7 +20,7 @@ Texture* newTexture(const char* filename)
 void freeTexture(Texture* this)
 {
     stbi_image_free(this->data);
-    free(this);
+    xfree(this);
 }
 
 size_t texturePixelToIndex(Texture* this, Vector2i point)
