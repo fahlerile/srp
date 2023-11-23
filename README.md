@@ -16,29 +16,37 @@ cd bin
 ```
 
 ## TODO
-- [x] Triangle color shading
-- [x] Think if my algorithms work for both clockwise and anticlockwise vertices' direction FOR TRIANGLES
-    - Yes, everything should work fine for any vertices' direction IN A TRIANGLE
-- [x] Fix a precision bug (set a tolerance compare for equality of sum of barycentric coordinates and 1)
-- [x] Test for different triangles (both clockwise and anticlockwise)
-- [x] Add triangle rasterization rules ([top-left](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules))
-- [x] Test triangle rasterization rules
-    - [x] Left/right edges touch
-    - [x] Top/botom edges touch
-- [x] Incremental computation
-- [x] Refactor/clean
-- [x] Textures
-- [ ] Think of a way to structure world space meshes
-    - [ ] I need a neat way to use dynamic-sized array, that is, some "`std::vector` alternative"
-- [ ] Vertex data parser (.obj?)
+Rendering models:
+- [x] Think of a way to structure world space models
+    - [x] I need a neat way to use dynamic-sized array, that is, some "`std::vector` alternative"
+        - `DynamicArray` struct
+- [x] Matrices
 - [x] `Scene` struct
 - [x] `Model` struct
     - [x] Fix memory leak with `Model` freeing
-- [x] Matrices
+- [ ] Vertex, face, edge structures (if I need them)
+- [ ] Vertex data parser in `Model`
 - [ ] Perspective projection
 - [ ] Depth buffer
+    - [ ] Interpolate z-coordinate inside triangle, draw a pixel only if that z coordinate is closer to viewport than already drawn one
 - [ ] Lighting
 - [ ] Shadows
 
+Documentation/testing:
+- [ ] Start documenting the code
+- [ ] Unit testing (for utilities)
+    - [ ] Matrix
+    - [ ] Vectors
+    - [ ] MemoryUtils
+    - [ ] NDC
+    - [ ] radians
+    - [ ] log
+    - [ ] DynamicArray
+    - [ ] compares
+    - [ ] Color
+- [ ] Integration testing
+    - ???
+
 ## Issues
 - SEGV if `-march=native` compiler flag is set (NULL dereferencing in the assembly of `mixColorsBaryCoordPolygon`)
+    - (may be outdated)
