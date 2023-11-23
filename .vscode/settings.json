@@ -94,6 +94,7 @@
         "matrix.h": "c",
         "stdint.h": "c",
         "math.h": "c",
-        "mainutils.h": "c"
+        "mainutils.h": "c",
+        "dynamicarray.h": "c"
     }
 }

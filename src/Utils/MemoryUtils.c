@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void* allocate(size_t n)
+void* xmalloc(size_t n)
 {
     void *p = malloc(n);
     if (p == NULL)
@@ -12,7 +12,7 @@ void* allocate(size_t n)
     return p;
 }
 
-void* reallocate(void* ptr, size_t new_n)
+void* xrealloc(void* ptr, size_t new_n)
 {
     void *p = realloc(ptr, new_n);
     if (p == NULL)
@@ -23,7 +23,7 @@ void* reallocate(void* ptr, size_t new_n)
     return p;
 }
 
-void* allocate_and_zero(size_t n_elem, size_t n_bytes)
+void* xcalloc(size_t n_elem, size_t n_bytes)
 {
     void *p = calloc(n_elem, n_bytes);
     if (p == NULL)

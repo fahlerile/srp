@@ -8,7 +8,7 @@ Renderer* newRenderer(int width, int height, int flags)
     if (SDL_CreateWindowAndRenderer(width, height, flags, &int_window, &int_renderer) != 0)
         return NULL;
 
-    Renderer* renderer = allocate(sizeof(Renderer));
+    Renderer* renderer = xmalloc(sizeof(Renderer));
     *renderer = (Renderer) {
         .internal_window = int_window,
         .internal_renderer = int_renderer,

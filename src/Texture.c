@@ -5,7 +5,7 @@
 
 Texture* newTexture(const char* filename)
 {
-    Texture* this = allocate(sizeof(Texture));
+    Texture* this = xmalloc(sizeof(Texture));
     int w, h, n;
     this->data = (Color*) stbi_load(filename, &w, &h, &n, 4);
     if (this->data == NULL)

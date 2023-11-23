@@ -12,6 +12,7 @@ set(
   Utils/NDC.c
   Utils/Matrix.c
   Utils/Color.c
+  Utils/DynamicArray.c
   Utils/compares.c
   Utils/Vectors/Vector2.c
   Utils/Vectors/Vector3.c

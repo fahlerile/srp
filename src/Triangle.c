@@ -6,13 +6,13 @@
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV,
                       TriangleType type, Renderer* renderer)
 {
-    Triangle* this = allocate(sizeof(Triangle));
+    Triangle* this = xmalloc(sizeof(Triangle));
 
     this->vertices = vertices;
     for (size_t i = 0; i < 3; i++)
         this->vertices[i] = NDCtoScreenSpace(renderer, vertices[i]);
 
-    this->edgeVectors = allocate(3 * sizeof(Vector3d));
+    this->edgeVectors = xmalloc(3 * sizeof(Vector3d));
     this->colors = colors;
     this->texture = texture;
     this->UV = UV;
