@@ -3,24 +3,33 @@
 #include "Utils/NDC.h"
 #include "Utils/Utils.h"
 
-Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV,
-                      TriangleType type, Renderer* renderer)
+Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
 {
     Triangle* this = xmalloc(sizeof(Triangle));
 
-    this->vertices = vertices;
     for (size_t i = 0; i < 3; i++)
         this->vertices[i] = NDCtoScreenSpace(renderer, vertices[i]);
 
-    this->edgeVectors = xmalloc(3 * sizeof(Vector3d));
-    this->colors = colors;
-    this->texture = texture;
-    this->UV = UV;
-    this->type = type;
+    if (colors != NULL)
+    {
+        this->colors = colors;
+        this->type = TriangleColored;
+    }
+    else if (texture != NULL && UV != NULL)
+    {
+        this->texture = texture;
+        this->UV = UV;
+        this->type = TriangleTextured;
+    }
+    else
+    {
+        LOGE("newTriangle invalid call (see docs)");
+        abort();
+    }
 
     // Calculate `edgeVectors`
     for (size_t i = 0; i < 3; i++)
-        this->edgeVectors[i] = Vector3dSubtract(vertices[(i+1 == 3) ? 0 : i+1], vertices[i]);
+        this->edgeVectors[i] = Vector3dSubtract(this->vertices[(i+1 == 3) ? 0 : i+1], this->vertices[i]);
 
     // Calculate `areaX2`
     this->areaX2 = Vector3dMagnitude(
@@ -64,8 +73,7 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vecto
 
 void freeTriangle(Triangle* this)
 {
-    free(this->edgeVectors);
-    free(this);
+    xfree(this);
 }
 
 void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* max)
