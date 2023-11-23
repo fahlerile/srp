@@ -31,8 +31,9 @@ cd bin
 - [ ] Think of a way to structure world space meshes
     - [ ] I need a neat way to use dynamic-sized array, that is, some "`std::vector` alternative"
 - [ ] Vertex data parser (.obj?)
-- [ ] `Scene` struct
-- [ ] `Model` struct
+- [x] `Scene` struct
+- [x] `Model` struct
+    - [x] Fix memory leak with `Model` freeing
 - [x] Matrices
 - [ ] Perspective projection
 - [ ] Depth buffer

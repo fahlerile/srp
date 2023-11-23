@@ -98,6 +98,7 @@
         "dynamicarray.h": "c",
         "stdbool.h": "c",
         "compares.h": "c",
-        "model.h": "c"
+        "model.h": "c",
+        "string.h": "c"
     }
 }
