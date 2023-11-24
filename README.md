@@ -36,24 +36,20 @@ Documentation/testing:
 - [ ] Start documenting the code
     - [ ] Triangle (computation, algorithm, etc.)
     - [ ] DynamicArray (why & how it works)
-- [ ] Unit testing (for utilities)
+- [ ] Unit testing (for *some* utilities)
     - [ ] Matrix
     - [ ] Vectors
-    - [ ] MemoryUtils
-    - [ ] NDC
-    - [ ] radians
-    - [ ] log
-    - [ ] DynamicArray
-    - [ ] compares
-    - [ ] Color
+    - [x] DynamicArray
 - [ ] Integration testing
     - ???
 
 Refactoring:
 - Triangle:
-    - [ ] Change barycentric coordinates' type to just array, not `Vector3d`
-    - [ ] Split up `triangleDraw` into multiple functions
-    - [ ] Split up `newTriangle` into multiple functions
+    - [x] Change barycentric coordinates' type to just array, not `Vector3d`
+        - No, this is not a good idea
+    - [x] Split up `triangleDraw` into multiple functions
+        - No ideas how to do this
+    - [x] Split up `newTriangle` into multiple functions
         - I might need them if I decide to add "editing" functionality (construct a `Triangle` once - use a million times by changing vertices/UV/texture)
 - Matrix:
     - [ ] Pass-by-pointer VS pass-by-value
