@@ -1,7 +1,7 @@
 #include "SDL2/SDL.h"
 #include "Renderer.h"
-#include "MainUtils.h"
-#include "Utils/Utils.h"
+#include "mainUtils.h"
+#include "utils/utils.h"
 #include "errorcodes.h"
 
 Renderer* initialize(int width, int height, int flags)

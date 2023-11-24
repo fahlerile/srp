@@ -1,5 +1,5 @@
 #include "Model.h"
-#include "Utils/Utils.h"
+#include "utils/utils.h"
 
 Model* newModel(const char* filename)
 {

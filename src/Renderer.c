@@ -1,5 +1,7 @@
 #include "Renderer.h"
-#include "Utils/Utils.h"
+#include "utils/utils.h"
+#include "Texture.h"
+#include "Triangle.h"
 
 Renderer* newRenderer(int width, int height, int flags)
 {

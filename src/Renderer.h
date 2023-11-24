@@ -1,6 +1,6 @@
 #pragma once
 #include "SDL2/SDL.h"
-#include "Utils/Utils.h"
+#include "utils/utils.h"
 
 // A wrapper around default SDL Window and Renderer structures
 typedef struct
@@ -8,8 +8,6 @@ typedef struct
     SDL_Window* internal_window;
     SDL_Renderer* internal_renderer;
 } Renderer;
-
-#include "Triangle.h"  // circular dependency
 
 // May return NULL on error
 Renderer* newRenderer(int width, int height, int flags);

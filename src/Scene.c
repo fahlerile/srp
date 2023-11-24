@@ -1,6 +1,6 @@
 #include "Scene.h"
 #include "Model.h"
-#include "Utils/Utils.h"
+#include "utils/utils.h"
 
 Scene* newScene(Matrix4 viewMatrix)
 {

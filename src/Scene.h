@@ -1,6 +1,6 @@
 #pragma once
-#include "Utils/DynamicArray.h"
-#include "Utils/Matrix.h"
+#include "utils/DynamicArray.h"
+#include "utils/Matrix.h"
 #include "Model.h"
 
 typedef struct

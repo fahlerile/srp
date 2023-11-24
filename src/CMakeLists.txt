@@ -2,7 +2,7 @@ set(
   SOURCES
 
   main.c
-  MainUtils/MainUtils.c
+  mainUtils/mainUtils.c
   Renderer.c
 
   Triangle.c
@@ -10,15 +10,15 @@ set(
   Model.c
   Scene.c
 
-  Utils/MemoryUtils.c
-  Utils/NDC.c
-  Utils/Matrix.c
-  Utils/Color.c
-  Utils/DynamicArray.c
-  Utils/compares.c
-  Utils/Vectors/Vector2.c
-  Utils/Vectors/Vector3.c
-  Utils/Vectors/Vector4.c
+  utils/MemoryUtils.c
+  utils/NDC.c
+  utils/Matrix.c
+  utils/Color.c
+  utils/DynamicArray.c
+  utils/compares.c
+  utils/Vectors/Vector2.c
+  utils/Vectors/Vector3.c
+  utils/Vectors/Vector4.c
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")

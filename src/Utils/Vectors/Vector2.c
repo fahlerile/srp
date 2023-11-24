@@ -1,5 +1,5 @@
 #include "Vector2.h"
-#include "Utils/Utils.h"
+#include "utils/utils.h"
 
 double Vector2dMagnitude(Vector2d a)
 {

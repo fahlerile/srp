@@ -1,6 +1,7 @@
 #pragma once
-#include "Utils/Utils.h"
+#include "utils/utils.h"
 #include "Texture.h"
+#include "Renderer.h"
 
 typedef enum
 {
@@ -33,8 +34,6 @@ typedef struct
     Vector3d baryDeltaX;
     Vector3d baryDeltaY;
 } Triangle;
-
-#include "Renderer.h"  // circular dependency
 
 // `vertices` must be NDC and clockwise!
 // colors OR (UV AND texture) should be NULL, the other one shouldn't

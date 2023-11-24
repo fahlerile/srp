@@ -1,5 +1,5 @@
 #include "Texture.h"
-#include "Utils/Utils.h"
+#include "utils/utils.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 

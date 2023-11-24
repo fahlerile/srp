@@ -1,6 +1,6 @@
 #pragma once
-#include "Utils/DynamicArray.h"
-#include "Utils/Vectors/Vector3.h"
+#include "utils/DynamicArray.h"
+#include "utils/Vectors/Vector3.h"
 
 typedef struct
 {

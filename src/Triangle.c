@@ -1,7 +1,7 @@
 #include <float.h>
 #include "Triangle.h"
-#include "Utils/NDC.h"
-#include "Utils/Utils.h"
+#include "utils/NDC.h"
+#include "utils/utils.h"
 
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
 {
