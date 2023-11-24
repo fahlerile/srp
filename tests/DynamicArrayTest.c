@@ -8,7 +8,7 @@ typedef struct __attribute__((packed))
     double b;
 } TestStruct;
 
-int test_int()
+void testInt()
 {
     DynamicArray* arr = newDynamicArray(3, sizeof(int));
     assert(arr->size == 0);
@@ -41,7 +41,7 @@ int test_int()
     freeDynamicArray(arr);
 }
 
-int test_double()
+void testDouble()
 {
     DynamicArray* arr = newDynamicArray(3, sizeof(double));
     assert(arr->size == 0);
@@ -74,7 +74,7 @@ int test_double()
     freeDynamicArray(arr);
 }
 
-int test_struct()
+void testStruct()
 {
     DynamicArray* arr = newDynamicArray(3, sizeof(TestStruct));
     assert(arr->size == 0);
@@ -119,7 +119,7 @@ int test_struct()
 
 int main()
 {
-    test_int();
-    test_double();
-    test_struct();
+    testInt();
+    testDouble();
+    testStruct();
 }

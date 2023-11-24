@@ -85,6 +85,13 @@ double Vector3dIndex(Vector3d a, size_t i)
     }
 }
 
+bool Vector3dEqual(Vector3d a, Vector3d b)
+{
+    return (a.x == b.x &&
+            a.y == b.y &&
+            a.z == b.z);
+}
+
 Vector3d Vector3dZeroZ(Vector3d a)
 {
     return (Vector3d) {

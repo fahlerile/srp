@@ -1,4 +1,6 @@
 #pragma once
+#include <stdint.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -18,3 +20,4 @@ double   Vector4dDot      (Vector4d a, Vector4d b);
 Color Vector4dToColor(Vector4d a);
 
 double Vector4dIndex(Vector4d a, size_t i);
+bool Vector4dEqual(Vector4d a, Vector4d b);

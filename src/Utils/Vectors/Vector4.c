@@ -95,3 +95,11 @@ double Vector4dIndex(Vector4d a, size_t i)
             abort();
     }
 }
+
+bool Vector4dEqual(Vector4d a, Vector4d b)
+{
+    return (a.x == b.x &&
+            a.y == b.y &&
+            a.z == b.z &&
+            a.w == b.w);
+}

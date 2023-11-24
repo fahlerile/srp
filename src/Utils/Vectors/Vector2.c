@@ -63,3 +63,9 @@ double Vector2dIndex(Vector2d a, size_t i)
             abort();
     }
 }
+
+bool Vector2dEqual(Vector2d a, Vector2d b)
+{
+    return (a.x == b.x &&
+            a.y == b.y);
+}

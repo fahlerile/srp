@@ -22,6 +22,26 @@ static inline void Matrix4SetColumn(Matrix4* a, Vector4d column, size_t i)
     a->data[3][i] = column.w;
 }
 
+bool Matrix4Equal(Matrix4* a, Matrix4* b)
+{
+    return (a->data[0][0] == b->data[0][0] &&
+            a->data[0][1] == b->data[0][1] &&
+            a->data[0][2] == b->data[0][2] &&
+            a->data[0][3] == b->data[0][3] &&
+            a->data[1][0] == b->data[1][0] &&
+            a->data[1][1] == b->data[1][1] &&
+            a->data[1][2] == b->data[1][2] &&
+            a->data[1][3] == b->data[1][3] &&
+            a->data[2][0] == b->data[2][0] &&
+            a->data[2][1] == b->data[2][1] &&
+            a->data[2][2] == b->data[2][2] &&
+            a->data[2][3] == b->data[2][3] &&
+            a->data[3][0] == b->data[3][0] &&
+            a->data[3][1] == b->data[3][1] &&
+            a->data[3][2] == b->data[3][2] &&
+            a->data[3][3] == b->data[3][3]);
+}
+
 Vector4d Matrix4MultiplyVector4d(Matrix4* a, Vector4d b)
 {
     Vector4d res = {0};
@@ -34,12 +54,12 @@ Vector4d Matrix4MultiplyVector4d(Matrix4* a, Vector4d b)
     return res;
 }
 
-Matrix4 Matrix4MultiplyMatrix4(Matrix4 a, Matrix4 b)
+Matrix4 Matrix4MultiplyMatrix4(Matrix4* a, Matrix4* b)
 {
     Matrix4 res = {0};
     for (size_t i = 0; i < 4; i++)
     {
-        Vector4d column = Matrix4MultiplyVector4d(&a, Matrix4GetColumn(&b, i));
+        Vector4d column = Matrix4MultiplyVector4d(a, Matrix4GetColumn(b, i));
         Matrix4SetColumn(&res, column, i);
     }
     return res;
@@ -108,13 +128,11 @@ Matrix4 Matrix4ConstructRotate(Vector3d rot)
 
 Matrix4 Matrix4ConstructTRS(Vector3d trans, Vector3d rot, Vector3d scale)
 {
-    return Matrix4MultiplyMatrix4(
-        Matrix4ConstructTranslate(trans),
-        Matrix4MultiplyMatrix4(
-            Matrix4ConstructRotate(rot),
-            Matrix4ConstructScale(scale)
-        )
-    );
+    Matrix4 T = Matrix4ConstructTranslate(trans);
+    Matrix4 R = Matrix4ConstructRotate(rot);
+    Matrix4 S = Matrix4ConstructScale(scale);
+    Matrix4 RS = Matrix4MultiplyMatrix4(&R, &S);
+    return Matrix4MultiplyMatrix4(&T, &RS);
 }
 
 Matrix4 Matrix4ConstructView(Vector3d trans, Vector3d rot, Vector3d scale)

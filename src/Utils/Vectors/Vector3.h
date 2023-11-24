@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -16,6 +17,7 @@ double   Vector3dDot      (Vector3d a, Vector3d b);
 Vector3d Vector3dCross    (Vector3d a, Vector3d b);
 
 double Vector3dIndex(Vector3d a, size_t i);
+bool Vector3dEqual(Vector3d a, Vector3d b);
 
 // Return (Vector3d) {a.x, a.y, 0}
 Vector3d Vector3dZeroZ(Vector3d a);

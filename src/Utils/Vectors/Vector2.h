@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct
 {
@@ -20,3 +21,4 @@ Vector2d Vector2dNegate   (Vector2d a);
 double   Vector2dDot      (Vector2d a, Vector2d b);
 
 double Vector2dIndex(Vector2d a, size_t i);
+bool Vector2dEqual(Vector2d a, Vector2d b);
