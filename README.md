@@ -41,7 +41,7 @@ Documentation/testing:
     - [ ] Vectors
     - [x] DynamicArray
 - [ ] Integration testing
-    - ???
+    - Check whether or not drawn triangle/polygon/model correctly (image comparison?)
 
 Refactoring:
 - Triangle:

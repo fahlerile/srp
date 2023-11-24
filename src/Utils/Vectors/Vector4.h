@@ -2,11 +2,6 @@
 
 typedef struct
 {
-    int x, y, z, w;
-} Vector4i;
-
-typedef struct
-{
     double x, y, z, w;
 } Vector4d;
 
