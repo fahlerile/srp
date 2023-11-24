@@ -36,9 +36,9 @@ Documentation/testing:
 - [ ] Start documenting the code
     - [ ] Triangle (computation, algorithm, etc.)
     - [ ] DynamicArray (why & how it works)
-- [ ] Unit testing (for *some* utilities)
-    - [ ] Matrix
-    - [ ] Vectors
+- [x] Unit testing (for *some* utilities)
+    - [x] Matrix
+    - [x] Vectors
     - [x] DynamicArray
 - [ ] Integration testing
     - Check whether or not drawn triangle/polygon/model correctly (image comparison?)
@@ -52,8 +52,8 @@ Refactoring:
     - [x] Split up `newTriangle` into multiple functions
         - I might need them if I decide to add "editing" functionality (construct a `Triangle` once - use a million times by changing vertices/UV/texture)
 - Matrix:
-    - [ ] Pass-by-pointer VS pass-by-value
+    - [x] Pass-by-pointer VS pass-by-value
+        - Pass by pointer
 
 ## Issues
-- SEGV if `-march=native` compiler flag is set (NULL dereferencing in the assembly of `mixColorsBaryCoordPolygon`)
-    - (may be outdated)
+- SEGV if `-march=native` compiler flag is set
