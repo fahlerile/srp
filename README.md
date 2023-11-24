@@ -33,9 +33,9 @@ Rendering models:
 - [ ] Shadows
 
 Documentation/testing:
-- [ ] Start documenting the code
-    - [ ] Triangle (computation, algorithm, etc.)
-    - [ ] DynamicArray (why & how it works)
+- [x] Start documenting the code
+    - [x] Triangle (computation, algorithm, etc.)
+    - [x] ~~DynamicArray (why & how it works)~~
 - [x] Unit testing (for *some* utilities)
     - [x] Matrix
     - [x] Vectors

@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    DynamicArray* matrices;
+    DynamicArray* matrices;  // an array of `Matrix4`
 } Model;
 
 Model* newModel(const char* filename);

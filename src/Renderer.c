@@ -3,6 +3,14 @@
 #include "Texture.h"
 #include "Triangle.h"
 
+/**
+ * @brief Construct a new `Renderer`
+ *
+ * @param width width of a window
+ * @param height height of a window
+ * @param flags SDL flags to pass to `SDL_CreateWindowAndRenderer`
+ * @return Renderer* a pointer to constructed `Renderer`
+ */
 Renderer* newRenderer(int width, int height, int flags)
 {
     SDL_Window* int_window;
@@ -30,7 +38,7 @@ Vector2i rendererGetWindowDimensions(Renderer* this)
     return (Vector2i) {x, y};
 }
 
-void rendererSetColor(Renderer* this, Color color)
+void rendererSetDrawColor(Renderer* this, Color color)
 {
     SDL_SetRenderDrawColor(this->internal_renderer,
                            color.r, color.g, color.b, color.a);
@@ -38,7 +46,7 @@ void rendererSetColor(Renderer* this, Color color)
 
 void rendererDrawPixel(Renderer* this, Vector2i point, Color color)
 {
-    rendererSetColor(this, color);
+    rendererSetDrawColor(this, color);
     SDL_RenderDrawPoint(this->internal_renderer, point.x, point.y);
 }
 
@@ -63,6 +71,7 @@ void rendererDrawToBuffer(Renderer* this)
     freeTexture(texture);
 }
 
+// @brief Save current buffer state as BMP
 void rendererSaveBuffer(Renderer* this, const char* filename)
 {
     Vector2i dimensions = rendererGetWindowDimensions(this);
@@ -79,6 +88,6 @@ void rendererSwapBuffer(Renderer* this)
 
 void rendererClearBuffer(Renderer* this, Color color)
 {
-    rendererSetColor(this, color);
+    rendererSetDrawColor(this, color);
     SDL_RenderClear(this->internal_renderer);
 }

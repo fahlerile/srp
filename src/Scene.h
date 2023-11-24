@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    DynamicArray* models;
+    DynamicArray* models;  // an array of `Model*`
     Matrix4 viewMatrix;
 } Scene;
 

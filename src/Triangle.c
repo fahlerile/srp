@@ -3,6 +3,16 @@
 #include "utils/NDC.h"
 #include "utils/utils.h"
 
+/**
+ * @brief Create a new `Triangle`
+ *
+ * @param vertices an array of three NDC vertices
+ * @param colors an array of three `Colors` (one for each vertex). May be `NULL` only if both `texture` and `UV` are not `NULL`
+ * @param texture a pointer to `Texture` to be used by this `Triangle`. May be `NULL` together with `UV` if `colors` is not `NULL`
+ * @param UV an array of `UV`-mapping coordinates for texture mapping. May be `NULL` together with `texture` if `colors` is not `NULL`
+ * @param renderer a pointer to `Renderer` on which you are planning to render this `Triangle`
+ * @return Triangle* a pointer to constructed `Triangle`
+ */
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
 {
     Triangle* this = xmalloc(sizeof(Triangle));
@@ -15,6 +25,10 @@ void freeTriangle(Triangle* this)
     xfree(this);
 }
 
+/**
+ * @brief Update & recalculate vital parameters of a `Triangle`
+ * See `newTriangle` for information about parameters
+ */
 void triangleReinitialize(Triangle* this, Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
 {
     triangleSetColorOrTexture(this, colors, texture, UV);
@@ -78,6 +92,7 @@ static void triangleCalculateBaryDeltasAndInitial(Triangle* this)
     };
     baryCoordsZero = Vector3dDivideD(baryCoordsZero, areaX2);
 
+    // see /docs/Triangle.md
     this->baryDeltaX = (Vector3d) {
         this->vertices[1].y - this->vertices[2].y,
         this->vertices[2].y - this->vertices[0].y,

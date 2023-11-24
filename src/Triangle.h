@@ -11,7 +11,7 @@ typedef enum
 
 typedef struct
 {
-    Vector3d vertices[3];
+    Vector3d vertices[3];  // viewport coordinates (except Z-coordinate, it is NDC)
     Vector3d edgeVectors[3];
 
     Vector3d minBoundingPoint;
@@ -28,19 +28,17 @@ typedef struct
     };
     TriangleType type;
 
-    // Barycentric coordinates for minBoundingPoint, used for incremental computation
+    // Barycentric coordinates for minBoundingPoint
     Vector3d baryCoordsInitial;
-    // Delta values for incremental computation of barycentric coordinates
+    // Delta values for of barycentric coordinates (incremental computation)
     Vector3d baryDeltaX;
     Vector3d baryDeltaY;
 } Triangle;
 
-// `vertices` must be NDC and clockwise!
-// colors OR (UV AND texture) should be NULL, the other one shouldn't
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer);
 void freeTriangle(Triangle* this);
-
 void triangleReinitialize(Triangle* this, Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer);
+
 static void triangleSetVertices(Triangle* this, Vector3d* vertices, Renderer* renderer);
 static void triangleSetColorOrTexture(Triangle* this, Color* colors, Texture* texture, Vector2d* UV);
 static void triangleCalculateEdgeVectors(Triangle* this);
