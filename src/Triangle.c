@@ -6,10 +6,32 @@
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
 {
     Triangle* this = xmalloc(sizeof(Triangle));
+    triangleReinitialize(this, vertices, colors, texture, UV, renderer);
+    return this;
+}
 
+void freeTriangle(Triangle* this)
+{
+    xfree(this);
+}
+
+void triangleReinitialize(Triangle* this, Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
+{
+    triangleSetColorOrTexture(this, colors, texture, UV);
+    triangleSetVertices(this, vertices, renderer);
+    triangleCalculateEdgeVectors(this);
+    triangleGetBoundingPoints(this);
+    triangleCalculateBaryDeltasAndInitial(this);
+}
+
+static void triangleSetVertices(Triangle* this, Vector3d* vertices, Renderer* renderer)
+{
     for (size_t i = 0; i < 3; i++)
         this->vertices[i] = NDCtoScreenSpace(renderer, vertices[i]);
+}
 
+static void triangleSetColorOrTexture(Triangle* this, Color* colors, Texture* texture, Vector2d* UV)
+{
     if (colors != NULL)
     {
         this->colors = colors;
@@ -23,13 +45,19 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vecto
     }
     else
     {
-        LOGE("newTriangle() invalid call");
+        LOGE("triangleSetColorOrTexture() invalid call");
         abort();
     }
+}
 
+static void triangleCalculateEdgeVectors(Triangle* this)
+{
     for (size_t i = 0; i < 3; i++)
         this->edgeVectors[i] = Vector3dSubtract(this->vertices[(i+1 == 3) ? 0 : i+1], this->vertices[i]);
+}
 
+static void triangleCalculateBaryDeltasAndInitial(Triangle* this)
+{
     double areaX2 = Vector3dMagnitude(
         Vector3dCross(this->edgeVectors[0], this->edgeVectors[2])
     );
@@ -64,20 +92,10 @@ Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vecto
     };
     this->baryDeltaY = Vector3dDivideD(this->baryDeltaY, areaX2);
 
-    triangleGetBoundingPoints(this, &this->minBoundingPoint, &this->maxBoundingPoint);
-    this->minBoundingPoint = Vector3dAdd(this->minBoundingPoint, (Vector3d) {0.5, 0.5, 0});
-    this->maxBoundingPoint = Vector3dAdd(this->maxBoundingPoint, (Vector3d) {0.5, 0.5, 0});
     this->baryCoordsInitial = triangleInitializeBarycentricCoordinates(this, baryCoordsZero, this->minBoundingPoint);
-
-    return this;
 }
 
-void freeTriangle(Triangle* this)
-{
-    xfree(this);
-}
-
-Color triangleInterpolateColor(Triangle* this, Vector3d barycentricCoordinates)
+static Color triangleInterpolateColor(Triangle* this, Vector3d barycentricCoordinates)
 {
     Vector4d resColorV = {0};  // result color as Vector4d
     for (size_t i = 0; i < 3; i++)
@@ -90,7 +108,7 @@ Color triangleInterpolateColor(Triangle* this, Vector3d barycentricCoordinates)
     return color;
 }
 
-Vector2d triangleInterpolateUV(Triangle* this, Vector3d barycentricCoordinates)
+static Vector2d triangleInterpolateUV(Triangle* this, Vector3d barycentricCoordinates)
 {
     Vector2d resUV = {0};
     for (size_t i = 0; i < 3; i++)
@@ -140,7 +158,7 @@ void triangleDraw(Triangle* this, Renderer* renderer)
     }
 }
 
-static void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* max)
+static void triangleGetBoundingPoints(Triangle* this)
 {
     Vector3d res_min = {DBL_MAX, DBL_MAX, DBL_MAX};
     Vector3d res_max = {0};
@@ -162,8 +180,8 @@ static void triangleGetBoundingPoints(Triangle* this, Vector3d* min, Vector3d* m
             res_max.z = this->vertices[i].z;
     }
 
-    *min = res_min;
-    *max = res_max;
+    this->minBoundingPoint = Vector3dAdd(res_min, (Vector3d) {0.5, 0.5, 0});
+    this->maxBoundingPoint = Vector3dAdd(res_max, (Vector3d) {0.5, 0.5, 0});
 }
 
 static bool triangleIsEdgeFlatTopOrLeft(Vector3d edge)
