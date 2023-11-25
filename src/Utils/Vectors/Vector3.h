@@ -8,6 +8,7 @@ typedef struct
 } Vector3d;
 
 double   Vector3dMagnitude(Vector3d a);
+Vector3d Vector3dNormalize(Vector3d a);
 Vector3d Vector3dAdd      (Vector3d a, Vector3d b);
 Vector3d Vector3dSubtract (Vector3d a, Vector3d b);
 Vector3d Vector3dMultiplyD(Vector3d a, double b);

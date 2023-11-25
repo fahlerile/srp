@@ -26,6 +26,8 @@ Rendering models:
     - [x] Fix memory leak with `Model` freeing
 - [ ] Vertex, face, edge structures (if I need them)
 - [ ] Vertex data parser in `Model`
+    - [ ] Think of an edge case where line is longer than 50 chars
+    - [ ] Fix possibility of buffer overflow (see comment)
 - [ ] Perspective projection
 - [ ] Depth buffer
     - [ ] Interpolate z-coordinate inside triangle, draw a pixel only if that z coordinate is closer to viewport than already drawn one
@@ -45,10 +47,8 @@ Documentation/testing:
 
 Refactoring:
 - Triangle:
-    - [x] Change barycentric coordinates' type to just array, not `Vector3d`
-        - No, this is not a good idea
-    - [x] Split up `triangleDraw` into multiple functions
-        - No ideas how to do this
+    - [x] ~~Change barycentric coordinates' type to just array, not `Vector3d`~~
+    - [x] ~~Split up `triangleDraw` into multiple functions~~
     - [x] Split up `newTriangle` into multiple functions
         - I might need them if I decide to add "editing" functionality (construct a `Triangle` once - use a million times by changing vertices/UV/texture)
 - Matrix:

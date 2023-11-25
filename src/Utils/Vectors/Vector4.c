@@ -9,6 +9,11 @@ double Vector4dMagnitude(Vector4d a)
                 a.w * a.w);
 }
 
+Vector4d Vector4dNormalize(Vector4d a)
+{
+    return Vector4dDivideD(a, Vector4dMagnitude(a));
+}
+
 Vector4d Vector4dAdd(Vector4d a, Vector4d b)
 {
     return (Vector4d) {

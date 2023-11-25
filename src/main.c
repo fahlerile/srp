@@ -17,7 +17,7 @@ int main(int argc, char** argv)
                                               (Vector3d) {0, 0, 0},
                                               (Vector3d) {0, 0, 0});
     Scene* world = newScene(viewMatrix);
-    Model* teapot = newModel("res/models/utah_teapot.obj");
+    Model* teapot = newModel("utah_teapot.obj");
     modelAddInstance(teapot, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0});
     sceneAddModel(world, teapot);
     freeSceneAndModels(world);

@@ -10,6 +10,7 @@ typedef struct
 #include "utils/Color.h"  // circular dependency
 
 double   Vector4dMagnitude(Vector4d a);
+Vector4d Vector4dNormalize(Vector4d a);
 Vector4d Vector4dAdd      (Vector4d a, Vector4d b);
 Vector4d Vector4dSubtract (Vector4d a, Vector4d b);
 Vector4d Vector4dMultiplyD(Vector4d a, double b);

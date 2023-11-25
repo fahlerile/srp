@@ -8,6 +8,11 @@ double Vector3dMagnitude(Vector3d a)
                 a.z * a.z);
 }
 
+Vector3d Vector3dNormalize(Vector3d a)
+{
+    return Vector3dDivideD(a, Vector3dMagnitude(a));
+}
+
 Vector3d Vector3dAdd(Vector3d a, Vector3d b)
 {
     return (Vector3d) {

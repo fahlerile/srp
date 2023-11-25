@@ -18,7 +18,7 @@ DynamicArray* newDynamicArray(size_t nElements, size_t nBytesPerElement)
 
 static void reallocateDynamicArray(DynamicArray* this)
 {
-    xrealloc(this->data, (this->allocated * 2) * this->nBytesPerElement);
+    this->data = xrealloc(this->data, (this->allocated * 2) * this->nBytesPerElement);
     this->allocated = this->allocated * 2;
 }
 

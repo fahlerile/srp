@@ -9,6 +9,7 @@ void test2()
     Vector2d b = {10.2, 5.4};
 
     assert(Vector2dMagnitude(a) == 5.);
+    assert(Vector2dEqual(Vector2dNormalize(a), (Vector2d) {3. / 5., 4. / 5.}));
 
     Vector2d c = Vector2dAdd(a, b);
     assert(Vector2dEqual(c, (Vector2d) {3. + 10.2, 4. + 5.4}));
@@ -35,6 +36,7 @@ void test3()
     Vector3d b = {10.2, 5.4, 5.2};
 
     assert(Vector3dMagnitude(a) == sqrt(50));
+    assert(Vector3dEqual(Vector3dNormalize(a), (Vector3d) {3. / sqrt(50), 4. / sqrt(50), 5. / sqrt(50)}));
 
     Vector3d c = Vector3dAdd(a, b);
     assert(Vector3dEqual(c, (Vector3d) {3. + 10.2, 4. + 5.4, 5. + 5.2}));
@@ -61,6 +63,7 @@ void test4()
     Vector4d b = {10.2, 5.4, 5.2, 7.3};
 
     assert(Vector4dMagnitude(a) == sqrt(55.29));
+    assert(Vector4dEqual(Vector4dNormalize(a), (Vector4d) {3. / sqrt(55.29), 4. / sqrt(55.29), 5. / sqrt(55.29), 2.3 / sqrt(55.29)}));
 
     Vector4d c = Vector4dAdd(a, b);
     assert(Vector4dEqual(c, (Vector4d) {3. + 10.2, 4. + 5.4, 5. + 5.2, 2.3 + 7.3}));

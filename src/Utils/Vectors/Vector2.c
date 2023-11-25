@@ -7,6 +7,11 @@ double Vector2dMagnitude(Vector2d a)
                 a.y * a.y);
 }
 
+Vector2d Vector2dNormalize(Vector2d a)
+{
+    return Vector2dDivideD(a, Vector2dMagnitude(a));
+}
+
 Vector2d Vector2dAdd(Vector2d a, Vector2d b)
 {
     return (Vector2d) {

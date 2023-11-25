@@ -13,6 +13,7 @@ typedef struct
 } Vector2d;
 
 double   Vector2dMagnitude(Vector2d a);
+Vector2d Vector2dNormalize(Vector2d a);
 Vector2d Vector2dAdd      (Vector2d a, Vector2d b);
 Vector2d Vector2dSubtract (Vector2d a, Vector2d b);
 Vector2d Vector2dMultiplyD(Vector2d a, double b);
