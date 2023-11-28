@@ -10,7 +10,8 @@ set(
   Model.c
   Scene.c
 
-  utils/MemoryUtils.c
+  utils/fileUtils.c
+  utils/memoryUtils.c
   utils/NDC.c
   utils/Matrix.c
   utils/Color.c
@@ -32,7 +33,7 @@ else()
   target_compile_options(${EXECUTABLE_NAME} PRIVATE
                          -Wall -Wextra -Wpedantic -Wno-unused -std=c2x)
                          # -march=native
-  # target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=)
+  # target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=address)
 endif()
 
 target_include_directories(${EXECUTABLE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

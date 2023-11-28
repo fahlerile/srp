@@ -2,7 +2,7 @@
 #include <string.h>
 #include <assert.h>
 #include "DynamicArray.h"
-#include "utils/MemoryUtils.h"
+#include "utils/memoryUtils.h"
 
 #define indexVoidPtr(ptr, i, nBytesPerElement) ((char*) ptr + (i * nBytesPerElement))
 

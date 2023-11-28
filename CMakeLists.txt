@@ -8,4 +8,4 @@ add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(lib)
 
-file(COPY res/ DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+file(COPY res/ DESTINATION ${CMAKE_BINARY_DIR}/bin/res/)

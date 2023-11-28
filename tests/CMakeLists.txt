@@ -1,7 +1,7 @@
 add_executable(DynamicArrayTest
     DynamicArrayTest.c
     ${CMAKE_SOURCE_DIR}/src/utils/DynamicArray.c
-    ${CMAKE_SOURCE_DIR}/src/utils/MemoryUtils.c
+    ${CMAKE_SOURCE_DIR}/src/utils/memoryUtils.c
 )
 add_executable(VectorsTest
     VectorsTest.c
@@ -16,12 +16,20 @@ add_executable(MatrixTest
     ${CMAKE_SOURCE_DIR}/src/utils/Vectors/Vector3.c
     ${CMAKE_SOURCE_DIR}/src/utils/Vectors/Vector4.c
 )
+add_executable(fileUtilsTest
+    fileUtilsTest.c
+    ${CMAKE_SOURCE_DIR}/src/utils/fileUtils.c
+    ${CMAKE_SOURCE_DIR}/src/utils/memoryUtils.c
+)
 
 set(testNames
     DynamicArrayTest
     VectorsTest
     MatrixTest
+    fileUtilsTest
 )
+
+file(COPY res/ DESTINATION ${CMAKE_BINARY_DIR}/tests/res)
 
 foreach(testName ${testNames})
     add_test(NAME ${testName} COMMAND ${testName})

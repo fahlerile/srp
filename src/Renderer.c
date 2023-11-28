@@ -63,7 +63,7 @@ void rendererDrawToBuffer(Renderer* this)
         (Vector2d) {1. , 0.}
     };
 
-    Texture* texture = newTexture("minecraftBricks.png");
+    Texture* texture = newTexture("res/textures/minecraftBricks.png");
     Triangle* triangle = newTriangle(vertices, NULL, texture, UV, this);
 
     triangleDraw(triangle, this);

@@ -12,7 +12,7 @@
 #include "Color.h"
 #include "Matrix.h"
 #include "Vectors/Vectors.h"
-#include "MemoryUtils.h"
+#include "memoryUtils.h"
 #include "DynamicArray.h"
 
 #include "radians.h"

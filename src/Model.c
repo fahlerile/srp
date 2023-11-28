@@ -2,6 +2,7 @@
 #include <string.h>
 #include "Model.h"
 #include "utils/utils.h"
+#include "utils/fileUtils.h"
 
 Model* newModel(const char* filename)
 {
@@ -17,35 +18,13 @@ Model* newModel(const char* filename)
 static void modelParseObj(Model* this, const char* filename)
 {
     FILE* fp = fopen(filename, "r");
-    int length = 50;
-    char* line = xmalloc(length * sizeof(char));
+    assert(fp != NULL);
+    char* line = NULL;
+    size_t length = 0;
     char lineType[3];
 
-    bool lineCutEarly = false;
-    char* beginningOfTheLine = NULL;  // used for handling too long lines
-
-    while (fgets(line, length, fp) != NULL)
+    while (readLine(&line, &length, fp) != EOF)
     {
-        if (lineCutEarly)
-        {
-            strcat(beginningOfTheLine, line);
-            char* wholeLine = beginningOfTheLine;  // "rename" for clarity (see strcat above)
-            xfree(line);
-            line = xmalloc((length * 2) * sizeof(char));
-            length = length * 2;
-            strcpy(line, wholeLine);
-            xfree(wholeLine);
-            lineCutEarly = false;
-        }
-
-        if (strchr(line, '\n') == NULL)  // if line is longer than the buffer
-        {
-            beginningOfTheLine = xmalloc((length * 2) * sizeof(char) - 1);
-            strcpy(beginningOfTheLine, line);
-            lineCutEarly = true;
-            continue;
-        }
-
         lineType[0] = '\0';  // to avoid data doubling on empty lines
         sscanf(line, "%2s", lineType);
 
@@ -97,6 +76,7 @@ static void modelParseObj(Model* this, const char* filename)
             LOGE("Unknown line type \"%s\" occured during parsing of %s\n", lineType, filename);
     }
     xfree(line);
+    fclose(fp);
 }
 
 void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3d scale)
