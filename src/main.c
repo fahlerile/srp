@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     while (running)
     {
         pollEvents(&running, &event);
-        rendererSwapBuffer(renderer);
+        // rendererSwapBuffer(renderer);  // have to comment this on linux
     }
 
     deinitialize(renderer);

@@ -26,4 +26,7 @@ set(testNames
 foreach(testName ${testNames})
     add_test(NAME ${testName} COMMAND ${testName})
     target_include_directories(${testName} PUBLIC ${CMAKE_SOURCE_DIR}/src)
+    if(UNIX)
+        target_link_libraries(${testName} m)
+    endif()
 endforeach(testName ${testNames})

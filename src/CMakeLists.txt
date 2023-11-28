@@ -28,8 +28,11 @@ add_executable(${EXECUTABLE_NAME} ${SOURCES})
 if(MSVC)
   target_compile_options(${EXECUTABLE_NAME} PRIVATE /W4 /WX)
 else()
+  # -fsanitize=address+shadow-call-stack+thread+leak+undefined
   target_compile_options(${EXECUTABLE_NAME} PRIVATE
-                         -Wall -Wextra -Wpedantic -Wno-unused -std=c2x)  # -march=native)
+                         -Wall -Wextra -Wpedantic -Wno-unused -std=c2x)
+                         # -march=native
+  # target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=)
 endif()
 
 target_include_directories(${EXECUTABLE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

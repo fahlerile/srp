@@ -17,14 +17,38 @@ Model* newModel(const char* filename)
 static void modelParseObj(Model* this, const char* filename)
 {
     FILE* fp = fopen(filename, "r");
-    const int n = 50;
-    char* line = xmalloc(n * sizeof(char));
+    int length = 50;
+    char* line = xmalloc(length * sizeof(char));
     char lineType[3];
 
-    while ((line = fgets(line, n, fp)) != NULL)
+    bool lineCutEarly = false;
+    char* beginningOfTheLine = NULL;  // used for handling too long lines
+
+    while (fgets(line, length, fp) != NULL)
     {
-        lineType[0] = '\0';  // to avoid doubling on empty lines
-        sscanf(line, "%s", lineType);  // BUG: may be buffer overflow here (only if wrong OBJ-file)
+        if (lineCutEarly)
+        {
+            strcat(beginningOfTheLine, line);
+            char* wholeLine = beginningOfTheLine;  // "rename" for clarity (see strcat above)
+            xfree(line);
+            line = xmalloc((length * 2) * sizeof(char));
+            length = length * 2;
+            strcpy(line, wholeLine);
+            xfree(wholeLine);
+            lineCutEarly = false;
+        }
+
+        if (strchr(line, '\n') == NULL)  // if line is longer than the buffer
+        {
+            beginningOfTheLine = xmalloc((length * 2) * sizeof(char) - 1);
+            strcpy(beginningOfTheLine, line);
+            lineCutEarly = true;
+            continue;
+        }
+
+        lineType[0] = '\0';  // to avoid data doubling on empty lines
+        sscanf(line, "%2s", lineType);
+
         if (lineType[0] == '\0' || strcmp(lineType, "#") == 0)
             continue;
         else if (strcmp(lineType, "v") == 0)
@@ -83,6 +107,9 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
 
 void freeModel(Model* this)
 {
+    freeDynamicArray(this->vertexPositions);
+    freeDynamicArray(this->UVs);
+    freeDynamicArray(this->normals);
     freeDynamicArray(this->matrices);
     xfree(this);
 }
