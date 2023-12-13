@@ -3,15 +3,25 @@
 #include "Model.h"
 #include "utils/utils.h"
 #include "utils/fileUtils.h"
+#include "utils/stringUtils.h"
+
+void faceFreeCallback(void* p_face)
+{
+    freeDynamicArray(((Face*) p_face)->vertices);
+}
 
 Model* newModel(const char* filename)
 {
     Model* this = xmalloc(sizeof(Model));
-    this->vertexPositions = newDynamicArray(100, sizeof(Vector4d));
-    this->UVs = newDynamicArray(100, sizeof(Vector2d));
-    this->normals = newDynamicArray(100, sizeof(Vector3d));
+
+    this->vertexPositions = newDynamicArray(100, sizeof(Vector4d), NULL);
+    this->UVs = newDynamicArray(100, sizeof(Vector2d), NULL);
+    this->normals = newDynamicArray(100, sizeof(Vector3d), NULL);
+    this->matrices = newDynamicArray(10, sizeof(Matrix4), NULL);
+    this->faces = newDynamicArray(100, sizeof(Face), faceFreeCallback);
+
     modelParseObj(this, filename);
-    this->matrices = newDynamicArray(10, sizeof(Matrix4));
+
     return this;
 }
 
@@ -62,8 +72,35 @@ static void modelParseObj(Model* this, const char* filename)
         // else if (strcmp(lineType, "vp"))
         else if (strcmp(lineType, "f") == 0)
         {
-            // char* vertex_str = splitString();
-            // for (str)
+            DynamicArray* vertices = newDynamicArray(3, sizeof(Vertex), NULL);
+            DynamicArray* vertices_str = splitString(line, " ");  // char*
+            bool fail = false;
+
+            for (size_t i = 0; i < vertices_str->size; i++)
+            {
+                char* token = *(char**) indexDynamicArray(vertices_str, i);
+                size_t v = 0, vt = 0, vn = 0;
+                sscanf(token, "%zu/%zu/%zu", &v, &vt, &vn);
+                if (v == 0)
+                {
+                    fail = true;
+                    break;
+                }
+
+                // -1 because OBJ is 1-base indexed
+                Vertex vert = {
+                    .position = indexDynamicArray(this->vertexPositions, v - 1),
+                    .UV = indexDynamicArray(this->UVs, vt - 1),
+                    .normal = indexDynamicArray(this->normals, vn - 1)
+                };
+
+                addToDynamicArray(vertices, &vert);
+            }
+            if (fail)
+                continue;
+
+            Face face = {.vertices = vertices};
+            addToDynamicArray(this->faces, &face);
         }
         // else if (strcmp(lineType, "g"))
         // else if (strcmp(lineType, "o"))

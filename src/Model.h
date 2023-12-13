@@ -17,10 +17,11 @@ typedef struct
 
 typedef struct
 {
-    DynamicArray* vertexPositions;  // an array of `Vector4d`
-    DynamicArray* UVs;              // an array of `Vector2d`
-    DynamicArray* normals;          // an array of `Vector3d`
-    DynamicArray* matrices;         // an array of `Matrix4`
+    DynamicArray* vertexPositions;  // `Vector4d`
+    DynamicArray* UVs;              // `Vector2d`
+    DynamicArray* normals;          // `Vector3d`
+    DynamicArray* matrices;         // `Matrix4`
+    DynamicArray* faces;            // `Face`
 } Model;
 
 Model* newModel(const char* filename);
