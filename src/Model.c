@@ -61,15 +61,10 @@ static void modelParseObj(Model* this, const char* filename)
         }
         // else if (strcmp(lineType, "vp"))
         else if (strcmp(lineType, "f") == 0)
-            continue;
-        // {
-        //     char* a = "a";
-        //     char* token = strtok_r(line, " ", NULL);
-        //     while ((token = strtok_r(NULL, " ", &a)) != NULL)
-        //     {
-        //         printf("%s ", token);
-        //     }
-        // }
+        {
+            // char* vertex_str = splitString();
+            // for (str)
+        }
         // else if (strcmp(lineType, "g"))
         // else if (strcmp(lineType, "o"))
         else
@@ -83,6 +78,20 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
 {
     Matrix4 mat = Matrix4ConstructTRS(position, rotation, scale);
     addToDynamicArray(this->matrices, &mat);
+}
+
+void modelRender(Model* this, Matrix4* view, Matrix4* projection)
+{
+    // object space -- MODELMAT --> world space -- VIEWMAT --> view (camera) space (camera looks in +Z) -- PROJECTIONMAT --> image space
+    // need near plane dimensions for orthogonal projection matrix construction
+    for (size_t i = 0; i < this->matrices->size; i++)
+    {
+        Matrix4* model = indexDynamicArray(this->matrices, i);
+        Matrix4 MV = Matrix4MultiplyMatrix4(view, model);
+        Matrix4 MVP = Matrix4MultiplyMatrix4(projection, &MV);
+        // transform every vertex & etc. with MVP matrix
+        // drawcalls
+    }
 }
 
 void freeModel(Model* this)

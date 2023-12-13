@@ -2,11 +2,12 @@
 #include "Model.h"
 #include "utils/utils.h"
 
-Scene* newScene(Matrix4 viewMatrix)
+Scene* newScene(Matrix4 viewMatrix, Matrix4 projectionMatrix)
 {
     Scene* this = xmalloc(sizeof(Scene));
     this->models = newDynamicArray(10, sizeof(Model*));
     this->viewMatrix = viewMatrix;
+    this->projectionMatrix = projectionMatrix;
     return this;
 }
 
@@ -17,7 +18,8 @@ void sceneAddModel(Scene* this, Model* model)
 
 void sceneRender(Scene* this)
 {
-
+    for (size_t i = 0; i < this->models->size; i++)
+        modelRender(*(Model**) indexDynamicArray(this->models, i), &this->viewMatrix, &this->projectionMatrix);
 }
 
 void freeSceneAndModels(Scene* this)
