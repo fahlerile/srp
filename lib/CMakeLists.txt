@@ -2,7 +2,7 @@ if(WIN32)
   find_library(
     SDL2_DLL_A
     SDL2.dll
-    HINTS SDL2_windows/lib
+    HINTS SDL2/lib
     REQUIRED
   )
   target_link_libraries(
