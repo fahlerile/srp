@@ -12,7 +12,8 @@ typedef struct
 DynamicArray* newDynamicArray(size_t nElements, size_t nBytesPerElement);
 static void reallocateDynamicArray(DynamicArray* this);
 void addToDynamicArray(DynamicArray* this, void* element);
-void delInDynamicArray(DynamicArray* this);  // "delete" last element
+void deleteLastInDynamicArray(DynamicArray* this);
 void setInDynamicArray(DynamicArray* this, void* element, size_t i);
 void* indexDynamicArray(DynamicArray* this, size_t i);
 void freeDynamicArray(DynamicArray* this);
+

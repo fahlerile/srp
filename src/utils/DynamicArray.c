@@ -31,7 +31,7 @@ void addToDynamicArray(DynamicArray* this, void* element)
     this->size += 1;
 }
 
-void delInDynamicArray(DynamicArray* this)
+void deleteLastInDynamicArray(DynamicArray* this)
 {
     this->size -= 1;
 }

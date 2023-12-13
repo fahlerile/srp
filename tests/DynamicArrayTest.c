@@ -29,7 +29,7 @@ void testInt()
     int expected[5] = {4, 6, 2, 1, 9};
     assert(memcmp(arr->data, (void*) expected, sizeof(expected)) == 0);
 
-    delInDynamicArray(arr);
+    deleteLastInDynamicArray(arr);
     assert(arr->size == 4);
     assert(*(int*) indexDynamicArray(arr, 0) == 4);
     assert(*(int*) indexDynamicArray(arr, 1) == 6);
@@ -62,7 +62,7 @@ void testDouble()
     double expected[5] = {4.3, 6.2, 2.3, 1.7, 9.1};
     assert(memcmp(arr->data, (void*) expected, sizeof(expected)) == 0);
 
-    delInDynamicArray(arr);
+    deleteLastInDynamicArray(arr);
     assert(arr->size == 4);
     assert(*(double*) indexDynamicArray(arr, 0) == 4.3);
     assert(*(double*) indexDynamicArray(arr, 1) == 6.2);
@@ -97,7 +97,7 @@ void testStruct()
     };
     assert(memcmp(arr->data, (void*) expected, sizeof(expected)) == 0);
 
-    delInDynamicArray(arr);
+    deleteLastInDynamicArray(arr);
     assert(arr->size == 4);
     TestStruct a = *(TestStruct*) indexDynamicArray(arr, 0);
     assert(a.a == 1);
