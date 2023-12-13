@@ -16,7 +16,7 @@ cd bin
 ```
 
 ## TODO
-Rendering models:
+### Rendering models:
 - [x] Think of a way to structure world space models
     - [x] I need a neat way to use dynamic-sized array, that is, some "`std::vector` alternative"
         - `DynamicArray` struct
@@ -24,11 +24,15 @@ Rendering models:
 - [x] `Scene` struct
 - [x] `Model` struct
     - [x] Fix memory leak with `Model` freeing
-- [ ] Face parser in `Model`
-    - [ ] Determine whether or not `readLine` reads INCLUDING '\n' or excluding and document it!
+- [x] Face parser in `Model`
+    - [x] Determine whether or not `readLine` reads INCLUDING '\n' or excluding and document it!
     - [ ] `splitString` (safe strtok implementation, I do not want to use GNU `strtok_r`)
-        - [ ] Generic `LinkedList` implementation 
-    - [ ] Vertex, face structures
+        - [x] ~~ Generic `LinkedList` implementation ~~
+        - [ ] ~~ Unit test for `LinkedList` ~~
+        - [x] Add freeing for `splitString` (add free callback to `DynamicArray`)
+            - [x] Add a test for this callback
+            - [x] Make everything use this callback
+    - [x] Vertex, face structures
 - [ ] Projection matrices
     - [ ] Orthogonal projection matrix construction
     - [ ] Perspective projection matrix construction
@@ -39,7 +43,7 @@ Rendering models:
 - [ ] Lighting
 - [ ] Shadows
 
-Documentation/testing:
+### Documentation/testing:
 - [x] Start documenting the code
     - [x] Triangle (computation, algorithm, etc.)
     - [x] ~~DynamicArray (why & how it works)~~
@@ -50,7 +54,7 @@ Documentation/testing:
 - [ ] Integration testing
     - Check whether or not drawn triangle/polygon/model correctly (image comparison?)
 
-Refactoring:
+### Refactoring:
 - Triangle:
     - [x] ~~Change barycentric coordinates' type to just array, not `Vector3d`~~
     - [x] ~~Split up `triangleDraw` into multiple functions~~
