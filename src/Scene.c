@@ -2,10 +2,15 @@
 #include "Model.h"
 #include "utils/utils.h"
 
+static void sceneFreeCallback(void* p_model)
+{
+    freeModel(*(Model**) p_model);
+}
+
 Scene* newScene(Matrix4 viewMatrix, Matrix4 projectionMatrix)
 {
     Scene* this = xmalloc(sizeof(Scene));
-    this->models = newDynamicArray(10, sizeof(Model*));
+    this->models = newDynamicArray(10, sizeof(Model*), sceneFreeCallback);
     this->viewMatrix = viewMatrix;
     this->projectionMatrix = projectionMatrix;
     return this;
@@ -24,11 +29,6 @@ void sceneRender(Scene* this)
 
 void freeSceneAndModels(Scene* this)
 {
-    // We store Model* in `models` array and we get a
-    // pointer to stored type from `indexDynamicArray`,
-    // so we need to dereference it to get a Model*
-    for (size_t i = 0; i < this->models->size; i++)
-        freeModel(*(Model**) indexDynamicArray(this->models, i));
     freeDynamicArray(this->models);
     xfree(this);
 }
