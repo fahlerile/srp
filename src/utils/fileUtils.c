@@ -3,8 +3,8 @@
 #include "fileUtils.h"
 
 /**
- * @brief Read the whole line from a filestream. Also see `getline` from GNU standard
- *
+ * @brief Read the whole line from a filestream INCLUDING '\n'
+ * Also see `getline` from GNU standard
  * @param line a pointer to string (`char` array) which was `malloc`'ed for `length` characters. If points to `NULL`, the buffer will be allocated inside the function (don't forget to `free` it!) and the value pointed to by `length` is ignored.
  * @param length a pointer to number of characters the `line` was allocated to hold. The value pointed to is ignored if `line` is `NULL`.
  * @param fp file descriptor
@@ -31,7 +31,7 @@ allocate:
 
 /**
  * @brief Find the distance from the current position in file to the next occurence of a specific character
- * May be interpreted as "length of a string buffer to be able to read from current character up to this character WITHOUT null byte (add +1 if you need null byte!)"
+ * May be interpreted as "length of a string buffer to be able to read from current character up to including this character WITHOUT null byte (add +1 if you need null byte!)"
  * @param ch char to look for
  * @param fp file pointer
  */
