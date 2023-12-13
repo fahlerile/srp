@@ -16,7 +16,9 @@ int main(int argc, char** argv)
     Matrix4 viewMatrix = Matrix4ConstructView((Vector3d) {0, 0, 0},
                                               (Vector3d) {0, 0, 0},
                                               (Vector3d) {0, 0, 0});
-    Scene* world = newScene(viewMatrix);
+    // Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection();
+    Matrix4 projectionMatrix = Matrix4ConstructIdentity();
+    Scene* world = newScene(viewMatrix, projectionMatrix);
     Model* teapot = newModel("res/models/utah_teapot.obj");
     modelAddInstance(teapot, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0});
     sceneAddModel(world, teapot);
@@ -30,7 +32,9 @@ int main(int argc, char** argv)
     while (running)
     {
         pollEvents(&running, &event);
-        // rendererSwapBuffer(renderer);  // have to comment this on linux
+#ifndef __linux__
+        rendererSwapBuffer(renderer);
+#endif
     }
 
     deinitialize(renderer);
