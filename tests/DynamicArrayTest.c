@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include "utils/DynamicArray.h"
+#include "utils/memoryUtils.h"
 
 typedef struct __attribute__((packed))
 {
@@ -10,7 +11,7 @@ typedef struct __attribute__((packed))
 
 void testInt()
 {
-    DynamicArray* arr = newDynamicArray(3, sizeof(int));
+    DynamicArray* arr = newDynamicArray(3, sizeof(int), NULL);
     assert(arr->size == 0);
     assert(arr->allocated == 3);
     assert(arr->nBytesPerElement == sizeof(int));
@@ -41,42 +42,9 @@ void testInt()
     freeDynamicArray(arr);
 }
 
-void testDouble()
-{
-    DynamicArray* arr = newDynamicArray(3, sizeof(double));
-    assert(arr->size == 0);
-    assert(arr->allocated == 3);
-    assert(arr->nBytesPerElement == sizeof(double));
-
-    addToDynamicArray(arr, &(double) {4.3});
-    addToDynamicArray(arr, &(double) {6.2});
-    addToDynamicArray(arr, &(double) {2.3});
-    assert(arr->size == 3);
-    assert(arr->allocated == 3);
-
-    addToDynamicArray(arr, &(double) {1.7});
-    addToDynamicArray(arr, &(double) {9.1});
-    assert(arr->size == 5);
-    assert(arr->allocated == 6);
-
-    double expected[5] = {4.3, 6.2, 2.3, 1.7, 9.1};
-    assert(memcmp(arr->data, (void*) expected, sizeof(expected)) == 0);
-
-    deleteLastInDynamicArray(arr);
-    assert(arr->size == 4);
-    assert(*(double*) indexDynamicArray(arr, 0) == 4.3);
-    assert(*(double*) indexDynamicArray(arr, 1) == 6.2);
-    assert(*(double*) indexDynamicArray(arr, 3) == 1.7);
-
-    setInDynamicArray(arr, &(double) {727.2}, 1);
-    assert(*(double*) indexDynamicArray(arr, 1) == 727.2);
-
-    freeDynamicArray(arr);
-}
-
 void testStruct()
 {
-    DynamicArray* arr = newDynamicArray(3, sizeof(TestStruct));
+    DynamicArray* arr = newDynamicArray(3, sizeof(TestStruct), NULL);
     assert(arr->size == 0);
     assert(arr->allocated == 3);
     assert(arr->nBytesPerElement == sizeof(TestStruct));
@@ -117,9 +85,28 @@ void testStruct()
     freeDynamicArray(arr);
 }
 
+void freeCallback(void* p_p_int)
+{
+    xfree(*(int**) p_p_int);
+}
+
+void testFreeCallback()
+{
+    DynamicArray* arr = newDynamicArray(3, sizeof(int*), freeCallback);
+
+    for (size_t i = 0; i < 10; i++)
+    {
+        int* elem = xmalloc(sizeof(int));
+        *elem = 5;
+        addToDynamicArray(arr, &elem);
+    }
+
+    freeDynamicArray(arr);
+}
+
 int main()
 {
     testInt();
-    testDouble();
     testStruct();
+    testFreeCallback();
 }

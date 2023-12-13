@@ -6,13 +6,14 @@
 
 #define indexVoidPtr(ptr, i, nBytesPerElement) ((char*) ptr + (i * nBytesPerElement))
 
-DynamicArray* newDynamicArray(size_t nElements, size_t nBytesPerElement)
+DynamicArray* newDynamicArray(size_t nElements, size_t nBytesPerElement, freeCallbackFunctionType freeCallback)
 {
     DynamicArray* this = xmalloc(sizeof(DynamicArray));
     this->data = xcalloc(nElements, nBytesPerElement);
     this->size = 0;
     this->allocated = nElements;
     this->nBytesPerElement = nBytesPerElement;
+    this->freeCallback = freeCallback;
     return this;
 }
 
@@ -50,6 +51,12 @@ void* indexDynamicArray(DynamicArray* this, size_t i)
 
 void freeDynamicArray(DynamicArray* this)
 {
+    if (this->freeCallback != NULL)
+    {
+        for (size_t i = 0; i < this->size; i++)
+            this->freeCallback(indexDynamicArray(this, i));
+    }
     xfree(this->data);
     xfree(this);
 }
+
