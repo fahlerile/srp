@@ -24,11 +24,16 @@ Rendering models:
 - [x] `Scene` struct
 - [x] `Model` struct
     - [x] Fix memory leak with `Model` freeing
-- [ ] Vertex, face, edge structures (if I need them)
-- [ ] Vertex data parser in `Model`
-    - [ ] Think of an edge case where line is longer than 50 chars
-    - [ ] Fix possibility of buffer overflow (see comment)
-- [ ] Perspective projection
+- [ ] Face parser in `Model`
+    - [ ] Determine whether or not `readLine` reads INCLUDING '\n' or excluding and document it!
+    - [ ] `splitString` (safe strtok implementation, I do not want to use GNU `strtok_r`)
+        - [ ] Generic `LinkedList` implementation 
+    - [ ] Vertex, face structures
+- [ ] Projection matrices
+    - [ ] Orthogonal projection matrix construction
+    - [ ] Perspective projection matrix construction
+    - [ ] MVP matrix transformation in `modelRender`
+    - [ ] Draw calls in `modelRender`
 - [ ] Depth buffer
     - [ ] Interpolate z-coordinate inside triangle, draw a pixel only if that z coordinate is closer to viewport than already drawn one
 - [ ] Lighting
