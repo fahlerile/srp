@@ -13,14 +13,23 @@ int main(int argc, char** argv)
     SDL_Event event;
     bool running = true;
 
-    Matrix4 viewMatrix = Matrix4ConstructView((Vector3d) {0, 0, 0},
-                                              (Vector3d) {0, 0, 0},
-                                              (Vector3d) {0, 0, 0});
-    // Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection();
-    Matrix4 projectionMatrix = Matrix4ConstructIdentity();
+    Matrix4 viewMatrix = Matrix4ConstructView(
+        (Vector3d) {0, 0, 0},
+        (Vector3d) {0, 0, 0},
+        (Vector3d) {0, 0, 0}
+    );  
+    Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection(
+        -2, 2,  // left, right
+        -2, 2,  // bottom, top
+         1, 5   // near, far
+    );
     Scene* world = newScene(viewMatrix, projectionMatrix);
     Model* teapot = newModel("res/models/utah_teapot.obj");
-    modelAddInstance(teapot, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0}, (Vector3d) {0, 0, 0});
+    modelAddInstance(teapot, 
+        (Vector3d) {0, 0, 0},
+        (Vector3d) {0, 0, 0},
+        (Vector3d) {0, 0, 0}
+    );
     sceneAddModel(world, teapot);
     freeSceneAndModels(world);
 
