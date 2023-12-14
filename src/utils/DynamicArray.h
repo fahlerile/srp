@@ -1,6 +1,12 @@
 #pragma once
 #include <stddef.h>
 
+/*
+ *  NOTE: It is absolutely safe to `addToDynamicArray` values allocated on the stack. What this function (and every other function manipulating the array) does is it copies the data pointed by a pointer passed to a function. So the following code is safe:
+ *  int a = 6;
+ *  addToDynamicArray(arr, &a);
+ */
+
 typedef void (*freeCallbackFunctionType)(void*);
 
 typedef struct
