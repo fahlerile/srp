@@ -34,10 +34,16 @@ cd bin
             - [x] Make everything use this callback
     - [x] Vertex, face structures
 - [ ] Projection matrices
-    - [ ] Orthogonal projection matrix construction
+    - [x] Orthogonal projection matrix construction
+    - [x] Vertices transformation in `modelRender`
+    - [ ] Add draw calls in `modelRender`
+        - [ ] Are draw calls overly complex? Do I need a `Triangle` structure? Maybe I want to rather have `renderFace` function?
+            - Yes, they are unnecessarily complex. I do not need to have a `Triangle` structure, instead I am going to create a `drawFace` function which will triangulate a face and draw it using the already written code (the one in `src/Triangle.c`)
     - [ ] Perspective projection matrix construction
-    - [ ] MVP matrix transformation in `modelRender`
-    - [ ] Draw calls in `modelRender`
+- [ ] Refactor & optimise
+    - [ ] Add comments/docs
+    - [ ] Is the structure overly complex?
+    - [ ] Can I avoid copying whole faces in `modelRender`?
 - [ ] Depth buffer
     - [ ] Interpolate z-coordinate inside triangle, draw a pixel only if that z coordinate is closer to viewport than already drawn one
 - [ ] Lighting

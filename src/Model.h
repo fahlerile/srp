@@ -12,8 +12,12 @@ typedef struct
 
 typedef struct
 {
-    DynamicArray* vertices;  // an array of `Vertex`
+    DynamicArray* vertices;  // `Vertex`
 } Face;
+
+Face* newFace(DynamicArray* vertices);
+Face* faceCopy(Face* this);
+void freeFace(Face* this);
 
 typedef struct
 {
@@ -21,7 +25,7 @@ typedef struct
     DynamicArray* UVs;              // `Vector2d`
     DynamicArray* normals;          // `Vector3d`
     DynamicArray* matrices;         // `Matrix4`
-    DynamicArray* faces;            // `Face`
+    DynamicArray* faces;            // `Face*`
 } Model;
 
 Model* newModel(const char* filename);

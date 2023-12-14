@@ -5,9 +5,28 @@
 #include "utils/fileUtils.h"
 #include "utils/stringUtils.h"
 
-void faceFreeCallback(void* p_face)
+Face* newFace(DynamicArray* vertices)
 {
-    freeDynamicArray(((Face*) p_face)->vertices);
+    Face* this = xmalloc(sizeof(Face));
+    this->vertices = vertices;
+    return this;
+}
+
+Face* faceCopy(Face* this)
+{
+    DynamicArray copy = copyDynamicArray(this->vertices);
+    return newFace(copy);
+}
+
+void freeFace(Face* this)
+{
+    freeDynamicArray(this->vertices);
+    xfree(this);
+}
+
+static void faceFreeCallback(void* p_face)
+{
+    freeFace((Face*) p_face);
 }
 
 Model* newModel(const char* filename)
@@ -18,7 +37,7 @@ Model* newModel(const char* filename)
     this->UVs = newDynamicArray(100, sizeof(Vector2d), NULL);
     this->normals = newDynamicArray(100, sizeof(Vector3d), NULL);
     this->matrices = newDynamicArray(10, sizeof(Matrix4), NULL);
-    this->faces = newDynamicArray(100, sizeof(Face), faceFreeCallback);
+    this->faces = newDynamicArray(100, sizeof(Face*), faceFreeCallback);
 
     modelParseObj(this, filename);
 
@@ -99,7 +118,7 @@ static void modelParseObj(Model* this, const char* filename)
             if (fail)
                 continue;
 
-            Face face = {.vertices = vertices};
+            Face* face = newFace(vertices);
             addToDynamicArray(this->faces, &face);
         }
         // else if (strcmp(lineType, "g"))
@@ -119,15 +138,29 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
 
 void modelRender(Model* this, Matrix4* view, Matrix4* projection)
 {
-    // object space -- MODELMAT --> world space -- VIEWMAT --> view (camera) space (camera looks in +Z) -- PROJECTIONMAT --> image space
-    // need near plane dimensions for orthogonal projection matrix construction
     for (size_t i = 0; i < this->matrices->size; i++)
     {
         Matrix4* model = indexDynamicArray(this->matrices, i);
         Matrix4 MV = Matrix4MultiplyMatrix4(view, model);
         Matrix4 MVP = Matrix4MultiplyMatrix4(projection, &MV);
-        // transform every vertex & etc. with MVP matrix
-        // drawcalls
+        
+        DynamicArray* transformedPositions = newDynamicArray(3, sizeof(Vector4d));
+        transformedPositions->size = 3;
+
+        for (size_t face_i = 0; face_i < this->faces->size; face_i++)
+        {
+            Face* copiedFace = copyFace((Face*) indexDynamicArray(this->faces, face_i));
+            for (size_t vertex_i = 0; vertex_i < copiedFace->vertices->size; vertex_i++)
+            {
+                Vertex* p_curVertex = indexDynamicArray(copiedFace->vertices; vertex_i);
+                Vector4d* p_curVertexPosition = p_curVertex->position;
+                Vector4d transformedVertexPosition = Matrix4MultiplyVector4d(&MVP, *p_curVertexPosition);
+                setInDynamicArray(transformedPositions, &transformedVertexPosition, vertex_i);
+                ((Vertex*) indexDynamicArray(copiedFace->vertices, vertex_i))->position = (Vector4d*) indexDynamicArray(transformedPositions, vertex_i);
+            } 
+
+            drawFace(copiedFace);
+        }
     }
 }
 
@@ -137,5 +170,6 @@ void freeModel(Model* this)
     freeDynamicArray(this->UVs);
     freeDynamicArray(this->normals);
     freeDynamicArray(this->matrices);
+    freeDynamicArray(this->faces);
     xfree(this);
 }
