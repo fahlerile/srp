@@ -10,7 +10,7 @@
  * @param colors an array of three `Colors` (one for each vertex). May be `NULL` only if both `texture` and `UV` are not `NULL`
  * @param texture a pointer to `Texture` to be used by this `Triangle`. May be `NULL` together with `UV` if `colors` is not `NULL`
  * @param UV an array of `UV`-mapping coordinates for texture mapping. May be `NULL` together with `texture` if `colors` is not `NULL`
- * @param renderer a pointer to `Renderer` on which you are planning to render this `Triangle`
+ * @param renderer a pointer to `Renderer` on which you want to render this `Triangle`
  * @return Triangle* a pointer to constructed `Triangle`
  */
 Triangle* newTriangle(Vector3d* vertices, Color* colors, Texture* texture, Vector2d* UV, Renderer* renderer)
