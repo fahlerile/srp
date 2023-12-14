@@ -22,4 +22,9 @@ Matrix4 Matrix4ConstructTranslate(Vector3d trans);
 Matrix4 Matrix4ConstructRotate(Vector3d rot);
 Matrix4 Matrix4ConstructTRS(Vector3d trans, Vector3d rot, Vector3d scale);
 Matrix4 Matrix4ConstructView(Vector3d trans, Vector3d rot, Vector3d scale);
-// Matrix4 Matrix4ConstructProjection();
+
+Matrix4 Matrix4ConstructOrthogonalProjection(
+    double left, double right,
+    double bottom, double top,
+    double near, double far
+);
