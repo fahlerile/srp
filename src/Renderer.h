@@ -17,7 +17,7 @@ Vector2i rendererGetWindowDimensions(Renderer* this);
 void rendererSetDrawColor(Renderer* this, Color color);
 void rendererDrawPixel(Renderer* this, Vector2i point, Color color);
 
-void rendererDrawToBuffer(Renderer* this);
 void rendererSaveBuffer(Renderer* this, const char* filename);
 void rendererSwapBuffer(Renderer* this);
 void rendererClearBuffer(Renderer* this, Color color);
+

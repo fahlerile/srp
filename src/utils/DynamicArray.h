@@ -21,9 +21,11 @@ typedef struct
 
 DynamicArray* newDynamicArray(size_t nElements, size_t nBytesPerElement, freeCallbackFunctionType freeCallback);
 static void reallocateDynamicArray(DynamicArray* this);
+void freeDynamicArray(DynamicArray* this);
+
 void addToDynamicArray(DynamicArray* this, void* element);
 void deleteLastInDynamicArray(DynamicArray* this);
 void setInDynamicArray(DynamicArray* this, void* element, size_t i);
 void* indexDynamicArray(DynamicArray* this, size_t i);
-void freeDynamicArray(DynamicArray* this);
+DynamicArray* copyDynamicArray(DynamicArray* this);
 

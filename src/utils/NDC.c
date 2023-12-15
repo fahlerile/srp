@@ -1,7 +1,7 @@
 #include "NDC.h"
 #include "Renderer.h"
 
-Vector3d NDCtoScreenSpace(Renderer* renderer, Vector3d NDC)
+Vector3d NDCtoScreenSpace(Renderer* renderer, Vector4d NDC)
 {
     Vector2i dimensions = rendererGetWindowDimensions(renderer);
     return (Vector3d) {

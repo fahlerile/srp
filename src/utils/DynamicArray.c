@@ -4,6 +4,8 @@
 #include "DynamicArray.h"
 #include "utils/memoryUtils.h"
 
+#include "utils/log.h"
+
 #define indexVoidPtr(ptr, i, nBytesPerElement) ((char*) ptr + (i * nBytesPerElement))
 
 DynamicArray* newDynamicArray(size_t nElements, size_t nBytesPerElement, freeCallbackFunctionType freeCallback)
@@ -51,6 +53,7 @@ void* indexDynamicArray(DynamicArray* this, size_t i)
 
 void freeDynamicArray(DynamicArray* this)
 {
+    LOGD("freeDynamicArray %p\n", this);
     if (this->freeCallback != NULL)
     {
         for (size_t i = 0; i < this->size; i++)
@@ -58,5 +61,13 @@ void freeDynamicArray(DynamicArray* this)
     }
     xfree(this->data);
     xfree(this);
+}
+
+DynamicArray* copyDynamicArray(DynamicArray* this)
+{
+    DynamicArray* arr = newDynamicArray(this->allocated, this->nBytesPerElement, this->freeCallback);
+    memcpy(arr->data, this->data, this->nBytesPerElement * this->size);
+    arr->size = this->size;
+    return arr;
 }
 

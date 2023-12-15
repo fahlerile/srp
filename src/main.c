@@ -24,18 +24,20 @@ int main(int argc, char** argv)
          1, 5   // near, far
     );
     Scene* world = newScene(viewMatrix, projectionMatrix);
-    Model* teapot = newModel("res/models/utah_teapot.obj");
+    Model* teapot = newModel("res/models/cube.obj");
     modelAddInstance(teapot, 
-        (Vector3d) {0, 0, 0},
+        (Vector3d) {0, 0, 3},
         (Vector3d) {0, 0, 0},
         (Vector3d) {0, 0, 0}
     );
     sceneAddModel(world, teapot);
+    
+    sceneRender(world, renderer);
+
     freeSceneAndModels(world);
 
     // Draw once & save - then loop forever
     rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});
-    rendererDrawToBuffer(renderer);
     rendererSaveBuffer(renderer, "screenshot.bmp");
     rendererSwapBuffer(renderer);
     while (running)

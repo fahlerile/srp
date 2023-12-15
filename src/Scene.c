@@ -21,10 +21,10 @@ void sceneAddModel(Scene* this, Model* model)
     addToDynamicArray(this->models, &model);
 }
 
-void sceneRender(Scene* this)
+void sceneRender(Scene* this, Renderer* renderer)
 {
     for (size_t i = 0; i < this->models->size; i++)
-        modelRender(*(Model**) indexDynamicArray(this->models, i), &this->viewMatrix, &this->projectionMatrix);
+        modelRender(*(Model**) indexDynamicArray(this->models, i), &this->viewMatrix, &this->projectionMatrix, renderer);
 }
 
 void freeSceneAndModels(Scene* this)

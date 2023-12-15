@@ -1,7 +1,6 @@
 #include "Renderer.h"
 #include "utils/utils.h"
 #include "Texture.h"
-#include "Triangle.h"
 
 /**
  * @brief Construct a new `Renderer`
@@ -48,27 +47,6 @@ void rendererDrawPixel(Renderer* this, Vector2i point, Color color)
 {
     rendererSetDrawColor(this, color);
     SDL_RenderDrawPoint(this->internal_renderer, point.x, point.y);
-}
-
-void rendererDrawToBuffer(Renderer* this)
-{
-    Vector3d vertices[3] = {
-        {-0.5, -0.5, 0.},
-        { 0.,   0.5, 0.},
-        { 0.5, -0.5, 0.}
-    };
-    Vector2d UV[3] = {
-        (Vector2d) {0. , 0.},
-        (Vector2d) {0.5, 1.},
-        (Vector2d) {1. , 0.}
-    };
-
-    Texture* texture = newTexture("res/textures/minecraftBricks.png");
-    Triangle* triangle = newTriangle(vertices, NULL, texture, UV, this);
-
-    triangleDraw(triangle, this);
-    freeTriangle(triangle);
-    freeTexture(texture);
 }
 
 // @brief Save current buffer state as BMP

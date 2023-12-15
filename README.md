@@ -33,12 +33,19 @@ cd bin
             - [x] Add a test for this callback
             - [x] Make everything use this callback
     - [x] Vertex, face structures
+- [x] `copyDynamicArray`
+- [ ] `triangulateFace` 
 - [ ] Projection matrices
     - [x] Orthogonal projection matrix construction
     - [x] Vertices transformation in `modelRender`
-    - [ ] Add draw calls in `modelRender`
-        - [ ] Are draw calls overly complex? Do I need a `Triangle` structure? Maybe I want to rather have `renderFace` function?
+    - [x] Add draw calls in `modelRender`
+        - [x] Are draw calls overly complex? Do I need a `Triangle` structure? Maybe I want to rather have `renderFace` function?
             - Yes, they are unnecessarily complex. I do not need to have a `Triangle` structure, instead I am going to create a `drawFace` function which will triangulate a face and draw it using the already written code (the one in `src/Triangle.c`)
+        - [x] Delete `Triangle` struct
+        - [x] Rename `Triangle.c` to `Face.c`
+        - [x] Move `Face` struct delaration to `Face.c`
+        - [x] Restructure the code to form the `drawFace` function
+    - [ ] Fix memory bug (`copyFace`)
     - [ ] Perspective projection matrix construction
 - [ ] Refactor & optimise
     - [ ] Add comments/docs

@@ -1,7 +1,8 @@
 #pragma once
+#include "Renderer.h"
+#include "Model.h"
 #include "utils/DynamicArray.h"
 #include "utils/Matrix.h"
-#include "Model.h"
 
 typedef struct
 {
@@ -12,5 +13,5 @@ typedef struct
 
 Scene* newScene(Matrix4 viewMatrix, Matrix4 projectionMatrix);
 void sceneAddModel(Scene* this, Model* model);
-void sceneRender(Scene* this);
+void sceneRender(Scene* this, Renderer* renderer);
 void freeSceneAndModels(Scene* this);

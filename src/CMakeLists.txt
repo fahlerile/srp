@@ -5,7 +5,7 @@ set(
     mainUtils/mainUtils.c
     Renderer.c
 
-    Triangle.c
+    Face.c
     Texture.c
     Model.c
     Scene.c
