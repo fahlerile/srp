@@ -54,7 +54,8 @@ cd bin
     - [ ] Move utilities that I may use in other projects to own git repos
         - [x] Restructure build system
         - [x] Fix linking to SDL2 for windows (build from source..?)
-        - [ ] Use git submodules
+        - [x] Use git submodules
+        - [ ] Fix `c-codebase` `fileUtils` test failing due to unability to open testfile
     - [ ] Add comments/docs
     - [ ] Is the structure overly complex?
     - [ ] Can I avoid copying whole faces in `modelRender`?

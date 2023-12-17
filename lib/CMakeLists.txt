@@ -1,11 +1,3 @@
-# target_include_directories(Color PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-# target_include_directories(Vector PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-# target_include_directories(Matrix PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-# target_include_directories(DynamicArray PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-# target_include_directories(fileUtils PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-# target_include_directories(memoryUtils PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-# target_include_directories(stringUtils PUBLIC . ${CMAKE_SOURCE_DIR}/src)
-
 add_subdirectory(c-codebase)
 
 target_link_libraries(
