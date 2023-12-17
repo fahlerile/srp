@@ -6,7 +6,8 @@
 // info
 // error
 // fatal
-// #define NO_LOG_MEMORY
+
+#define NO_LOG_MEMORY
 
 #if defined(NDEBUG)
     #define LOGM(...)

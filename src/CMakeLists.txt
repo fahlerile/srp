@@ -10,22 +10,13 @@ set(
     Model.c
     Scene.c
 
-    utils/fileUtils.c
-    utils/stringUtils.c
-    utils/memoryUtils.c
     utils/NDC.c
-    utils/Matrix.c
-    utils/Color.c
-    utils/DynamicArray.c
     utils/compares.c
-    utils/Vectors/Vector2.c
-    utils/Vectors/Vector3.c
-    utils/Vectors/Vector4.c
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
-
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
+target_include_directories(${EXECUTABLE_NAME} PUBLIC .)
 
 if(MSVC)
     target_compile_options(${EXECUTABLE_NAME} PRIVATE /W4 /WX)
@@ -37,4 +28,3 @@ else()
     endif()
 endif()
 
-target_include_directories(${EXECUTABLE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -3,8 +3,8 @@
 #include "Model.h"
 #include "Face.h"
 #include "utils/utils.h"
-#include "utils/fileUtils.h"
-#include "utils/stringUtils.h"
+#include "fileUtils/fileUtils.h"
+#include "stringUtils/stringUtils.h"
 
 static void faceFreeCallback(void* p_face)
 {

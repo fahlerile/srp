@@ -9,12 +9,13 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "Color.h"
-#include "Matrix.h"
-#include "Vectors/Vectors.h"
-#include "memoryUtils.h"
-#include "DynamicArray.h"
+#include "Color/Color.h"
+#include "Matrix/Matrix.h"
+#include "Vector/Vector.h"
+#include "memoryUtils/memoryUtils.h"
+#include "DynamicArray/DynamicArray.h"
 
 #include "radians.h"
 #include "compares.h"
 #include "log.h"
+

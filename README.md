@@ -4,6 +4,9 @@ A rasterizer in C. Is able to draw shaded or textured triangles in screen-space 
 
 ## Building
 
+Prerequsites:
+- SDL2 installed in C compiler path
+
 ```bash
 git clone ...
 cd rasterizer
@@ -48,6 +51,10 @@ cd bin
     - [ ] Fix memory bug (`copyFace`)
     - [ ] Perspective projection matrix construction
 - [ ] Refactor & optimise
+    - [ ] Move utilities that I may use in other projects to own git repos
+        - [x] Restructure build system
+        - [x] Fix linking to SDL2 for windows (build from source..?)
+        - [ ] Use git submodules
     - [ ] Add comments/docs
     - [ ] Is the structure overly complex?
     - [ ] Can I avoid copying whole faces in `modelRender`?

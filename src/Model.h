@@ -1,8 +1,8 @@
 #pragma once
 #include "Renderer.h"
-#include "utils/DynamicArray.h"
-#include "utils/Vectors/Vectors.h"
-#include "utils/Matrix.h"
+#include "DynamicArray/DynamicArray.h"
+#include "Vector/Vector.h"
+#include "Matrix/Matrix.h"
 
 typedef struct
 {
