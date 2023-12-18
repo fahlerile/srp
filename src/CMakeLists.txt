@@ -14,7 +14,6 @@ set(
     utils/compares.c
 )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
 target_include_directories(${EXECUTABLE_NAME} PUBLIC .)
 

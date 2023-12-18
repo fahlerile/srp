@@ -56,6 +56,8 @@ cd bin
         - [x] Fix linking to SDL2 for windows (build from source..?)
         - [x] Use git submodules
         - [ ] Fix `c-codebase` `fileUtils` test failing due to unability to open testfile
+    - [ ] Add global context
+    - [ ] Fix not calling `SDL_Quit` and `SDL_MainReady` (`atexit`)
     - [ ] Add comments/docs
     - [ ] Is the structure overly complex?
     - [ ] Can I avoid copying whole faces in `modelRender`?

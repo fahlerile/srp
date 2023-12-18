@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "utils/utils.h"
-#define SDL_MAIN_HANDLED
 #include "SDL2/SDL.h"
 #include "Renderer.h"
 #include "Scene.h"
