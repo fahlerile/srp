@@ -56,6 +56,7 @@ cd bin
         - [x] Fix linking to SDL2 for windows (build from source..?)
         - [x] Use git submodules
         - [ ] Fix `c-codebase` `fileUtils` test failing due to unability to open testfile
+    - [ ] Delete `mainUtils`
     - [ ] Add global context
     - [ ] Fix not calling `SDL_Quit` and `SDL_MainReady` (`atexit`)
     - [ ] Add comments/docs

@@ -2,13 +2,12 @@
 #include <string.h>
 #include "Model.h"
 #include "Face.h"
-#include "utils/utils.h"
 #include "fileUtils/fileUtils.h"
 #include "stringUtils/stringUtils.h"
 
 static void faceFreeCallback(void* p_face)
 {
-    freeFace((Face*) p_face);
+    freeFace(*(Face**) p_face);
 }
 
 Model* newModel(const char* filename)
@@ -73,7 +72,7 @@ static void modelParseObj(Model* this, const char* filename)
         // else if (strcmp(lineType, "vp"))
         else if (strcmp(lineType, "f") == 0)
         {
-            DynamicArray* vertices = newDynamicArray(3, sizeof(Vertex), NULL);
+            DynamicArray* vertices = newDynamicArray(3, sizeof(Vertex), NULL);  // Vertex
             DynamicArray* vertices_str = splitString(line, " ");  // char*
             bool fail = false;
 
@@ -125,18 +124,17 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
 
 void modelRender(Model* this, Matrix4* view, Matrix4* projection, Renderer* renderer)
 {
+    DynamicArray* transformedPositions = newDynamicArray(3, sizeof(Vector4d), NULL);
+    transformedPositions->size = 3;
+
     for (size_t i = 0; i < this->matrices->size; i++)
     {
-        Matrix4* model = indexDynamicArray(this->matrices, i);
-        Matrix4 MV = Matrix4MultiplyMatrix4(view, model);
+        Matrix4* modelMatrix = indexDynamicArray(this->matrices, i);
+        Matrix4 MV = Matrix4MultiplyMatrix4(view, modelMatrix);
         Matrix4 MVP = Matrix4MultiplyMatrix4(projection, &MV);
         
-        DynamicArray* transformedPositions = newDynamicArray(3, sizeof(Vector4d), NULL);
-        transformedPositions->size = 3;
-
         for (size_t face_i = 0; face_i < this->faces->size; face_i++)
         {
-            // allocating 7 petabytes here (wtf?)
             Face* copiedFace = copyFace(*(Face**) indexDynamicArray(this->faces, face_i));
             for (size_t vertex_i = 0; vertex_i < copiedFace->vertices->size; vertex_i++)
             {
@@ -148,9 +146,11 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection, Renderer* rend
             } 
 
             drawFace(copiedFace, renderer);
+            freeFace(copiedFace);
         }
-        freeDynamicArray(transformedPositions);
     }
+
+    freeDynamicArray(transformedPositions);
 }
 
 void freeModel(Model* this)
