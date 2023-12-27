@@ -1,7 +1,7 @@
 #include <float.h>
 #include "Face.h"
+#include "DynamicArray/DynamicArray.h"
 #include "utils/NDC.h"
-#include "utils/utils.h"
 
 Face* newFace(DynamicArray* vertices)
 {
@@ -19,6 +19,8 @@ Face* copyFace(Face* this)
 DynamicArray* triangulateFace(Face* this)
 {
     // TODO
+    LOGE("triangulateFace: NOT IMPLEMENTED!\n");
+    return NULL;
 }
 
 void freeFace(Face* this)
@@ -36,6 +38,7 @@ void drawFace(Face* this, Renderer* renderer)
     //     Face* triangle = *(Face**) indexDynamicArray(triangulatedFace, i);
     //     drawTriangle(triangle, renderer);
     // }
+    
     drawTriangle(this, renderer);
 }
 
@@ -43,16 +46,21 @@ void drawTriangle(Face* this, Renderer* renderer)
 {
     assert(this->vertices->size == 3);
 
-    Vector3d SSVertices[3];  // Screen Space Vertices
-    triangleConvertVerticesToScreenSpace(this, renderer, SSVertices);
+    // if (context.polygonMode == polygonModeLine)
+    //     triangleDrawEdges(this);
+    // else if (context.polygonMode == polygonModeFill)
+    //     triangleFill(this);
+    // else
+    //     LOGE("drawTriangle: unknown polygonMode!\n");
 
+    Vector3d SSVertices[3];  // Screen Space Vertices
     Vector3d minBoundingPoint, maxBoundingPoint;
-    triangleGetBoundingPoints(this, SSVertices, &minBoundingPoint, &maxBoundingPoint);
-    
     Vector3d edgeVectors[3];
-    triangleCalculateEdgeVectors(this, SSVertices, edgeVectors);
-    
     Vector3d baryCoordsInitial, baryDeltaX, baryDeltaY;
+
+    triangleConvertVerticesToScreenSpace(this, renderer, SSVertices);
+    triangleGetBoundingPoints(this, SSVertices, &minBoundingPoint, &maxBoundingPoint);
+    triangleCalculateEdgeVectors(this, SSVertices, edgeVectors);
     triangleCalculateBaryDeltasAndInitial(this, SSVertices, edgeVectors, &baryCoordsInitial, &baryDeltaX, &baryDeltaY, minBoundingPoint);
 
     Vector3d barycentricCoordinates = baryCoordsInitial;
@@ -75,11 +83,12 @@ void drawTriangle(Face* this, Renderer* renderer)
 
             if (roughlyEqualD(sumBarycentric, 1))
             {
-                Color color = {255, 0, 0, 255};
+                // TODO
                 // if (type == TriangleTextured)
                 //     color = textureGetColorAtUV(texture, triangleInterpolateUV(this, barycentricCoordinates));
                 // else
                 //     color = triangleInterpolateColor(this, barycentricCoordinates);
+                Color color = {255, 255, 255, 255};
                 rendererDrawPixel(renderer, (Vector2i) {x, y}, color);
             }
 

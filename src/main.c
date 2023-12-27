@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include "utils/utils.h"
-#include "SDL2/SDL.h"
 #include "Renderer.h"
 #include "Scene.h"
 #include "Model.h"
@@ -13,9 +10,9 @@ int main(int argc, char** argv)
     bool running = true;
 
     Matrix4 viewMatrix = Matrix4ConstructView(
-        (Vector3d) {0, 0, 0},
-        (Vector3d) {0, 0, 0},
-        (Vector3d) {0, 0, 0}
+        (Vector3d) {0, 0, 0},  // translate
+        (Vector3d) {0, 0, 0},  // rotate
+        (Vector3d) {1, 1, 1}   // scale
     );  
     Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection(
         -2, 2,  // left, right
@@ -27,16 +24,13 @@ int main(int argc, char** argv)
     modelAddInstance(teapot, 
         (Vector3d) {0, 0, 3},
         (Vector3d) {0, 0, 0},
-        (Vector3d) {0, 0, 0}
+        (Vector3d) {1, 1, 1}
     );
     sceneAddModel(world, teapot);
     
+    rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});
     sceneRender(world, renderer);
 
-    freeSceneAndModels(world);
-
-    // Draw once & save - then loop forever
-    rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});
     rendererSaveBuffer(renderer, "screenshot.bmp");
     rendererSwapBuffer(renderer);
     while (running)
@@ -47,5 +41,6 @@ int main(int argc, char** argv)
 #endif
     }
 
+    freeSceneAndModels(world);
     deinitialize(renderer);
 }

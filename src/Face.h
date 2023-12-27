@@ -1,6 +1,4 @@
 #pragma once
-#include "utils/utils.h"
-#include "Texture.h"
 #include "Renderer.h"
 
 typedef struct
