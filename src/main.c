@@ -1,13 +1,13 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "Model.h"
-#include "mainUtils/mainUtils.h"
+#include "Context.h"
+
+Context context;
 
 int main(int argc, char** argv)
 {
-    Renderer* renderer = initialize(256, 256, 0);
-    SDL_Event event;
-    bool running = true;
+    constructContext(&context);
 
     Matrix4 viewMatrix = Matrix4ConstructView(
         (Vector3d) {0, 0, 0},  // translate
@@ -28,19 +28,19 @@ int main(int argc, char** argv)
     );
     sceneAddModel(world, teapot);
     
-    rendererClearBuffer(renderer, (Color) {0, 0, 0, 255});
-    sceneRender(world, renderer);
+    rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
+    sceneRender(world);
 
-    rendererSaveBuffer(renderer, "screenshot.bmp");
-    rendererSwapBuffer(renderer);
-    while (running)
+    rendererSaveBuffer(context.renderer, "screenshot.bmp");
+    rendererSwapBuffer(context.renderer);
+    while (context.running)
     {
-        pollEvents(&running, &event);
+        pollEvents();
 #ifndef __linux__
         rendererSwapBuffer(renderer);
 #endif
     }
 
     freeSceneAndModels(world);
-    deinitialize(renderer);
 }
+

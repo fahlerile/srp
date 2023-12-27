@@ -1,7 +1,5 @@
 #pragma once
-#include "Renderer.h"
 #include "DynamicArray/DynamicArray.h"
-#include "Vector/Vector.h"
 #include "Matrix/Matrix.h"
 
 typedef struct
@@ -15,7 +13,7 @@ typedef struct
 
 Model* newModel(const char* filename);
 void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3d scale);
-void modelRender(Model* this, Matrix4* view, Matrix4* projection, Renderer* renderer);
+void modelRender(Model* this, Matrix4* view, Matrix4* projection);
 void freeModel(Model* this);
 
 static void modelParseObj(Model* this, const char* filename);

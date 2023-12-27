@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include "Model.h"
-#include "utils/utils.h"
 
 static void sceneFreeCallback(void* p_model)
 {
@@ -21,10 +20,10 @@ void sceneAddModel(Scene* this, Model* model)
     addToDynamicArray(this->models, &model);
 }
 
-void sceneRender(Scene* this, Renderer* renderer)
+void sceneRender(Scene* this)
 {
     for (size_t i = 0; i < this->models->size; i++)
-        modelRender(*(Model**) indexDynamicArray(this->models, i), &this->viewMatrix, &this->projectionMatrix, renderer);
+        modelRender(*(Model**) indexDynamicArray(this->models, i), &this->viewMatrix, &this->projectionMatrix);
 }
 
 void freeSceneAndModels(Scene* this)
