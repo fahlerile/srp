@@ -4,6 +4,7 @@
 #include "Face.h"
 #include "fileUtils/fileUtils.h"
 #include "stringUtils/stringUtils.h"
+#include "Context.h"
 
 static void faceFreeCallback(void* p_face)
 {
@@ -122,7 +123,7 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
     addToDynamicArray(this->matrices, &mat);
 }
 
-void modelRender(Model* this, Matrix4* view, Matrix4* projection, Renderer* renderer)
+void modelRender(Model* this, Matrix4* view, Matrix4* projection)
 {
     DynamicArray* transformedPositions = newDynamicArray(3, sizeof(Vector4d), NULL);
     transformedPositions->size = 3;
@@ -145,7 +146,7 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection, Renderer* rend
                 ((Vertex*) indexDynamicArray(copiedFace->vertices, vertex_i))->position = (Vector4d*) indexDynamicArray(transformedPositions, vertex_i);
             } 
 
-            drawFace(copiedFace, renderer);
+            drawFace(copiedFace);
             freeFace(copiedFace);
         }
     }

@@ -2,7 +2,7 @@ set(
     SOURCES
 
     main.c
-    mainUtils/mainUtils.c
+    Context.c
     Renderer.c
 
     Face.c

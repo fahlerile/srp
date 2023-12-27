@@ -2,6 +2,7 @@
 #include "Face.h"
 #include "DynamicArray/DynamicArray.h"
 #include "utils/NDC.h"
+#include "Context.h"
 
 Face* newFace(DynamicArray* vertices)
 {
@@ -29,7 +30,7 @@ void freeFace(Face* this)
     xfree(this);
 }
 
-void drawFace(Face* this, Renderer* renderer)
+void drawFace(Face* this)
 {   
     // TODO
     // DynamicArray* triangulatedFace = faceTriangulate(this);  // `Face*`
@@ -39,26 +40,53 @@ void drawFace(Face* this, Renderer* renderer)
     //     drawTriangle(triangle, renderer);
     // }
     
-    drawTriangle(this, renderer);
+    drawTriangle(this);
 }
 
-void drawTriangle(Face* this, Renderer* renderer)
+void drawTriangle(Face* this)
 {
     assert(this->vertices->size == 3);
 
-    // if (context.polygonMode == polygonModeLine)
-    //     triangleDrawEdges(this);
-    // else if (context.polygonMode == polygonModeFill)
-    //     triangleFill(this);
-    // else
-    //     LOGE("drawTriangle: unknown polygonMode!\n");
+    if (context.faceMode == faceModeLine)
+        triangleDrawEdges(this);
+    else if (context.faceMode == faceModeFill)
+        triangleFill(this);
+    else
+        LOGE("drawTriangle: unknown polygonMode!\n");
+}
 
+void drawLineBresenham(Vector2d p1, Vector2d p2)
+{
+    // TODO
+    LOGE("drawLineBresenham: NOT IMPLEMENTED!\n");
+}
+
+static void triangleDrawEdges(Face* this)
+{
+    Vector3d SSVertices[3];  // Screen Space Vertices
+    triangleConvertVerticesToScreenSpace(this, SSVertices);
+    drawLineBresenham(
+        (Vector2d) {SSVertices[0].x, SSVertices[0].y},
+        (Vector2d) {SSVertices[1].x, SSVertices[1].y}
+    );
+    drawLineBresenham(
+        (Vector2d) {SSVertices[1].x, SSVertices[1].y},
+        (Vector2d) {SSVertices[2].x, SSVertices[2].y}
+    );
+    drawLineBresenham(
+        (Vector2d) {SSVertices[2].x, SSVertices[2].y},
+        (Vector2d) {SSVertices[0].x, SSVertices[0].y}
+    );
+}
+
+static void triangleFill(Face* this)
+{
     Vector3d SSVertices[3];  // Screen Space Vertices
     Vector3d minBoundingPoint, maxBoundingPoint;
     Vector3d edgeVectors[3];
     Vector3d baryCoordsInitial, baryDeltaX, baryDeltaY;
 
-    triangleConvertVerticesToScreenSpace(this, renderer, SSVertices);
+    triangleConvertVerticesToScreenSpace(this, SSVertices);
     triangleGetBoundingPoints(this, SSVertices, &minBoundingPoint, &maxBoundingPoint);
     triangleCalculateEdgeVectors(this, SSVertices, edgeVectors);
     triangleCalculateBaryDeltasAndInitial(this, SSVertices, edgeVectors, &baryCoordsInitial, &baryDeltaX, &baryDeltaY, minBoundingPoint);
@@ -89,7 +117,7 @@ void drawTriangle(Face* this, Renderer* renderer)
                 // else
                 //     color = triangleInterpolateColor(this, barycentricCoordinates);
                 Color color = {255, 255, 255, 255};
-                rendererDrawPixel(renderer, (Vector2i) {x, y}, color);
+                rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
             }
 
             nextPixel:
@@ -100,10 +128,15 @@ void drawTriangle(Face* this, Renderer* renderer)
     }
 }
 
-static void triangleConvertVerticesToScreenSpace(Face* this, Renderer* renderer, Vector3d* SSVertices)
+static void triangleConvertVerticesToScreenSpace(Face* this, Vector3d* SSVertices)
 {
     for (size_t i = 0; i < this->vertices->size; i++)
-        SSVertices[i] = NDCtoScreenSpace(renderer, *((Vertex*) indexDynamicArray(this->vertices, i))->position);
+    {
+        SSVertices[i] = NDCtoScreenSpace(
+            context.renderer,
+            *((Vertex*) indexDynamicArray(this->vertices, i))->position
+        );
+    }
 }
 
 static void triangleGetBoundingPoints(Face* triangle, Vector3d* SSVertices, Vector3d* min, Vector3d* max)

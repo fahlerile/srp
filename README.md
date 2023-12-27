@@ -48,20 +48,19 @@ cd bin
         - [x] Rename `Triangle.c` to `Face.c`
         - [x] Move `Face` struct delaration to `Face.c`
         - [x] Restructure the code to form the `drawFace` function
-    - [ ] Fix memory bug (`copyFace`)
+    - [x] Fix memory bug (`copyFace`)
     - [ ] Perspective projection matrix construction
-- [ ] Refactor & optimise
-    - [ ] Move utilities that I may use in other projects to own git repos
+- [ ] Line drawing function (for `faceModeLine`)
+- [ ] Refactor & optimize
+    - [x] Move utilities that I may use in other projects to own git repos
         - [x] Restructure build system
         - [x] Fix linking to SDL2 for windows (build from source..?)
         - [x] Use git submodules
-        - [ ] Fix `c-codebase` `fileUtils` test failing due to unability to open testfile
-    - [ ] Delete `mainUtils`
-    - [ ] Add global context
-    - [ ] Fix not calling `SDL_Quit` and `SDL_MainReady` (`atexit`)
-    - [ ] Add comments/docs
+    - [x] Delete `mainUtils`, add global context
+    - [x] Fix not calling `SDL_Quit` and `SDL_MainReady` (`atexit`)
     - [ ] Is the structure overly complex?
     - [ ] Can I avoid copying whole faces in `modelRender`?
+- [ ] DOCUMENTATION!
 - [ ] Depth buffer
     - [ ] Interpolate z-coordinate inside triangle, draw a pixel only if that z coordinate is closer to viewport than already drawn one
 - [ ] Lighting

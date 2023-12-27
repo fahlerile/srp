@@ -13,5 +13,5 @@ typedef struct
 
 Scene* newScene(Matrix4 viewMatrix, Matrix4 projectionMatrix);
 void sceneAddModel(Scene* this, Model* model);
-void sceneRender(Scene* this, Renderer* renderer);
+void sceneRender(Scene* this);
 void freeSceneAndModels(Scene* this);
