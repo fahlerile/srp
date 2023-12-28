@@ -46,9 +46,9 @@ bool areAllVerticesOfAFaceOutsideOfUnitCube(Face* this)
     for (size_t i = 0; i < this->vertices->size; i++)
     {
         Vector4d position = *((Vertex*) indexDynamicArray(this->vertices, i))->position;
-        if ((position.x > -1. && position.x < 1.) ||
-            (position.y > -1. && position.y < 1.) ||
-            (position.z > -1. && position.z < 1.))
+        if ((position.x >= -1. && position.x <= 1.) &&
+            (position.y >= -1. && position.y <= 1.) &&
+            (position.z >= -1. && position.z <= 1.))
         {
             return false;
         }

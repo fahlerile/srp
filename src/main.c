@@ -3,7 +3,6 @@
 #include "Model.h"
 #include "draw.h"
 #include "Context.h"
-#include "fileUtils/fileUtils.h"
 
 Context context;
 
@@ -17,14 +16,14 @@ int main(int argc, char** argv)
         (Vector3d) {1, 1, 1}   // scale
     );  
     Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection(
-        -2, 2,  // x
-        -2, 2,  // y
-         0, 5   // z
+        -17.5, 17.5,  // x
+        -17.5, 17.5,  // y
+         0, 40  // z
     );
     Scene* world = newScene(viewMatrix, projectionMatrix);
-    Model* teapot = newModel("res/models/cube.obj");
+    Model* teapot = newModel("res/models/utah_teapot.obj");
     modelAddInstance(teapot, 
-        (Vector3d) {0, 0, 3},
+        (Vector3d) {0, 0, 20},
         (Vector3d) {0, 0, 0},
         (Vector3d) {1, 1, 1}
     );
