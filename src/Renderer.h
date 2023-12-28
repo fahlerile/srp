@@ -1,6 +1,6 @@
 #pragma once
 #include "SDL2/SDL.h"
-#include "utils/utils.h"
+#include "Vector/Vector.h"
 
 // @brief A wrapper around default SDL Window and Renderer structures
 typedef struct

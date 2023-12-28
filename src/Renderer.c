@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "utils/utils.h"
+#include "utils.h"
 #include "Texture.h"
 
 /**

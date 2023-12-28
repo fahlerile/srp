@@ -1,5 +1,5 @@
 #pragma once
-#include "utils/utils.h"
+#include "utils.h"
 
 typedef struct
 {
@@ -16,3 +16,4 @@ size_t textureUVToIndex(Texture* this, Vector2d uvPoint);
 
 Color textureGetColorAtPixel(Texture* this, Vector2i point);
 Color textureGetColorAtUV(Texture* this, Vector2d uvPoint);
+

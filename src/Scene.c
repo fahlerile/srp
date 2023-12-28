@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "Scene.h"
 #include "Model.h"
 

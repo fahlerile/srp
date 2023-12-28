@@ -1,6 +1,6 @@
 # rasterizer
 
-A rasterizer in C. Is able to draw shaded or textured triangles in screen-space for now.
+A rasterizer in C.
 
 ## Building
 
@@ -50,7 +50,9 @@ cd bin
         - [x] Restructure the code to form the `drawFace` function
     - [x] Fix memory bug (`copyFace`)
     - [ ] Perspective projection matrix construction
-- [ ] Line drawing function (for `faceModeLine`)
+- [x] Line drawing function (for `faceModeLine`)
+    - [ ] Fix `drawLineBresenham` to be able to draw ALL lines!
+- [ ] Test wireframe rendering on various models
 - [ ] Refactor & optimize
     - [x] Move utilities that I may use in other projects to own git repos
         - [x] Restructure build system
@@ -58,6 +60,7 @@ cd bin
         - [x] Use git submodules
     - [x] Delete `mainUtils`, add global context
     - [x] Fix not calling `SDL_Quit` and `SDL_MainReady` (`atexit`)
+    - [x] Delete `utils/`, add functions and definitions directly to `utils.h` 
     - [ ] Is the structure overly complex?
     - [ ] Can I avoid copying whole faces in `modelRender`?
 - [ ] DOCUMENTATION!

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Model.h"
+#include "DynamicArray/DynamicArray.h"
 #include "Face.h"
 #include "fileUtils/fileUtils.h"
 #include "stringUtils/stringUtils.h"
@@ -125,9 +126,6 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
 
 void modelRender(Model* this, Matrix4* view, Matrix4* projection)
 {
-    DynamicArray* transformedPositions = newDynamicArray(3, sizeof(Vector4d), NULL);
-    transformedPositions->size = 3;
-
     for (size_t i = 0; i < this->matrices->size; i++)
     {
         Matrix4* modelMatrix = indexDynamicArray(this->matrices, i);
@@ -137,6 +135,9 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
         for (size_t face_i = 0; face_i < this->faces->size; face_i++)
         {
             Face* copiedFace = copyFace(*(Face**) indexDynamicArray(this->faces, face_i));
+            DynamicArray* transformedPositions = newDynamicArray(copiedFace->vertices->size, sizeof(Vector4d), NULL);
+            transformedPositions->size = copiedFace->vertices->size;
+
             for (size_t vertex_i = 0; vertex_i < copiedFace->vertices->size; vertex_i++)
             {
                 Vertex* p_curVertex = indexDynamicArray(copiedFace->vertices, vertex_i);
@@ -146,12 +147,13 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
                 ((Vertex*) indexDynamicArray(copiedFace->vertices, vertex_i))->position = (Vector4d*) indexDynamicArray(transformedPositions, vertex_i);
             } 
 
-            drawFace(copiedFace);
+            if (!areAllVerticesOfAFaceOutsideOfUnitCube(copiedFace))
+                drawFace(copiedFace);
+
             freeFace(copiedFace);
+            freeDynamicArray(transformedPositions);
         }
     }
-
-    freeDynamicArray(transformedPositions);
 }
 
 void freeModel(Model* this)

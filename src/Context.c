@@ -3,7 +3,7 @@
 #include "Renderer.h"
 #include "Context.h"
 #include "Face.h"
-#include "utils/utils.h"
+#include "utils.h"
 #include "errorcodes.h"
 #include "constants.h"
 
@@ -26,7 +26,7 @@ void constructContext(Context* this)
     atexit(destroyContext);
 
     this->running = true;
-    this->faceMode = faceModeFill;
+    this->faceMode = FACE_MODE;
 }
 
 void pollEvents()
@@ -46,3 +46,4 @@ void destroyContext()
 {
     freeRenderer(context.renderer);
 }
+

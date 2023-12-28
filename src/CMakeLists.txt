@@ -4,14 +4,12 @@ set(
     main.c
     Context.c
     Renderer.c
+    draw.c
 
     Face.c
     Texture.c
     Model.c
     Scene.c
-
-    utils/NDC.c
-    utils/compares.c
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})

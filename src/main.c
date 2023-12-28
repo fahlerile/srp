@@ -1,7 +1,9 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "Model.h"
+#include "draw.h"
 #include "Context.h"
+#include "fileUtils/fileUtils.h"
 
 Context context;
 
@@ -15,9 +17,9 @@ int main(int argc, char** argv)
         (Vector3d) {1, 1, 1}   // scale
     );  
     Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection(
-        -2, 2,  // left, right
-        -2, 2,  // bottom, top
-         1, 5   // near, far
+        -2, 2,  // x
+        -2, 2,  // y
+         0, 5   // z
     );
     Scene* world = newScene(viewMatrix, projectionMatrix);
     Model* teapot = newModel("res/models/cube.obj");
@@ -42,5 +44,78 @@ int main(int argc, char** argv)
     }
 
     freeSceneAndModels(world);
+}
+
+void bresenhamTest()
+{
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {512, 256}
+    );
+
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {512, 128}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {512, 0}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {256+128, 0}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {256, 0}
+    );
+
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {512, 256+128}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {512, 512}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {512-128, 512}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {256, 512}
+    );
+
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {0, 128}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {0, 0}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {256-128, 0}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {0, 256}
+    );
+
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {0, 256+128}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {0, 512}
+    );
+    drawLineBresenham(
+        (Vector2i) {256, 256},
+        (Vector2i) {128, 512}
+    );
+
 }
 
