@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "DynamicArray/DynamicArray.h"
 #include "Face.h"
+#include "draw.h"
 #include "fileUtils/fileUtils.h"
 #include "stringUtils/stringUtils.h"
 #include "Context.h"
@@ -107,7 +108,8 @@ static void modelParseObj(Model* this, const char* filename)
             }
 
             Face* face = newFace(vertices);
-            addToDynamicArray(this->faces, &face);
+            DynamicArray* triangulatedFaces = triangulateFace(face);  // Face*
+            concatDynamicArray(this->faces, triangulatedFaces);
         }
         // else if (strcmp(lineType, "g"))
         // else if (strcmp(lineType, "o"))
@@ -153,7 +155,7 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
             // LOG_FACE(copiedFace, LOGD);
 
             if (!areAllVerticesOfAFaceOutsideOfUnitCube(copiedFace))
-                drawFace(copiedFace);
+                drawTriangle(copiedFace);
 
             freeFace(copiedFace);
             freeDynamicArray(transformedPositions);

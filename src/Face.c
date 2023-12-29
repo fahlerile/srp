@@ -15,30 +15,29 @@ Face* copyFace(Face* this)
     return newFace(copy);
 }
 
+// Triangulate a face. FACE SHOULD BE A CONVEX POLYGON!
+// Uses a simple "sun rays" algorithm
 DynamicArray* triangulateFace(Face* this)
 {
-    // TODO
     LOGE("triangulateFace: NOT IMPLEMENTED!\n");
     return NULL;
+
+    // if (this->vertices->size == 3)
+    // {
+    //     DynamicArray(1, sizeof(Face*));
+    // }
+
+    DynamicArray* triangles = newDynamicArray(2, sizeof(Face*), NULL);
+    for (size_t i = 2, n = this->vertices->size; i < n; i++)
+    {
+        // TRIANGLE 0 i-1 i
+    }
 }
 
 void freeFace(Face* this)
 {
     freeDynamicArray(this->vertices);
     xfree(this);
-}
-
-void drawFace(Face* this)
-{   
-    // TODO
-    // DynamicArray* triangulatedFace = faceTriangulate(this);  // `Face*`
-    // for (size_t i = 0; i < triangulatedFace->size; i++)
-    // {
-    //     Face* triangle = *(Face**) indexDynamicArray(triangulatedFace, i);
-    //     drawTriangle(triangle, renderer);
-    // }
-    
-    drawTriangle(this);
 }
 
 bool areAllVerticesOfAFaceOutsideOfUnitCube(Face* this)
