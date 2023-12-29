@@ -39,3 +39,5 @@ void freeFace(Face* this);
 
 bool areAllVerticesOfAFaceOutsideOfUnitCube(Face* this);
 
+void faceFreeCallbackForDynamicArray(void* p_p_face);
+
