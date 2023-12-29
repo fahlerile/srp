@@ -3,14 +3,10 @@
 #include "Model.h"
 #include "DynamicArray/DynamicArray.h"
 #include "Face.h"
+#include "draw.h"
 #include "fileUtils/fileUtils.h"
 #include "stringUtils/stringUtils.h"
 #include "Context.h"
-
-static void faceFreeCallback(void* p_face)
-{
-    freeFace(*(Face**) p_face);
-}
 
 Model* newModel(const char* filename)
 {
@@ -20,7 +16,7 @@ Model* newModel(const char* filename)
     this->UVs = newDynamicArray(100, sizeof(Vector2d), NULL);
     this->normals = newDynamicArray(100, sizeof(Vector3d), NULL);
     this->matrices = newDynamicArray(10, sizeof(Matrix4), NULL);
-    this->faces = newDynamicArray(100, sizeof(Face*), faceFreeCallback);
+    this->faces = newDynamicArray(100, sizeof(Face*), faceFreeCallbackForDynamicArray);
 
     modelParseObj(this, filename);
 
@@ -107,7 +103,14 @@ static void modelParseObj(Model* this, const char* filename)
             }
 
             Face* face = newFace(vertices);
-            addToDynamicArray(this->faces, &face);
+
+            if (face->vertices->size == 3)
+                addToDynamicArray(this->faces, &face);
+            else
+            {
+                DynamicArray* triangulatedFaces = triangulateFace(face);  // Face*
+                concatDynamicArray(this->faces, triangulatedFaces);
+            }
         }
         // else if (strcmp(lineType, "g"))
         // else if (strcmp(lineType, "o"))
@@ -147,13 +150,9 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
                 ((Vertex*) indexDynamicArray(copiedFace->vertices, vertex_i))->position = (Vector4d*) indexDynamicArray(transformedPositions, vertex_i);
             }
     
-            // LOGD("FACE %zu\n", face_i);
-            // LOG_FACE(*(Face**) indexDynamicArray(this->faces, face_i), LOGD);
-            // LOGD("TRANSFORMED FACE:\n");
-            // LOG_FACE(copiedFace, LOGD);
-
+            // if at least one vertex of a face is inside of unit cube
             if (!areAllVerticesOfAFaceOutsideOfUnitCube(copiedFace))
-                drawFace(copiedFace);
+                drawTriangle(copiedFace);
 
             freeFace(copiedFace);
             freeDynamicArray(transformedPositions);

@@ -8,7 +8,7 @@ typedef struct
     DynamicArray* UVs;              // `Vector2d`
     DynamicArray* normals;          // `Vector3d`
     DynamicArray* matrices;         // `Matrix4`
-    DynamicArray* faces;            // `Face*`
+    DynamicArray* faces;            // `Face*` (triangulated)
 } Model;
 
 Model* newModel(const char* filename);

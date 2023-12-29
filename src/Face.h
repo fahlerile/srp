@@ -37,7 +37,7 @@ Face* copyFace(Face* this);
 DynamicArray* triangulateFace(Face* this);
 void freeFace(Face* this);
 
-void drawFace(Face* this);
-
 bool areAllVerticesOfAFaceOutsideOfUnitCube(Face* this);
+
+void faceFreeCallbackForDynamicArray(void* p_p_face);
 
