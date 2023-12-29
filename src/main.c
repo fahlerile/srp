@@ -15,15 +15,15 @@ int main(int argc, char** argv)
         (Vector3d) {0, 0, 0},  // rotate
         (Vector3d) {1, 1, 1}   // scale
     );  
-    Matrix4 projectionMatrix = Matrix4ConstructOrthogonalProjection(
-        -17.5, 17.5,  // x
-        -17.5, 17.5,  // y
-         0, 40  // z
+    Matrix4 projectionMatrix = Matrix4ConstructPerspectiveProjection(
+        30, -30,  // x
+        30, -30,  // y
+        1,  100   // z
     );
     Scene* world = newScene(viewMatrix, projectionMatrix);
     Model* teapot = newModel("res/models/utah_teapot.obj");
     modelAddInstance(teapot, 
-        (Vector3d) {0, 0, 20},
+        (Vector3d) {0, 0, 60},
         (Vector3d) {0, 0, 0},
         (Vector3d) {1, 1, 1}
     );

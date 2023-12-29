@@ -142,10 +142,15 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
             {
                 Vertex* p_curVertex = indexDynamicArray(copiedFace->vertices, vertex_i);
                 Vector4d* p_curVertexPosition = p_curVertex->position;
-                Vector4d transformedVertexPosition = Matrix4MultiplyVector4d(&MVP, *p_curVertexPosition);
+                Vector4d transformedVertexPosition = Matrix4MultiplyVector4dHomogeneous(&MVP, *p_curVertexPosition);
                 setInDynamicArray(transformedPositions, &transformedVertexPosition, vertex_i);
                 ((Vertex*) indexDynamicArray(copiedFace->vertices, vertex_i))->position = (Vector4d*) indexDynamicArray(transformedPositions, vertex_i);
-            } 
+            }
+    
+            // LOGD("FACE %zu\n", face_i);
+            // LOG_FACE(*(Face**) indexDynamicArray(this->faces, face_i), LOGD);
+            // LOGD("TRANSFORMED FACE:\n");
+            // LOG_FACE(copiedFace, LOGD);
 
             if (!areAllVerticesOfAFaceOutsideOfUnitCube(copiedFace))
                 drawFace(copiedFace);
