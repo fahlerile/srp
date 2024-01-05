@@ -1,76 +1,56 @@
-#include "Renderer.h"
-#include "Vector/Vector2.h"
-#include "utils.h"
+#include "Triangle.h"
+#include "Line.h"
 #include "Context.h"
-#include "draw.h"
 
-void drawTriangle(Face* this)
+DynamicArray* triangulateFace(DynamicArray* vertices)
 {
-    assert(this->vertices->size == 3);
+    LOGW("triangulateFace called!\n");
 
-    if (context.faceMode == faceModeLine)
-        triangleDrawEdges(this);
-    else if (context.faceMode == faceModeFill)
-        triangleFill(this);
-    else
-        LOGE("drawTriangle: unknown polygonMode!\n");
+    DynamicArray* triangles = newDynamicArray(2, sizeof(Triangle), NULL);
+    Vertex vertex0 = *(Vertex*) indexDynamicArray(vertices, 0);
+
+    for (size_t i = 2, n = vertices->size; i < n; i++)
+    {
+        Triangle triangle = {{
+            vertex0,
+            *(Vertex*) indexDynamicArray(vertices, i-1),
+            *(Vertex*) indexDynamicArray(vertices, i)
+        }};
+        addToDynamicArray(triangles, &triangle);
+    }
+
+    return triangles;
 }
 
-// See https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-void drawLineBresenham(Vector2i p1, Vector2i p2)
+bool areAllVerticesOfATriangleOutsideOfUnitCube(Triangle* this)
 {
-    Color color = {255, 255, 255, 255};
-
-    if (p1.x > p2.x)
-        SWAP(p1, p2);
-
-    int dx = p2.x - p1.x;
-    int dy = p2.y - p1.y;
-
-    bool steep = abs(dy) > abs(dx);
-    if (steep)
+    for (size_t i = 0; i < 3; i++)
     {
-        SWAP(dx, dy);
-        SWAP(p1.x, p1.y);
-        SWAP(p2.x, p2.y);
-    }
-
-    if (p1.x > p2.x)
-    {
-        SWAP(p1, p2);
-        dx = -dx;
-        dy = -dy;
-    }
-
-    int D = 2*dy - dx;
-    int y = p1.y;
-    int yIncrement = 1;
-    if (dy < 0 || (dx < 0 && steep))
-    {
-        yIncrement = -1;
-        dy = -dy;
-    }
-
-    for (int x = p1.x; x <= p2.x; x++)
-    {
-        rendererDrawPixel(
-            context.renderer,
-            (steep) ? (Vector2i) {y, x} : (Vector2i) {x, y},
-            color
-        );
-        if (D > 0)
+        Vector4d position = *(this->vertices[i].position);
+        if ((position.x >= -1. && position.x <= 1.) &&
+            (position.y >= -1. && position.y <= 1.) &&
+            (position.z >= -1. && position.z <= 1.))
         {
-            y += yIncrement;
-            D -= 2*dx;
+            return false;
         }
-        D += 2*dy;
     }
+    return true;
 }
 
-static void triangleDrawEdges(Face* this)
+void drawTriangle(Triangle* triangle)
+{
+    if (context.drawingMode == drawingModeLine)
+        triangleDrawEdges(triangle);
+    else if (context.drawingMode == drawingModeFill)
+        triangleFill(triangle);
+    else
+        LOGE("drawTriangle: unknown drawingMode!\n");
+}
+
+static void triangleDrawEdges(Triangle* triangle)
 {
     Vector3d SSVertices[3];  // Screen Space Vertices
-    triangleConvertVerticesToScreenSpace(this, SSVertices);
+    triangleConvertVerticesToScreenSpace(triangle, SSVertices);
     
     Vector2i points[3] = {
         Vector2dRound((Vector2d) {SSVertices[0].x, SSVertices[0].y}),
@@ -83,17 +63,17 @@ static void triangleDrawEdges(Face* this)
     drawLineBresenham(points[0], points[2]);
 }
 
-static void triangleFill(Face* this)
+static void triangleFill(Triangle* triangle)
 {
     Vector3d SSVertices[3];  // Screen Space Vertices
     Vector3d minBoundingPoint, maxBoundingPoint;
     Vector3d edgeVectors[3];
     Vector3d baryCoordsInitial, baryDeltaX, baryDeltaY;
 
-    triangleConvertVerticesToScreenSpace(this, SSVertices);
+    triangleConvertVerticesToScreenSpace(triangle, SSVertices);
     triangleGetBoundingPoints(SSVertices, &minBoundingPoint, &maxBoundingPoint);
-    triangleCalculateEdgeVectors(this, SSVertices, edgeVectors);
-    triangleCalculateBaryDeltasAndInitial(this, SSVertices, edgeVectors, &baryCoordsInitial, &baryDeltaX, &baryDeltaY, minBoundingPoint);
+    triangleCalculateEdgeVectors(SSVertices, edgeVectors);
+    triangleCalculateBaryDeltasAndInitial(triangle, SSVertices, edgeVectors, &baryCoordsInitial, &baryDeltaX, &baryDeltaY, minBoundingPoint);
 
     Vector3d barycentricCoordinates = baryCoordsInitial;
     for (double y = minBoundingPoint.y; y < maxBoundingPoint.y; y += 1.0)
@@ -132,13 +112,15 @@ static void triangleFill(Face* this)
     }
 }
 
-static void triangleConvertVerticesToScreenSpace(Face* this, Vector3d* SSVertices)
+static void triangleConvertVerticesToScreenSpace(
+    Triangle* triangle, Vector3d* SSVertices
+)
 {
-    for (size_t i = 0; i < this->vertices->size; i++)
+    for (size_t i = 0; i < 3; i++)
     {
         SSVertices[i] = NDCtoScreenSpace(
             context.renderer,
-            *((Vertex*) indexDynamicArray(this->vertices, i))->position
+            *(triangle->vertices[i].position)
         );
     }
 }
@@ -170,13 +152,19 @@ static void triangleGetBoundingPoints(Vector3d* SSVertices, Vector3d* min, Vecto
     *max = Vector3dAdd(res_max, (Vector3d) {0.5, 0.5, 0});
 }
 
-static void triangleCalculateEdgeVectors(Face* this, Vector3d* SSVertices, Vector3d* edgeVectors)
+static void triangleCalculateEdgeVectors(
+    Vector3d* SSVertices, Vector3d* edgeVectors
+)
 {
     for (size_t i = 0; i < 3; i++)
         edgeVectors[i] = Vector3dSubtract(SSVertices[(i+1 == 3) ? 0 : i+1], SSVertices[i]);
 }
 
-static void triangleCalculateBaryDeltasAndInitial(Face* this, Vector3d* SSVertices, Vector3d* edgeVectors, Vector3d* baryCoordsInitial, Vector3d* baryDeltaX, Vector3d* baryDeltaY, Vector3d minBoundingPoint)
+static void triangleCalculateBaryDeltasAndInitial(
+    Triangle* triangle, Vector3d* SSVertices, Vector3d* edgeVectors,
+    Vector3d* baryCoordsInitial, Vector3d* baryDeltaX,
+    Vector3d* baryDeltaY, Vector3d minBoundingPoint
+)
 {
     double areaX2 = Vector3dMagnitude(
         Vector3dCross(edgeVectors[0], edgeVectors[2])
@@ -213,7 +201,10 @@ static void triangleCalculateBaryDeltasAndInitial(Face* this, Vector3d* SSVertic
     };
     *baryDeltaY = Vector3dDivideD(*baryDeltaY, areaX2);
 
-    *baryCoordsInitial = triangleInitializeBarycentricCoordinates(this, baryCoordsZero, *baryDeltaX, *baryDeltaY, minBoundingPoint);
+    *baryCoordsInitial = triangleInitializeBarycentricCoordinates(
+        baryCoordsZero, *baryDeltaX,
+        *baryDeltaY, minBoundingPoint
+    );
 }
 
 static bool triangleIsEdgeFlatTopOrLeft(Vector3d edge)
@@ -223,7 +214,10 @@ static bool triangleIsEdgeFlatTopOrLeft(Vector3d edge)
 }
 
 // Initialize barycentric coordinates for `point`
-static Vector3d triangleInitializeBarycentricCoordinates(Face* this, Vector3d baryCoordsZero, Vector3d baryDeltaX, Vector3d baryDeltaY, Vector3d point)
+static Vector3d triangleInitializeBarycentricCoordinates(
+    Vector3d baryCoordsZero, Vector3d baryDeltaX,
+    Vector3d baryDeltaY, Vector3d point
+)
 {
     return Vector3dAdd(
         Vector3dAdd(
@@ -257,4 +251,5 @@ static Vector3d triangleInitializeBarycentricCoordinates(Face* this, Vector3d ba
 //     }
 //     return resUV;
 // }
+
 

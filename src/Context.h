@@ -1,16 +1,21 @@
 #pragma once
 
 #include <stdbool.h>
-#include "Face.h"
 #include "Renderer.h"
 #include "SDL2/SDL.h"
+
+typedef enum
+{
+    drawingModeFill = 0,
+    drawingModeLine
+} drawingMode;
 
 typedef struct
 {
     bool running;
     Renderer* renderer;
     SDL_Event event;
-    faceModeType faceMode;
+    drawingMode drawingMode;
 } Context;
 
 extern Context context;

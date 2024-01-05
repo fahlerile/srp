@@ -2,7 +2,6 @@
 #include <SDL2/SDL.h>
 #include "Renderer.h"
 #include "Context.h"
-#include "Face.h"
 #include "utils.h"
 #include "errorcodes.h"
 #include "constants.h"
@@ -26,7 +25,7 @@ void constructContext(Context* this)
     atexit(destroyContext);
 
     this->running = true;
-    this->faceMode = FACE_MODE;
+    this->drawingMode = DRAWING_MODE;
 }
 
 void pollEvents()

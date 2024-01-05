@@ -23,7 +23,8 @@ cd bin
 - [x] Projection matrices
 - [x] Test wireframe rendering on various models
 - [ ] Refactor & optimize
-    - [ ] Remove `Face` structure, create `Triangle` typedef for `Vertex[3]`
+    - [x] Remove `Face` structure, create `Triangle` typedef for `Vertex[3]`
+    - [x] Rewrite `.obj` parser for `f` line type
     - [ ] Avoid heap allocation in `modelRender`
     - [ ] Make `modelRender` to draw ONLY ONE instance of a model (remove `matrices` field in `Model` structure)
     - [ ] Optimize Bresenham's line drawing algorithm implementation

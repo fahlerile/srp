@@ -4,9 +4,9 @@ set(
     main.c
     Context.c
     Renderer.c
-    draw.c
 
-    Face.c
+    Line.c
+    Triangle.c
     Texture.c
     Model.c
     Scene.c

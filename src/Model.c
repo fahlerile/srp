@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <string.h>
-#include "Model.h"
 #include "DynamicArray/DynamicArray.h"
-#include "Face.h"
-#include "draw.h"
 #include "fileUtils/fileUtils.h"
-#include "stringUtils/stringUtils.h"
+#include "Model.h"
+#include "Triangle.h"
+#include "Line.h"
 #include "Context.h"
 
 Model* newModel(const char* filename)
@@ -16,7 +15,7 @@ Model* newModel(const char* filename)
     this->UVs = newDynamicArray(100, sizeof(Vector2d), NULL);
     this->normals = newDynamicArray(100, sizeof(Vector3d), NULL);
     this->matrices = newDynamicArray(10, sizeof(Matrix4), NULL);
-    this->faces = newDynamicArray(100, sizeof(Face*), faceFreeCallbackForDynamicArray);
+    this->triangles = newDynamicArray(100, sizeof(Triangle), NULL);
 
     modelParseObj(this, filename);
 
@@ -30,6 +29,9 @@ static void modelParseObj(Model* this, const char* filename)
     char* line = NULL;
     size_t length = 0;
     char lineType[3];
+
+    // an array for holding the vertices of a face (initializing here to avoid heap allocation at every iteration)
+    DynamicArray* faceVertices = newDynamicArray(3, sizeof(Vertex), NULL);
 
     while (readLine(&line, &length, fp) != EOF)
     {
@@ -70,54 +72,59 @@ static void modelParseObj(Model* this, const char* filename)
         // else if (strcmp(lineType, "vp"))
         else if (strcmp(lineType, "f") == 0)
         {
-            DynamicArray* vertices = newDynamicArray(3, sizeof(Vertex), NULL);  // Vertex
-            DynamicArray* vertices_str = splitString(line, " ");  // char*
             bool fail = false;
+            char* vertexString = NULL;
+            strtok(line, " ");
 
-            // starting with 1 because we do not need `f`
-            for (size_t i = 1; i < vertices_str->size; i++)
+            while ((vertexString = strtok(NULL, " ")) != NULL)
             {
-                char* token = *(char**) indexDynamicArray(vertices_str, i);
                 size_t v = 0, vt = 0, vn = 0;
-                sscanf(token, "%zu/%zu/%zu", &v, &vt, &vn);
-                if (v == 0)
+                sscanf(vertexString, "%zu/%zu/%zu", &v, &vt, &vn);
+                if (v == 0)  // nothing found for vertex position
                 {
                     fail = true;
                     break;
                 }
-
-                // -1 because OBJ is 1-base indexed
-                Vertex vert = {
-                    .position = indexDynamicArray(this->vertexPositions, v - 1),
-                    .UV = indexDynamicArray(this->UVs, vt - 1),
-                    .normal = indexDynamicArray(this->normals, vn - 1)
+                
+                // .obj is 1-base indexed, so -1
+                Vertex vertex = {
+                    .position = (Vector4d*) indexDynamicArray(this->vertexPositions, v-1),
+                    .UV =       (Vector2d*) indexDynamicArray(this->UVs, vt-1),
+                    .normal =   (Vector3d*) indexDynamicArray(this->normals, vn-1)
                 };
-
-                addToDynamicArray(vertices, &vert);
+                addToDynamicArray(faceVertices, &vertex);
             }
-            freeDynamicArray(vertices_str);
+
             if (fail)
+                goto faceParsingCleanup;
+
+            if (faceVertices->size == 3)
             {
-                freeDynamicArray(vertices);
-                continue;
+                Triangle triangle = {{
+                    *(Vertex*) indexDynamicArray(faceVertices, 0),
+                    *(Vertex*) indexDynamicArray(faceVertices, 1),
+                    *(Vertex*) indexDynamicArray(faceVertices, 2)
+                }};
+                addToDynamicArray(this->triangles, &triangle);
             }
-
-            Face* face = newFace(vertices);
-
-            if (face->vertices->size == 3)
-                addToDynamicArray(this->faces, &face);
             else
             {
-                DynamicArray* triangulatedFaces = triangulateFace(face);  // Face*
-                concatDynamicArray(this->faces, triangulatedFaces);
+                DynamicArray* trianglesOfThisFace = triangulateFace(faceVertices);  // Triangle
+                concatDynamicArray(this->triangles, trianglesOfThisFace);
+                freeDynamicArray(trianglesOfThisFace);
             }
+
+faceParsingCleanup:
+            deleteAllFromDynamicArray(faceVertices);
         }
         // else if (strcmp(lineType, "g"))
         // else if (strcmp(lineType, "o"))
         else
             LOGE("Unknown line type \"%s\" occured during parsing of %s\n", lineType, filename);
     }
+
     xfree(line);
+    freeDynamicArray(faceVertices);
     fclose(fp);
 }
 
@@ -129,33 +136,47 @@ void modelAddInstance(Model* this, Vector3d position, Vector3d rotation, Vector3
 
 void modelRender(Model* this, Matrix4* view, Matrix4* projection)
 {
-    for (size_t i = 0; i < this->matrices->size; i++)
+    for (size_t matrixI = 0; matrixI < this->matrices->size; matrixI++)
     {
-        Matrix4* modelMatrix = indexDynamicArray(this->matrices, i);
+        Matrix4* modelMatrix = indexDynamicArray(this->matrices, matrixI);
         Matrix4 MV = Matrix4MultiplyMatrix4(view, modelMatrix);
         Matrix4 MVP = Matrix4MultiplyMatrix4(projection, &MV);
         
-        for (size_t face_i = 0; face_i < this->faces->size; face_i++)
+        for (size_t faceI = 0; faceI < this->triangles->size; faceI++)
         {
-            Face* copiedFace = copyFace(*(Face**) indexDynamicArray(this->faces, face_i));
-            DynamicArray* transformedPositions = newDynamicArray(copiedFace->vertices->size, sizeof(Vector4d), NULL);
-            transformedPositions->size = copiedFace->vertices->size;
+            Triangle* triangle = indexDynamicArray(this->triangles, faceI);
+            Vertex verticesTransformed[3];
+            
+            Vector4d verticesPositions[3];
+            Vector2d verticesUVs[3];
+            Vector3d verticesNormals[3];
 
-            for (size_t vertex_i = 0; vertex_i < copiedFace->vertices->size; vertex_i++)
+            for (size_t vertexI = 0; vertexI < 3; vertexI++)
             {
-                Vertex* p_curVertex = indexDynamicArray(copiedFace->vertices, vertex_i);
-                Vector4d* p_curVertexPosition = p_curVertex->position;
-                Vector4d transformedVertexPosition = Matrix4MultiplyVector4dHomogeneous(&MVP, *p_curVertexPosition);
-                setInDynamicArray(transformedPositions, &transformedVertexPosition, vertex_i);
-                ((Vertex*) indexDynamicArray(copiedFace->vertices, vertex_i))->position = (Vector4d*) indexDynamicArray(transformedPositions, vertex_i);
-            }
-    
-            // if at least one vertex of a face is inside of unit cube
-            if (!areAllVerticesOfAFaceOutsideOfUnitCube(copiedFace))
-                drawTriangle(copiedFace);
+                Vertex* vertex = &(triangle->vertices[vertexI]);
 
-            freeFace(copiedFace);
-            freeDynamicArray(transformedPositions);
+                verticesPositions[vertexI] = Matrix4MultiplyVector4dHomogeneous(
+                    &MVP, *(vertex->position)
+                );
+                verticesUVs[vertexI] = *(vertex->UV);
+                verticesNormals[vertexI] = *(vertex->normal);
+
+                verticesTransformed[vertexI] = (Vertex) {
+                    .position = &(verticesPositions[vertexI]),
+                    .UV =       &(verticesUVs[vertexI]),
+                    .normal =   &(verticesNormals[vertexI])
+                };
+            }
+
+            Triangle triangleTransformed = {{
+                verticesTransformed[0],
+                verticesTransformed[1],
+                verticesTransformed[2]
+            }};
+
+            // if at least one vertex of a face is inside of unit cube
+            if (!areAllVerticesOfATriangleOutsideOfUnitCube(&triangleTransformed))
+                drawTriangle(&triangleTransformed);
         }
     }
 }
@@ -166,6 +187,6 @@ void freeModel(Model* this)
     freeDynamicArray(this->UVs);
     freeDynamicArray(this->normals);
     freeDynamicArray(this->matrices);
-    freeDynamicArray(this->faces);
+    freeDynamicArray(this->triangles);
     xfree(this);
 }
