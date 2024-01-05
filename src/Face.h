@@ -1,4 +1,5 @@
 #pragma once
+
 #include "utils.h"
 
 #define LOG_FACE(p_face, LOG_FN) \

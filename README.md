@@ -19,19 +19,22 @@ cd bin
 ```
 
 ## TODO
-- [ ] `triangulateFace`
+- [x] `triangulateFace` (NOT TESTED!)
 - [x] Projection matrices
 - [x] Test wireframe rendering on various models
 - [ ] Refactor & optimize
-    - [ ] Is the structure overly complex?
-    - [ ] Can I avoid copying whole faces in `modelRender`?
+    - [ ] Remove `Face` structure, create `Triangle` typedef for `Vertex[3]`
+    - [ ] Avoid heap allocation in `modelRender`
+    - [ ] Make `modelRender` to draw ONLY ONE instance of a model (remove `matrices` field in `Model` structure)
+    - [ ] Optimize Bresenham's line drawing algorithm implementation
 - [ ] DOCUMENTATION!
-- [ ] Color interpolation
-- [ ] Textures, UV-mapping
 - [ ] Depth buffer
+- [ ] Shaders
+    - [ ] Color interpolation
+    - [ ] Textures, UV-mapping
 - [ ] Lighting
 - [ ] Shadows
-- [ ] Integration testing
+- [ ] Testing
     - Check whether or not drawn triangle/polygon/model correctly (image comparison?)
 
 ## Issues

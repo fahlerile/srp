@@ -19,9 +19,16 @@ if(MSVC)
     target_compile_options(${EXECUTABLE_NAME} PRIVATE /W4 /WX)
 else()
     target_compile_options(${EXECUTABLE_NAME} PRIVATE
-                         -Wall -Wextra -Wpedantic -Wno-unused -std=c2x)
+        -Wall -Wextra -Wpedantic -Wno-unused -std=c2x
+    )
     if(UNIX AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=address)
+       target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=address)
     endif()
+endif()
+
+# output gmon.out
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -pg)
+    target_link_options(${EXECUTABLE_NAME} PRIVATE -pg)
 endif()
 

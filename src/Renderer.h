@@ -7,12 +7,11 @@ typedef struct
 {
     SDL_Window* internal_window;
     SDL_Renderer* internal_renderer;
+    Vector2i dimensions;
 } Renderer;
 
 Renderer* newRenderer(int width, int height, int flags);
 void freeRenderer(Renderer* this);
-
-Vector2i rendererGetWindowDimensions(Renderer* this);
 
 void rendererSetDrawColor(Renderer* this, Color color);
 void rendererDrawPixel(Renderer* this, Vector2i point, Color color);

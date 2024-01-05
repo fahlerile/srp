@@ -21,6 +21,7 @@ Renderer* newRenderer(int width, int height, int flags)
     *renderer = (Renderer) {
         .internal_window = int_window,
         .internal_renderer = int_renderer,
+        .dimensions = (Vector2i) {width, height}
     };
     return renderer;
 }
@@ -30,17 +31,12 @@ void freeRenderer(Renderer* this)
     xfree(this);
 }
 
-Vector2i rendererGetWindowDimensions(Renderer* this)
-{
-    int x, y;
-    SDL_GetWindowSize(this->internal_window, &x, &y);
-    return (Vector2i) {x, y};
-}
-
 void rendererSetDrawColor(Renderer* this, Color color)
 {
-    SDL_SetRenderDrawColor(this->internal_renderer,
-                           color.r, color.g, color.b, color.a);
+    SDL_SetRenderDrawColor(
+        this->internal_renderer,
+        color.r, color.g, color.b, color.a
+    );
 }
 
 void rendererDrawPixel(Renderer* this, Vector2i point, Color color)
@@ -52,8 +48,7 @@ void rendererDrawPixel(Renderer* this, Vector2i point, Color color)
 // @brief Save current buffer state as BMP
 void rendererSaveBuffer(Renderer* this, const char* filename)
 {
-    Vector2i dimensions = rendererGetWindowDimensions(this);
-    SDL_Surface* shot = SDL_CreateRGBSurface(0, dimensions.x, dimensions.y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    SDL_Surface* shot = SDL_CreateRGBSurface(0, this->dimensions.x, this->dimensions.y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     SDL_RenderReadPixels(this->internal_renderer, NULL, SDL_PIXELFORMAT_ARGB8888, shot->pixels, shot->pitch);
     SDL_SaveBMP(shot, filename);
     SDL_FreeSurface(shot);
