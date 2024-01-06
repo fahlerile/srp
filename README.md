@@ -25,8 +25,10 @@ cd bin
 - [ ] Refactor & optimize
     - [x] Remove `Face` structure, create `Triangle` typedef for `Vertex[3]`
     - [x] Rewrite `.obj` parser for `f` line type
-    - [ ] Avoid heap allocation in `modelRender`
+    - [x] Avoid heap allocation in `modelRender`
     - [ ] Make `modelRender` to draw ONLY ONE instance of a model (remove `matrices` field in `Model` structure)
+    - [ ] Think about "shader support" (a function that gets called in `modelRender`? Then how to implement "uniforms"?)
+    - [ ] Think about "`Vertex` variability" (e.g. having color data instead of UV, adding additional data to vertices and etc. like in OpenGL)
     - [ ] Optimize Bresenham's line drawing algorithm implementation
 - [ ] DOCUMENTATION!
 - [ ] Depth buffer
