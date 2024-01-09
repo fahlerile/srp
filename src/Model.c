@@ -12,7 +12,7 @@ Model* newModel(const char* filename)
     Model* this = xmalloc(sizeof(Model));
 
     this->vertexPositions = newDynamicArray(100, sizeof(Vector4d), NULL);
-    this->UVs = newDynamicArray(100, sizeof(Vector2d), NULL);
+    this->textureCoords = newDynamicArray(100, sizeof(Vector3d), NULL);
     this->normals = newDynamicArray(100, sizeof(Vector3d), NULL);
     this->matrices = newDynamicArray(10, sizeof(Matrix4), NULL);
     this->triangles = newDynamicArray(100, sizeof(Triangle), NULL);
@@ -57,8 +57,8 @@ static void modelParseObj(Model* this, const char* filename)
             sscanf(line, "%s %lf %lf %lf", lineType, &u, &v, &w);
             if (isnan(u) || isnan(v))
                 continue;
-            Vector2d UV = {u, v};
-            addToDynamicArray(this->UVs, &UV);
+            Vector3d UVW = {u, v, w};
+            addToDynamicArray(this->textureCoords, &UVW);
         }
         else if (strcmp(lineType, "vn") == 0)
         {
@@ -148,7 +148,7 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
             Vertex verticesTransformed[3];
             
             Vector4d verticesPositions[3];
-            Vector2d verticesUVs[3];
+            Vector3d verticesTextureCoords[3];
             Vector3d verticesNormals[3];
 
             for (size_t vertexI = 0; vertexI < 3; vertexI++)
@@ -158,12 +158,12 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
                 verticesPositions[vertexI] = Matrix4MultiplyVector4dHomogeneous(
                     &MVP, *(vertex->position)
                 );
-                verticesUVs[vertexI] = *(vertex->UV);
+                verticesTextureCoords[vertexI] = *(vertex->UV);
                 verticesNormals[vertexI] = *(vertex->normal);
 
                 verticesTransformed[vertexI] = (Vertex) {
                     .position = &(verticesPositions[vertexI]),
-                    .UV =       &(verticesUVs[vertexI]),
+                    .UV =       &(verticesTextureCoords[vertexI]),
                     .normal =   &(verticesNormals[vertexI])
                 };
             }
@@ -184,7 +184,7 @@ void modelRender(Model* this, Matrix4* view, Matrix4* projection)
 void freeModel(Model* this)
 {
     freeDynamicArray(this->vertexPositions);
-    freeDynamicArray(this->UVs);
+    freeDynamicArray(this->textureCoords);
     freeDynamicArray(this->normals);
     freeDynamicArray(this->matrices);
     freeDynamicArray(this->triangles);
