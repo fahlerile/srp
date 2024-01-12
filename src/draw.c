@@ -6,29 +6,28 @@
 #include "utils.h"
 #include "draw.h"
 
-static void geometryShader(
-    void* vertex, Vector4d* transformedPosition, VertexBuffer* vertexBuffer
-)
-{
-
-}
-
 void drawVertexBuffer(
-    DrawMode drawMode, size_t startIndex,
-    size_t count, VertexBuffer* vertexBuffer
+    DrawMode drawMode, size_t startIndex, size_t count, 
+    VertexBuffer* vertexBuffer, GeometryShaderType geometryShader, 
+    FragmentShaderType fragmentShader
 )
 {
     assert(drawMode == DRAW_MODE_TRIANGLES && "Only triangles are implemented");
 
     for (size_t i = startIndex, n = startIndex + count; i < n; i += 3)
     {
-        Vector4d transformedPositionsHomogenous[3];
+        Vector4d transformedPositionsHomogenous[3] = {
+            {0., 0., 0., 0.},
+            {0., 0., 0., 0.},
+            {0., 0., 0., 0.}
+        };
         Vector3d transformedPositions[3];
 
         for (size_t j = 0; j < 3; j++)
         {
             geometryShader(
                 VertexBufferGetVertexPointer(vertexBuffer, i+j),
+                vertexBuffer, context.uniforms,
                 transformedPositionsHomogenous[j]
             );
             transformedPositions[j] = \

@@ -5,7 +5,8 @@
 #include "VertexBuffer.h"
 
 VertexBuffer* newVertexBuffer(
-    void* data, size_t nBytesPerVertex, size_t nVertices
+    void* data, size_t nBytesPerVertex, size_t nVertices,
+    size_t* attributeOffsets, size_t nAttributes
 )
 {
     VertexBuffer* this = xmalloc(sizeof(VertexBuffer));
@@ -14,37 +15,36 @@ VertexBuffer* newVertexBuffer(
     memcpy(this->buffer, data, nBytesPerVertex * nVertices);
     this->nBytesPerVertex = nBytesPerVertex;
     this->nVertices = nVertices;
-    this->vertexAttributes = newDynamicArray(1, sizeof(VertexAttribute), NULL);
+
+    this->attributeOffsets = xmalloc(sizeof(size_t) * nAttributes);
+    memcpy(
+        this->attributeOffsets, attributeOffsets,
+        sizeof(size_t) * nAttributes
+    );
+    this->nAttributes = nAttributes;
 
     return this;
 }
 
-void VertexBufferConfigureAttribute(
-    VertexBuffer* this, size_t attributeIndex,
-    size_t countOfElementsInAttribute, AttributeType attributeType,
-    size_t attributeOffset
-)
+void freeVertexBuffer(VertexBuffer* this)
 {
-    VertexAttribute attr = {
-        .type = attributeType,
-        .countOfElements = countOfElementsInAttribute,
-        .offset = attributeOffset
-    };
-    setInDynamicArray(this->vertexAttributes, &attr, attributeIndex);
+    xfree(this->buffer);
+    xfree(this);
 }
 
-void* VertexBufferGetVertexPointer(VertexBuffer* vertexBuffer, size_t i)
+void* VertexBufferGetVertexPointer(VertexBuffer* this, size_t i)
 {
-    assert(vertexBuffer->nVertices > i);
+    assert(this->nVertices > i);
     return indexVoidPointer(
-        vertexBuffer->buffer, i, vertexBuffer->nBytesPerVertex
+        this->buffer, i, this->nBytesPerVertex
     );
 }
 
-void freeVertexBuffer(VertexBuffer* this)
+void* VertexPointerGetAttributePointerByIndex(
+    VertexBuffer* this, void* p_vertex, size_t attributeI
+)
 {
-    freeDynamicArray(this->vertexAttributes);
-    xfree(this->buffer);
-    xfree(this);
+    assert(attributeI < this->nAttributes);
+    return ((char*) p_vertex)[this->attributeOffsets[attributeI]];
 }
 

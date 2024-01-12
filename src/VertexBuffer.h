@@ -9,30 +9,22 @@ typedef enum
 
 typedef struct
 {
-    AttributeType type;
-    size_t countOfElements;
-    size_t offset;
-} VertexAttribute;
-
-typedef struct
-{
     void* buffer;
     size_t nBytesPerVertex;
     size_t nVertices;
-    DynamicArray* vertexAttributes;  // VertexAttribute
+    size_t* attributeOffsets;
     size_t nAttributes;
 } VertexBuffer;
 
+// `attributeOffsets` is assumed to be sorted
 VertexBuffer* newVertexBuffer(
-    void* data, size_t nBytesPerVertex, size_t nVertices
+    void* data, size_t nBytesPerVertex, size_t nVertices,
+    size_t* attributeOffsets, size_t nAttributes
 );
-void VertexBufferConfigureAttribute(
-    VertexBuffer* this, size_t attributeIndex,
-    size_t countOfElementsInAttribute, AttributeType attributeType,
-    size_t attributeOffset
-);
-
-void* VertexBufferGetVertexPointer(VertexBuffer* VertexBuffer, size_t i);
-
 void freeVertexBuffer(VertexBuffer* this);
+
+void* VertexBufferGetVertexPointer(VertexBuffer* vertexBuffer, size_t i);
+void* VertexPointerGetAttributePointerByIndex(
+    VertexBuffer* vertexBuffer, void* p_vertex, size_t attributeI
+);
 

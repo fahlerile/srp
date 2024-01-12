@@ -15,6 +15,28 @@ typedef struct
     Color color;
 } Vertex;
 
+void geometryShader(
+    void* p_vertex, VertexBuffer* vertexBuffer, Uniforms* uniforms,
+    Vector4d* transformedPositionHomogenous
+)
+{
+    Vector3d position = \
+        *(Vector3d*) VertexPointerGetAttributePointerByIndex(
+            vertexBuffer, p_vertex, 0
+        );
+    *transformedPositionHomogenous = (Vector4d) {
+        position.x,
+        position.y,
+        position.z,
+        1.
+    };
+}
+
+void fragmentShader()
+{
+
+}
+
 int main(int argc, char** argv)
 {
     constructContext(&context);
@@ -25,20 +47,26 @@ int main(int argc, char** argv)
         {{ 0.5, -0.5, 0.}, {0, 0, 255, 255}}
     };
 
+    size_t attributeOffsets[2] = {
+        offsetof(Vertex, position),
+        offsetof(Vertex, color)
+    };
+
+    VertexBuffer* vertexBuffer = newVertexBuffer(
+        data, sizeof(Vertex), 3, attributeOffsets, 2
+    );
+
+    drawVertexBuffer(
+        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer,
+        geometryShader, fragmentShader
+    );
+
     // size_t index[3] = {
     //     0, 1, 2
     // };
-
-    VertexBuffer* vertexBuffer = newVertexBuffer(data, sizeof(Vertex), 3);
-    VertexBufferConfigureAttribute(vertexBuffer, 0, 3, TYPE_DOUBLE, offsetof(Vertex, position));
-    VertexBufferConfigureAttribute(vertexBuffer, 1, 4, TYPE_UINT8, offsetof(Vertex, color));
-
+    
     // indexBuffer indexBuffer = newIndexBuffer(index, sizeof(size_t) * 3);
-
     // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
-    drawVertexBuffer(
-        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer
-    );
 
     while (context.running)
     {
