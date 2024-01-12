@@ -14,7 +14,7 @@ Model* newModel(const char* filename)
     this->vertexPositions = newDynamicArray(100, sizeof(Vector4d), NULL);
     this->textureCoords = newDynamicArray(100, sizeof(Vector3d), NULL);
     this->normals = newDynamicArray(100, sizeof(Vector3d), NULL);
-    this->matrices = newDynamicArray(10, sizeof(Matrix4), NULL);
+    this->matrices = newDynamicArray(1, sizeof(Matrix4), NULL);
     this->triangles = newDynamicArray(100, sizeof(Triangle), NULL);
 
     modelParseObj(this, filename);
@@ -29,9 +29,6 @@ static void modelParseObj(Model* this, const char* filename)
     char* line = NULL;
     size_t length = 0;
     char lineType[3];
-
-    // an array for holding the vertices of a face (initializing here to avoid heap allocation at every iteration)
-    DynamicArray* faceVertices = newDynamicArray(3, sizeof(Vertex), NULL);
 
     while (readLine(&line, &length, fp) != EOF)
     {
@@ -72,50 +69,52 @@ static void modelParseObj(Model* this, const char* filename)
         // else if (strcmp(lineType, "vp"))
         else if (strcmp(lineType, "f") == 0)
         {
-            bool fail = false;
             char* vertexString = NULL;
             strtok(line, " ");
 
+            // for every vertex in a current face
             while ((vertexString = strtok(NULL, " ")) != NULL)
             {
                 size_t v = 0, vt = 0, vn = 0;
                 sscanf(vertexString, "%zu/%zu/%zu", &v, &vt, &vn);
+
                 if (v == 0)  // nothing found for vertex position
                 {
                     fail = true;
                     break;
                 }
                 
-                // .obj is 1-base indexed, so -1
-                Vertex vertex = {
-                    .position = (Vector4d*) indexDynamicArray(this->vertexPositions, v-1),
-                    .UV =       (Vector2d*) indexDynamicArray(this->UVs, vt-1),
-                    .normal =   (Vector3d*) indexDynamicArray(this->normals, vn-1)
+                Vector4d position = *(Vector4d*) indexDynamicArray(this->vertexPositions, v-1);
+                Vector3d textureCoords = *(Vector3d*) indexDynamicArray(this->textureCoords, vt-1);
+                Vector3d normal = *(Vector3d*) indexDynamicArray(this->normals, vn-1);
+
+                VertexOBJ vertex = {
+                    .position = position,
+                    .textureCoords = textureCoords,
+                    .normal = normal
                 };
-                addToDynamicArray(faceVertices, &vertex);
+
+                addToDynamicArray(faceVertices, vertex);
             }
 
             if (fail)
-                goto faceParsingCleanup;
+            {
+                deleteAllFromDynamicArray(faceVertices);
+                continue;
+            }
 
             if (faceVertices->size == 3)
             {
-                Triangle triangle = {{
-                    *(Vertex*) indexDynamicArray(faceVertices, 0),
-                    *(Vertex*) indexDynamicArray(faceVertices, 1),
-                    *(Vertex*) indexDynamicArray(faceVertices, 2)
-                }};
-                addToDynamicArray(this->triangles, &triangle);
+                // Load vertices into VBO if there will be no duplicates
+                // Add EBO indices
             }
             else
             {
-                DynamicArray* trianglesOfThisFace = triangulateFace(faceVertices);  // Triangle
-                concatDynamicArray(this->triangles, trianglesOfThisFace);
-                freeDynamicArray(trianglesOfThisFace);
+                DynamicArray* triangles = triangulateFace(faceVertices);
+                // Get unique vertices from array of `Triangle`'s, load them into VBO
+                // Add EBO indices
+                VBOAddDynamicArrayOfVertices();
             }
-
-faceParsingCleanup:
-            deleteAllFromDynamicArray(faceVertices);
         }
         // else if (strcmp(lineType, "g"))
         // else if (strcmp(lineType, "o"))

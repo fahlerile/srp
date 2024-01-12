@@ -5,6 +5,9 @@ set(
     Context.c
     Renderer.c
 
+    VertexBuffer.c
+    draw.c
+
     Line.c
     Triangle.c
     Texture.c

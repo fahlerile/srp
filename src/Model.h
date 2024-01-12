@@ -5,7 +5,7 @@
 typedef struct
 {
     DynamicArray* vertexPositions;  // `Vector4d`
-    DynamicArray* UVs;              // `Vector2d`
+    DynamicArray* textureCoords;    // `Vector3d`
     DynamicArray* normals;          // `Vector3d`
     DynamicArray* matrices;         // `Matrix4`
     DynamicArray* triangles;        // `Triangle`
