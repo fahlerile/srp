@@ -52,7 +52,7 @@ void* VertexPointerGetAttributePointerByIndex(
 
 void drawVertexBuffer(
     DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, GeometryShaderType geometryShader, 
+    VertexBuffer* vertexBuffer, VertexShaderType vertexShader, 
     FragmentShaderType fragmentShader
 )
 {
@@ -69,7 +69,7 @@ void drawVertexBuffer(
 
         for (size_t j = 0; j < 3; j++)
         {
-            geometryShader(
+            vertexShader(
                 VertexBufferGetVertexPointer(vertexBuffer, i+j),
                 vertexBuffer, context.uniforms,
                 &(transformedPositionsHomogenous[j])

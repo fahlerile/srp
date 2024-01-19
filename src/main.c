@@ -16,7 +16,7 @@ typedef struct
     Color color;
 } Vertex;
 
-void geometryShader(
+void vertexShader(
     void* p_vertex, VertexBuffer* vertexBuffer, Uniforms* uniforms,
     Vector4d* transformedPositionHomogenous
 )
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
     drawVertexBuffer(
         DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer,
-        geometryShader, fragmentShader
+        vertexShader, fragmentShader
     );
 
     // size_t index[3] = {

@@ -18,7 +18,7 @@ typedef enum
     DRAW_MODE_TRIANGLES
 } DrawMode;
 
-typedef void (*GeometryShaderType)(
+typedef void (*VertexShaderType)(
     void* p_vertex, VertexBuffer* vertexBuffer, Uniforms* uniforms, 
     Vector4d* transformedPositionHomogenous
 );
@@ -38,7 +38,7 @@ void* VertexPointerGetAttributePointerByIndex(
 
 void drawVertexBuffer(
     DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, GeometryShaderType geometryShader, 
+    VertexBuffer* vertexBuffer, VertexShaderType vertexShader, 
     FragmentShaderType fragmentShader
 );
 
