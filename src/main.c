@@ -5,7 +5,7 @@
 #include "Context.h"
 #include "utils.h"
 
-#include "vertexBuffer.h"
+#include "VertexBuffer.h"
 #include "draw.h"
 
 Context context;

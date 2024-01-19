@@ -1,5 +1,5 @@
 #pragma once
-#include "vertexBuffer.h" 
+#include "VertexBuffer.h" 
 #include "Vector/Vector.h"
 
 void drawTriangle(Vector3d* NDCPositions);

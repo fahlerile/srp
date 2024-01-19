@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdint.h>
-#include "MemoryUtils/MemoryUtils.h"
+#include "memoryUtils/memoryUtils.h"
 #include "Uniforms.h"
 
 Uniforms* newUniforms()
