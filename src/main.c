@@ -21,15 +21,14 @@ void vertexShader(
     Vector4d* transformedPositionHomogenous
 )
 {
-    Vector3d position = *(Vector3d*) VertexPointerGetAttributePointerByIndex(
-        vertexBuffer, p_vertex, 0
+    Vector4d position = Vector3dToVector4dHomogenous(
+        *(Vector3d*) VertexPointerGetAttributePointerByIndex(
+            vertexBuffer, p_vertex, 0
+        )
     );
-    *transformedPositionHomogenous = (Vector4d) {
-        position.x,
-        position.y,
-        position.z,
-        1.
-    };
+
+    Matrix4 MVP = *(Matrix4*) getUniform(uniforms, 0);
+    *transformedPositionHomogenous = Matrix4MultiplyVector4dHomogeneous(&MVP, position);
 }
 
 void fragmentShader()
@@ -56,9 +55,14 @@ int main(int argc, char** argv)
         data, sizeof(Vertex), 3, attributeOffsets, 2
     );
 
+    Matrix4 rotation = Matrix4ConstructRotate(
+        (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(45.0)}
+    );
+    addUniform(context.uniforms, &rotation, sizeof(Matrix4));
+
     rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
     drawVertexBuffer(
-        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer,
+        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer, context.uniforms,
         vertexShader, fragmentShader
     );
 

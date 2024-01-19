@@ -2,6 +2,7 @@
 #include "DynamicArray/DynamicArray.h"
 
 // Assumes that `data` is contiguous -> no gaps between uniforms
+// Assumes that the last element in the `offsets` array is the index of the first free byte
 typedef struct
 {
     void* data;
@@ -12,7 +13,9 @@ typedef struct
 
 Uniforms* newUniforms();
 void freeUniforms(Uniforms* this);
-
-void addUniform(Uniforms* this, void* element, size_t nBytes);
 static void reallocUniforms(Uniforms* this);
+
+// Returns the index of the added uniform
+size_t addUniform(Uniforms* this, void* element, size_t nBytes);
+void* getUniform(Uniforms* this, size_t index);
 

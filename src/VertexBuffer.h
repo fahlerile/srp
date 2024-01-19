@@ -38,7 +38,7 @@ void* VertexPointerGetAttributePointerByIndex(
 
 void drawVertexBuffer(
     DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, VertexShaderType vertexShader, 
-    FragmentShaderType fragmentShader
+    VertexBuffer* vertexBuffer, Uniforms* uniforms,
+    VertexShaderType vertexShader, FragmentShaderType fragmentShader
 );
 
