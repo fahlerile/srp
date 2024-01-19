@@ -4,55 +4,52 @@
 #include "memoryUtils/memoryUtils.h"
 #include "Uniforms.h"
 
-Uniforms* newUniforms()
+Uniforms* newUniforms(size_t nUniforms)
 {
     Uniforms* this = xmalloc(sizeof(Uniforms));
-
-    this->bytesAllocated = 64;
-    this->data = xmalloc(this->bytesAllocated);
-    this->offsets = newDynamicArray(1, sizeof(size_t), NULL);
-    addToDynamicArray(this->offsets, &((size_t) {0}));
-    this->nElements = 0;
-    
+    this->pointers = newDynamicArray(nUniforms, sizeof(void*), NULL);
+    this->pointers->size = nUniforms;
     return this;
 }
 
 void freeUniforms(Uniforms* this)
 {
-    if (this->data != NULL)
-        xfree(this->data);
-    freeDynamicArray(this->offsets);
+    // free all allocated buffers (do not free unused/NULL ones)
+    for (size_t i = 0; i < this->pointers->size; i++)
+    {
+        void* ptr = *(void**) indexDynamicArray(this->pointers, i);
+        if (ptr != NULL)
+            xfree(ptr);
+    }
+    freeDynamicArray(this->pointers);
     xfree(this);
 }
 
-static void reallocUniforms(Uniforms* this)
+void reallocUniforms(Uniforms* this, size_t n)
 {
-    this->bytesAllocated *= 2;
-    this->data = xrealloc(this->data, this->bytesAllocated);
+    reallocateDynamicArray(this->pointers, n);
+    this->pointers->size = n;
 }
 
-size_t addUniform(Uniforms* this, void* element, size_t nBytes)
+void addUniform(Uniforms* this, size_t index, void* p_element, size_t nBytes)
 {
-    size_t indexOfTheFirstFreeByte = \
-        *(size_t*) indexDynamicArray(this->offsets, this->nElements);
+    // assert it is not already in use
+    assert(*(void**) indexDynamicArray(this->pointers, index) == NULL);
 
-checkEnoughMemory:
-    if (indexOfTheFirstFreeByte + 1 + nBytes > this->bytesAllocated)
-    {
-        reallocUniforms(this);
-        goto checkEnoughMemory;  // realloc may not be enough for the new element 
-    }
+    void* buffer = xmalloc(nBytes);
+    memcpy(buffer, p_element, nBytes);
+    setInDynamicArray(this->pointers, &buffer, index);
+}
 
-    memcpy((uint8_t*) this->data + indexOfTheFirstFreeByte, element, nBytes);
-    addToDynamicArray(this->offsets, &((size_t) {indexOfTheFirstFreeByte + nBytes}));
-    this->nElements += 1;
-
-    return this->nElements - 1;
+void deleteUniform(Uniforms* this, size_t index)
+{
+    setInDynamicArray(this->pointers, &((void*){NULL}), index);
 }
 
 void* getUniform(Uniforms* this, size_t index)
 {
-    assert(index < this->nElements);
-    return (uint8_t*) this->data + *(size_t*) indexDynamicArray(this->offsets, index);
+    void* ptr = *(void**) indexDynamicArray(this->pointers, index);
+    assert(ptr != NULL);
+    return ptr;
 }
 

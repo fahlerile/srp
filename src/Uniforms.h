@@ -1,21 +1,19 @@
 #pragma once
 #include "DynamicArray/DynamicArray.h"
 
-// Assumes that `data` is contiguous -> no gaps between uniforms
-// Assumes that the last element in the `offsets` array is the index of the first free byte
+// The user is responsible for freeing all the resources allocated by
+// uniforms added by `addUniform`
+// `pointers` store NULL if there is nothing at index
 typedef struct
 {
-    void* data;
-    size_t bytesAllocated;
-    DynamicArray* offsets;  // `size_t`
-    size_t nElements;
+    DynamicArray* pointers;  // `void*`
 } Uniforms;
 
-Uniforms* newUniforms();
+Uniforms* newUniforms(size_t nUniforms);
 void freeUniforms(Uniforms* this);
-static void reallocUniforms(Uniforms* this);
+void reallocUniforms(Uniforms* this, size_t n);
 
-// Returns the index of the added uniform
-size_t addUniform(Uniforms* this, void* element, size_t nBytes);
+void addUniform(Uniforms* this, size_t index, void* p_element, size_t nBytes);
+void deleteUniform(Uniforms* this, size_t index);
 void* getUniform(Uniforms* this, size_t index);
 

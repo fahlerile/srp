@@ -19,7 +19,7 @@ typedef enum
 } DrawMode;
 
 typedef void (*VertexShaderType)(
-    void* p_vertex, VertexBuffer* vertexBuffer, Uniforms* uniforms, 
+    void* p_vertex, VertexBuffer* vertexBuffer,
     Vector4d* transformedPositionHomogenous
 );
 typedef void (*FragmentShaderType)();
@@ -38,7 +38,6 @@ void* VertexPointerGetAttributePointerByIndex(
 
 void drawVertexBuffer(
     DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, Uniforms* uniforms,
-    VertexShaderType vertexShader, FragmentShaderType fragmentShader
+    VertexBuffer* vertexBuffer, VertexShaderType vertexShader, FragmentShaderType fragmentShader
 );
 

@@ -15,7 +15,7 @@ void constructContext(Context* this)
     }
 
     this->renderer = newRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_RENDERER_SDL_FLAGS);
-    this->uniforms = newUniforms();
+    this->uniforms = newUniforms(DEFAULT_N_UNIFORMS);
 
     if (this->renderer == NULL)
     {

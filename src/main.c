@@ -1,7 +1,5 @@
 #define SDL_MAIN_HANDLED
 #include "Renderer.h"
-// #include "Scene.h"
-// #include "Model.h"
 #include "Context.h"
 #include "utils.h"
 
@@ -17,17 +15,19 @@ typedef struct
 } Vertex;
 
 void vertexShader(
-    void* p_vertex, VertexBuffer* vertexBuffer, Uniforms* uniforms,
+    void* p_vertex, VertexBuffer* vertexBuffer,
     Vector4d* transformedPositionHomogenous
 )
 {
+    // layout(location = 0) uniform mat4 MVP;
+    Matrix4 MVP = *(Matrix4*) getUniform(context.uniforms, 0);
+
     Vector4d position = Vector3dToVector4dHomogenous(
         *(Vector3d*) VertexPointerGetAttributePointerByIndex(
             vertexBuffer, p_vertex, 0
         )
     );
 
-    Matrix4 MVP = *(Matrix4*) getUniform(uniforms, 0);
     *transformedPositionHomogenous = Matrix4MultiplyVector4dHomogeneous(&MVP, position);
 }
 
@@ -58,12 +58,11 @@ int main(int argc, char** argv)
     Matrix4 rotation = Matrix4ConstructRotate(
         (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(45.0)}
     );
-    addUniform(context.uniforms, &rotation, sizeof(Matrix4));
+    addUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
 
     rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
     drawVertexBuffer(
-        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer, context.uniforms,
-        vertexShader, fragmentShader
+        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer, vertexShader, fragmentShader
     );
 
     // size_t index[3] = {

@@ -53,8 +53,7 @@ void* VertexPointerGetAttributePointerByIndex(
 
 void drawVertexBuffer(
     DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, Uniforms* uniforms,
-    VertexShaderType vertexShader, FragmentShaderType fragmentShader
+    VertexBuffer* vertexBuffer, VertexShaderType vertexShader, FragmentShaderType fragmentShader
 )
 {
     assert(drawMode == DRAW_MODE_TRIANGLES && "Only triangles are implemented");
@@ -72,8 +71,7 @@ void drawVertexBuffer(
         {
             vertexShader(
                 VertexBufferGetVertexPointer(vertexBuffer, i+j),
-                vertexBuffer, uniforms,
-                &(transformedPositionsHomogenous[j])
+                vertexBuffer, &(transformedPositionsHomogenous[j])
             );
             transformedPositions[j] = \
                 Vector4dHomogenousDivide(transformedPositionsHomogenous[j]);
