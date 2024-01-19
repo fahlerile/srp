@@ -29,27 +29,17 @@ cd bin
     - [x] Do not ignore `w` component in `modelParseObj`
         - `Model.UV` is now `Model.textureCoords`
         - `Model.textureCoords` is of type `Vector3d` (U, V, W)
-    - [ ] Create VBO, EAO and VAO-like structures
-        - `modelParseObj`, face parser:
-            - For every vertex in the face:
-                - [x] Get position, UV and normal data from 1-based `.obj` indices
-                    - [ ] Handle the case where there are no UV coords or/and normals!
-                - [ ] Add a vertex to a buffer
-                - [ ] If a vertex is faulty (invalid index, no position data), proceed to the next line and delete everything stored in buffer
-            - If everything is good:
-                - [ ] Add vertices from a temporary buffer to a `Model`'s VBO if the same ones are not already there
-                    - [ ] Think of a fast lookup/search data structure to store 3 values (`v`, `vt`, `vn` indices from `.obj`) as indices and an index in `VBO` for this vertex as value
-                - [ ] Triangulate if needed
-                - [ ] Add indices for EBO
-        - `VBO`
-            - A structure similar to `DynamicArray` (it will probably be used in implementation with `uint8` stored type)
-            - Should store attribute data (store offsets to different attributes), should operate on bytes
-        - `EBO`
-            - A structure similar to (if not the same as) `DynamicArray`
     - [ ] Make `modelRender` to draw ONLY ONE instance of a model (remove `matrices` field in `Model` structure)
-    - [ ] Think about "shader support" (a function that gets called in `modelRender`? Then how to implement "uniforms"?)
-    - [ ] Think about "`Vertex` variability" (e.g. having color data instead of UV, adding additional data to vertices and etc. like in OpenGL)
     - [ ] Optimize Bresenham's line drawing algorithm implementation
+- [ ] "own opengl"
+    - [x] Think about "shader support" (a function that gets called in `modelRender`? Then how to implement "uniforms"?)
+    - [x] Think about "`Vertex` variability" (e.g. having color data instead of UV, adding additional data to vertices and etc. like in OpenGL)
+    - [x] Create VBO-like structure
+    - [x] Get a triangle rendered with a vertex shader
+    - [ ] Test `Uniforms` structure, think a little more about better possible alternative (names for uniforms? own uniform for each shader "program"?)
+    - [ ] Think about and implement data interpolating inside the primitive (см. вкладку на телефоне)
+    - [ ] DIVIDE the OpenGL-like API implementation and other code (such as Model and Scene abstractions)
+    - [ ] Create EBO-like structure
 - [ ] DOCUMENTATION!
 - [ ] Depth buffer
 - [ ] Shaders
