@@ -1,23 +1,36 @@
 #pragma once
+#include "vertexBuffer.h" 
+#include "Vector/Vector.h"
 
-typedef enum
-{
-    DRAW_MODE_LINES = 0,
-    DRAW_MODE_TRIANGLES
-} DrawMode;
+void drawTriangle(Vector3d* NDCPositions);
 
-typedef void (*GeometryShaderType)(
-    void* p_vertex, Uniforms* uniforms, VertexBuffer* vertexBuffer,
-    Vector4d* transformedPositionHomogenous
+// Transform a plain array of N NDC coordinates to a plain array of N screen space coordinates
+static void transformPositionsToScreenSpace(
+    Vector3d* NDCPositions, size_t n, Vector3d* SSPositions
 );
-typedef void (*FragmentShaderType)();
 
-void drawVertexBuffer(
-    DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, GeometryShaderType geometryShader, 
-    FragmentShaderType fragmentShader
+// Get two 2D (X, Y) bounding points for a plain array of N screen space vertex positions
+static void getBoundingPoints(
+    Vector3d* SSPositions, size_t n, 
+    Vector3d* minBoundingPoint, Vector3d* maxBoundingPoint
 );
-static void drawTriangle(
-    Vector3d* NDCPositions, VertexBuffer* vertexBuffer
+
+// Calculate edge vectors for a plain array of N screen space vertex positions
+static void calculateEdgeVectors(
+    Vector3d* SSPositions, size_t n, Vector3d* edgeVectors
 );
+
+// Calculate per-pixel delta values for barycentric coordinates for a triangle and barycentric coordinates for point (0, 0)
+static void triangleCalculateBarycenticDeltas(
+    Vector3d* SSPositions, Vector3d* edgeVectors,
+    Vector3d* barycentricDeltaX, Vector3d* barycentricDeltaY,
+    Vector3d* barycentricCoordinatesZero
+);
+// Calculate barycentric coordinates in a triangle for a point given per-pixel delta values
+static Vector3d triangleCalculateBarycentricCoordinatesForPoint(
+    Vector3d barycentricCoordinatesZero, Vector3d barycentricDeltaX,
+    Vector3d barycentricDeltaY, Vector3d point
+);
+
+static bool triangleIsEdgeFlatTopOrLeft(Vector3d edgeVector);
 

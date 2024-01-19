@@ -6,13 +6,11 @@ set(
     Renderer.c
 
     VertexBuffer.c
+    Uniforms.c
     draw.c
 
     Line.c
-    Triangle.c
     Texture.c
-    Model.c
-    Scene.c
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})

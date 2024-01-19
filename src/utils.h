@@ -37,7 +37,7 @@
 
 // Convert NDC coordinates to Screen space coordinates
 // Leaves `z` the same
-inline static Vector3d NDCtoScreenSpace(Renderer* renderer, Vector4d NDC)
+inline static Vector3d NDCToScreenSpace(Renderer* renderer, Vector3d NDC)
 {
     Vector2i dimensions = renderer->dimensions;
     return (Vector3d) {

@@ -1,62 +1,32 @@
 #include <stdint.h>
 #include <assert.h>
 #include "Vector/Vector.h"
-#include "VertexBuffer.h" 
 #include "Context.h"
 #include "utils.h"
 #include "draw.h"
 
-void drawVertexBuffer(
-    DrawMode drawMode, size_t startIndex, size_t count, 
-    VertexBuffer* vertexBuffer, GeometryShaderType geometryShader, 
-    FragmentShaderType fragmentShader
-)
-{
-    assert(drawMode == DRAW_MODE_TRIANGLES && "Only triangles are implemented");
-
-    for (size_t i = startIndex, n = startIndex + count; i < n; i += 3)
-    {
-        Vector4d transformedPositionsHomogenous[3] = {
-            {0., 0., 0., 0.},
-            {0., 0., 0., 0.},
-            {0., 0., 0., 0.}
-        };
-        Vector3d transformedPositions[3];
-
-        for (size_t j = 0; j < 3; j++)
-        {
-            geometryShader(
-                VertexBufferGetVertexPointer(vertexBuffer, i+j),
-                vertexBuffer, context.uniforms,
-                transformedPositionsHomogenous[j]
-            );
-            transformedPositions[j] = \
-                Vector4dHomogenousDivide(transformedPositionsHomogenous[j]);
-        }
-        drawTriangle(transformedPositions, vertexBuffer);
-    }
-}
-
-static void drawTriangle(
-    Vector3d* NDCPositions, VertexBuffer* vertexBuffer
-)
+void drawTriangle(Vector3d* NDCPositions)
 {
     Vector3d SSPositions[3];
     Vector3d edgeVectors[3];
-    Vector2d minBoundingPoint, maxBoundingPoint;
+    Vector3d minBoundingPoint, maxBoundingPoint;
     Vector3d barycentricCoordinates, barycentricDeltaX, barycentricDeltaY;
 
-    triangleTransformPositionsToScreenSpace(NDCPositions, SSPositions);
-    triangleGetBoundingPoints(SSPositions, &minBoundingPoint, &maxBoundingPoint);
-    // We want to loop over centers of pixels, not over their bound
-    minBoundingPoint = Vector2dAdd(minBoundingPoint, (Vector2d) {0.5, 0.5});
-    maxBoundingPoint = Vector2dAdd(maxBoundingPoint, (Vector2d) {0.5, 0.5});
+    transformPositionsToScreenSpace(NDCPositions, 3, SSPositions);
+    getBoundingPoints(SSPositions, 3, &minBoundingPoint, &maxBoundingPoint);
+    // We want to loop over centers of pixels, not over their edge
+    minBoundingPoint = Vector3dAdd(minBoundingPoint, (Vector3d) {0.5, 0.5, 0.});
+    maxBoundingPoint = Vector3dAdd(maxBoundingPoint, (Vector3d) {0.5, 0.5, 0.});
 
-    triangleCalculateEdgeVectors(SSPositions, edgeVectors);
-    triangleCalculateBarycenticDeltas(&barycentricDeltaX, &barycentricDeltaY);
-    triangleCalculateBarycentricCoordinatesForPoint(
-        barycentricDeltaX, barycentricDeltaY, minBoundingPoint,
+    calculateEdgeVectors(SSPositions, 3, edgeVectors);
+
+    triangleCalculateBarycenticDeltas(
+        SSPositions, edgeVectors, &barycentricDeltaX, &barycentricDeltaY,
         &barycentricCoordinates
+    );
+    barycentricCoordinates = triangleCalculateBarycentricCoordinatesForPoint(
+        barycentricCoordinates, barycentricDeltaX, barycentricDeltaY,
+        minBoundingPoint
     );
 
     for (double y = minBoundingPoint.y; y < maxBoundingPoint.y; y += 1.)
@@ -97,5 +67,118 @@ nextPixel:
             barycentricCoordinates, barycentricDeltaY
         );
     }
+}
+
+static void transformPositionsToScreenSpace(
+    Vector3d* NDCPositions, size_t n, Vector3d* SSPositions
+)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        SSPositions[i] = \
+            NDCToScreenSpace(context.renderer, NDCPositions[i]);
+    }
+}
+
+static void getBoundingPoints(
+    Vector3d* SSPositions, size_t n, 
+    Vector3d* minBoundingPoint, Vector3d* maxBoundingPoint
+)
+{
+    Vector3d min = {DBL_MAX, DBL_MAX, DBL_MAX};
+    Vector3d max = {0};
+
+    for (size_t i = 0; i < n; i++)
+    {
+        if (SSPositions[i].x < min.x)
+            min.x = SSPositions[i].x;
+        if (SSPositions[i].y < min.y)
+            min.y = SSPositions[i].y;
+        if (SSPositions[i].z < min.z)
+            min.z = SSPositions[i].z;
+
+        if (SSPositions[i].x > max.x)
+            max.x = SSPositions[i].x;
+        if (SSPositions[i].y > max.y)
+            max.y = SSPositions[i].y;
+        if (SSPositions[i].z > max.z)
+            max.z = SSPositions[i].z;
+    }
+
+    *minBoundingPoint = min;
+    *maxBoundingPoint = max;
+}
+
+static void calculateEdgeVectors(
+    Vector3d* SSPositions, size_t n, Vector3d* edgeVectors
+)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        edgeVectors[i] = Vector3dSubtract(
+            SSPositions[(i+1 == n) ? 0 : i+1], SSPositions[i]
+        );
+    }
+}
+
+static void triangleCalculateBarycenticDeltas(
+    Vector3d* SSPositions, Vector3d* edgeVectors,
+    Vector3d* barycentricDeltaX, Vector3d* barycentricDeltaY,
+    Vector3d* barycentricCoordinatesZero
+)
+{
+    double areaX2 = Vector3dMagnitude(
+        Vector3dCross(edgeVectors[0], edgeVectors[2])
+    );
+
+    *barycentricCoordinatesZero = (Vector3d) {
+        Vector3dCross(
+            Vector3dZeroZ(edgeVectors[1]),
+            Vector3dZeroZ(Vector3dNegate(SSPositions[1]))
+        ).z / areaX2,
+        Vector3dCross(
+            Vector3dZeroZ(edgeVectors[2]),
+            Vector3dZeroZ(Vector3dNegate(SSPositions[2]))
+        ).z / areaX2,
+        Vector3dCross(
+            Vector3dZeroZ(edgeVectors[0]),
+            Vector3dZeroZ(Vector3dNegate(SSPositions[0]))
+        ).z / areaX2
+    };
+
+    // see /docs/Triangle.md
+    *barycentricDeltaX = (Vector3d) {
+        SSPositions[1].y - SSPositions[2].y,
+        SSPositions[2].y - SSPositions[0].y,
+        SSPositions[0].y - SSPositions[1].y
+    };
+    *barycentricDeltaX = Vector3dDivideD(*barycentricDeltaX, areaX2);
+
+    *barycentricDeltaY = (Vector3d) {
+        SSPositions[2].x - SSPositions[1].x,
+        SSPositions[0].x - SSPositions[2].x,
+        SSPositions[1].x - SSPositions[0].x
+    };
+    *barycentricDeltaY = Vector3dDivideD(*barycentricDeltaY, areaX2);
+}
+
+static Vector3d triangleCalculateBarycentricCoordinatesForPoint(
+    Vector3d barycentricCoordinatesZero, Vector3d barycentricDeltaX,
+    Vector3d barycentricDeltaY, Vector3d point
+)
+{
+    return Vector3dAdd(
+        Vector3dAdd(
+            barycentricCoordinatesZero,
+            Vector3dMultiplyD(barycentricDeltaX, point.x)
+        ),
+        Vector3dMultiplyD(barycentricDeltaY, point.y)
+    );
+}
+
+static bool triangleIsEdgeFlatTopOrLeft(Vector3d edgeVector)
+{
+    // is flat top OR is left
+    return ( (edgeVector.x > 0) && (edgeVector.y == 0) ) || (edgeVector.y < 0);
 }
 

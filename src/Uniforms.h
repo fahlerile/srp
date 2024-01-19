@@ -1,4 +1,5 @@
 #pragma once
+#include "DynamicArray/DynamicArray.h"
 
 // Assumes that `data` is contiguous -> no gaps between uniforms
 typedef struct
@@ -10,8 +11,8 @@ typedef struct
 } Uniforms;
 
 Uniforms* newUniforms();
-void freeUniforms();
+void freeUniforms(Uniforms* this);
 
 void addUniform(Uniforms* this, void* element, size_t nBytes);
-void reallocUniforms(Uniforms* this);
+static void reallocUniforms(Uniforms* this);
 

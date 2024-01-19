@@ -1,6 +1,7 @@
+#define SDL_MAIN_HANDLED
 #include "Renderer.h"
-#include "Scene.h"
-#include "Model.h"
+// #include "Scene.h"
+// #include "Model.h"
 #include "Context.h"
 #include "utils.h"
 
@@ -20,10 +21,9 @@ void geometryShader(
     Vector4d* transformedPositionHomogenous
 )
 {
-    Vector3d position = \
-        *(Vector3d*) VertexPointerGetAttributePointerByIndex(
-            vertexBuffer, p_vertex, 0
-        );
+    Vector3d position = *(Vector3d*) VertexPointerGetAttributePointerByIndex(
+        vertexBuffer, p_vertex, 0
+    );
     *transformedPositionHomogenous = (Vector4d) {
         position.x,
         position.y,
@@ -42,9 +42,9 @@ int main(int argc, char** argv)
     constructContext(&context);
 
     Vertex data[3] = {
-        {{ 0.0,  0.5, 0.}, {255, 0, 0, 255}},
-        {{-0.5, -0.5, 0.}, {0, 255, 0, 255}},
-        {{ 0.5, -0.5, 0.}, {0, 0, 255, 255}}
+        {{-0.5, -0.5, 0.}, {255, 0, 0, 255}},
+        {{ 0. ,  0.5, 0.}, {0, 255, 0, 255}},
+        {{ 0.5, -0.5, 0.}, {0, 0, 255, 255}},
     };
 
     size_t attributeOffsets[2] = {
@@ -56,6 +56,7 @@ int main(int argc, char** argv)
         data, sizeof(Vertex), 3, attributeOffsets, 2
     );
 
+    rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
     drawVertexBuffer(
         DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer,
         geometryShader, fragmentShader
@@ -68,6 +69,8 @@ int main(int argc, char** argv)
     // indexBuffer indexBuffer = newIndexBuffer(index, sizeof(size_t) * 3);
     // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
 
+    rendererSaveBuffer(context.renderer, "screenshot.bmp");
+    rendererSwapBuffer(context.renderer);
     while (context.running)
     {
         pollEvents();
@@ -110,6 +113,7 @@ int main(int argc, char** argv)
     // }
 
     // freeSceneAndModels(world);
+
     return 0;
 }
 

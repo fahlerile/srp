@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
+#include "draw.h"
 #include "memoryUtils/memoryUtils.h"
 #include "VertexBuffer.h"
+#include "Context.h"
 
 VertexBuffer* newVertexBuffer(
     void* data, size_t nBytesPerVertex, size_t nVertices,
@@ -45,6 +47,37 @@ void* VertexPointerGetAttributePointerByIndex(
 )
 {
     assert(attributeI < this->nAttributes);
-    return ((char*) p_vertex)[this->attributeOffsets[attributeI]];
+    return ((char*) p_vertex) + this->attributeOffsets[attributeI];
+}
+
+void drawVertexBuffer(
+    DrawMode drawMode, size_t startIndex, size_t count, 
+    VertexBuffer* vertexBuffer, GeometryShaderType geometryShader, 
+    FragmentShaderType fragmentShader
+)
+{
+    assert(drawMode == DRAW_MODE_TRIANGLES && "Only triangles are implemented");
+
+    for (size_t i = startIndex, n = startIndex + count; i < n; i += 3)
+    {
+        Vector4d transformedPositionsHomogenous[3] = {
+            {0., 0., 0., 0.},
+            {0., 0., 0., 0.},
+            {0., 0., 0., 0.}
+        };
+        Vector3d transformedPositions[3];
+
+        for (size_t j = 0; j < 3; j++)
+        {
+            geometryShader(
+                VertexBufferGetVertexPointer(vertexBuffer, i+j),
+                vertexBuffer, context.uniforms,
+                &(transformedPositionsHomogenous[j])
+            );
+            transformedPositions[j] = \
+                Vector4dHomogenousDivide(transformedPositionsHomogenous[j]);
+        }
+        drawTriangle(transformedPositions);
+    }
 }
 

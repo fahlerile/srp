@@ -15,6 +15,7 @@ void constructContext(Context* this)
     }
 
     this->renderer = newRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_RENDERER_SDL_FLAGS);
+    this->uniforms = newUniforms();
 
     if (this->renderer == NULL)
     {
@@ -44,5 +45,6 @@ void pollEvents()
 void destroyContext()
 {
     freeRenderer(context.renderer);
+    freeUniforms(context.uniforms);
 }
 
