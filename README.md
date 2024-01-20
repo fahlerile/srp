@@ -42,7 +42,7 @@ cd bin
         - For now, I will leave `Uniforms` as singleton structure stored in `Context` 
         - Hence, I will not pass the `Uniforms` structure in arguments and access them through global `Context`
     - [x] Test `Uniforms` structure
-    - [ ] Think about and implement data interpolating inside the primitive (см. вкладку на телефоне)
+    - [x] Think about and implement data interpolation inside the primitive (см. вкладку на телефоне)
     - [ ] DIVIDE the OpenGL-like API implementation and other code (such as Model and Scene abstractions)
     - [ ] Create EBO-like structure (`indexBuffer`)
 - [ ] DOCUMENTATION!

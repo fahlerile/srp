@@ -5,8 +5,17 @@
 #include "utils.h"
 #include "draw.h"
 
-void drawTriangle(Vector3d* NDCPositions)
+void drawTriangle(void* vsOutput)
 {
+    Vector3d NDCPositions[3];
+    for (size_t i = 0; i < 3; i++)
+    {
+        NDCPositions[i] = *(Vector3d*) (vertexShaderOutputGetAttributePointerByIndex(
+            (uint8_t*) vsOutput + (context.vertexShaderOutputInformation.nBytes * i),
+            0
+        ));
+    }
+
     Vector3d SSPositions[3];
     Vector3d edgeVectors[3];
     Vector3d minBoundingPoint, maxBoundingPoint;
@@ -51,9 +60,13 @@ void drawTriangle(Vector3d* NDCPositions)
 
             if (ROUGHLY_EQUAL(barycentricCoordinatesSum, 1.))
             {
-                // Color color;
-                // fragmentShader(&color);
-                Color color = {255, 255, 255, 255};
+                uint8_t interpolatedVSOutput[context.vertexShaderOutputInformation.nBytes];
+                interpolateVertexShaderOutputInTriangle(
+                    vsOutput, barycentricCoordinates, &interpolatedVSOutput
+                );
+
+                Color color = {0};
+                context.fragmentShader(interpolatedVSOutput, &color);
                 rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
             }
             

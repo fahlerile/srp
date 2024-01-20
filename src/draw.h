@@ -2,7 +2,9 @@
 #include "VertexBuffer.h" 
 #include "Vector/Vector.h"
 
-void drawTriangle(Vector3d* NDCPositions);
+// `vsOutput` is an array of 3 vertex shader outputs 
+// NDC vertex positions are assumed to be first at every VS output (see the comment above `VertexShaderType` definition)
+void drawTriangle(void* vsOutput);
 
 // Transform a plain array of N NDC coordinates to a plain array of N screen space coordinates
 static void transformPositionsToScreenSpace(

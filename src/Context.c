@@ -27,6 +27,10 @@ void constructContext(Context* this)
 
     this->running = true;
     this->drawingMode = DRAWING_MODE;
+
+    this->vertexShader = NULL;
+    memset(&this->vertexShaderOutputInformation, '\0', sizeof(this->vertexShaderOutputInformation));
+    this->fragmentShader = NULL;
 }
 
 void pollEvents()

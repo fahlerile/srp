@@ -5,35 +5,58 @@
 
 #include "VertexBuffer.h"
 #include "draw.h"
+#include "Type.h"
+#include "Shaders.h"
 
 Context context;
 
 typedef struct 
 {
     Vector3d position;
-    Color color;
+    Vector3d color;
 } Vertex;
 
 void vertexShader(
-    void* p_vertex, VertexBuffer* vertexBuffer,
-    Vector4d* transformedPositionHomogenous
+    Uniforms* uniforms, void* p_vertex, VertexBuffer* vertexBuffer,
+    void* outputBuffer
 )
 {
     // layout(location = 0) uniform mat4 MVP;
-    Matrix4 MVP = *(Matrix4*) getUniform(context.uniforms, 0);
+    Matrix4 MVP = *(Matrix4*) getUniform(uniforms, 0);
 
-    Vector4d position = Vector3dToVector4dHomogenous(
-        *(Vector3d*) VertexPointerGetAttributePointerByIndex(
-            vertexBuffer, p_vertex, 0
-        )
+    // layout(location = 0) in vec3 aPosition; 
+    Vector3d aPosition = *(Vector3d*) VertexPointerGetAttributePointerByIndex(
+        vertexBuffer, p_vertex, 0
+    );
+    Vector3d aColor = *(Vector3d*) VertexPointerGetAttributePointerByIndex(
+        vertexBuffer, p_vertex, 1
     );
 
-    *transformedPositionHomogenous = Matrix4MultiplyVector4dHomogeneous(&MVP, position);
+    Vector3d position = Vector4dHomogenousDivide(Matrix4MultiplyVector4dHomogeneous(
+        &MVP, Vector3dToVector4dHomogenous(aPosition)
+    ));
+    Vector3d color = aColor;
+
+    // Copy everything to the output buffer
+    memcpy(
+        indexVoidPointer(
+            outputBuffer, context.vertexShaderOutputInformation.attributeOffsets[0], 1
+        ),
+        &position, sizeof(position)
+    );
+    memcpy(
+        indexVoidPointer(
+            outputBuffer, context.vertexShaderOutputInformation.attributeOffsets[1], 1
+        ),
+        &color, sizeof(color)
+    );
 }
 
-void fragmentShader()
+void fragmentShader(void* interpolatedVSOutput, Color* color)
 {
-
+    Vector3d vecColor = \
+        *(Vector3d*) vertexShaderOutputGetAttributePointerByIndex(interpolatedVSOutput, 1);
+    *color = Vector4dToColor(Vector3dToVector4dHomogenous(vecColor));
 }
 
 int main(int argc, char** argv)
@@ -41,9 +64,9 @@ int main(int argc, char** argv)
     constructContext(&context);
 
     Vertex data[3] = {
-        {{-0.5, -0.5, 0.}, {255, 0, 0, 255}},
-        {{ 0. ,  0.5, 0.}, {0, 255, 0, 255}},
-        {{ 0.5, -0.5, 0.}, {0, 0, 255, 255}},
+        {{-0.5, -0.5, 0.}, {1.0, 0.0, 0.0}},
+        {{ 0. ,  0.5, 0.}, {0.0, 1.0, 0.0}},
+        {{ 0.5, -0.5, 0.}, {0.0, 0.0, 1.0}},
     };
 
     size_t attributeOffsets[2] = {
@@ -61,9 +84,21 @@ int main(int argc, char** argv)
     addUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
 
     rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-    drawVertexBuffer(
-        DRAW_MODE_TRIANGLES, 0, 3, vertexBuffer, vertexShader, fragmentShader
-    );
+
+    size_t vsOutputAttributeOffsets[2] = {0, sizeof(Vector3d)};
+    Type vsOutputAttributeTypes[2] = {TypeVector3d, TypeVector3d};
+
+    VertexShaderOutputInformation vsOutputInfo = {
+        .nBytes = sizeof(Vector3d) + sizeof(Vector3d),
+        .nAttributes = 2,
+        .attributeOffsets = vsOutputAttributeOffsets,
+        .attributeTypes = vsOutputAttributeTypes
+    };
+
+    context.vertexShader = vertexShader;
+    context.vertexShaderOutputInformation = vsOutputInfo;
+    context.fragmentShader = fragmentShader;
+    drawVertexBuffer(vertexBuffer, DRAW_MODE_TRIANGLES, 0, 3);
 
     // size_t index[3] = {
     //     0, 1, 2

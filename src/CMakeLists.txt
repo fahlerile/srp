@@ -8,6 +8,7 @@ set(
     VertexBuffer.c
     Uniforms.c
     draw.c
+    Shaders.c
 
     Line.c
     Texture.c
