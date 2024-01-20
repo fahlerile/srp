@@ -1,5 +1,7 @@
 #pragma once
 #include <stddef.h>
+#include <stdarg.h>
+#include "memoryUtils/memoryUtils.h"
 #include "VertexBuffer.h"
 #include "Type.h"
 
@@ -26,4 +28,9 @@ void* vertexShaderOutputGetAttributePointerByIndex(void* vsOutput, size_t index)
 void interpolateVertexShaderOutputInTriangle(
     void* threeVSOutput, Vector3d barycentricCoordinates, void* interpolatedVSOutput
 );
+
+void vertexShaderLoadAttributesFromVertexPointer(
+    void* p_vertex, VertexBuffer* vertexBuffer, ...
+);
+void vertexShaderCopyToOutputBuffer(void* outputBuffer, ...);
 

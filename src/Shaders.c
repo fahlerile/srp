@@ -56,3 +56,42 @@ void interpolateVertexShaderOutputInTriangle(
     }
 }
 
+void vertexShaderLoadAttributesFromVertexPointer(
+    void* p_vertex, VertexBuffer* vertexBuffer, ...
+)
+{
+    va_list args;
+    va_start(args, vertexBuffer);
+
+    for (size_t i = 0; i < context.vertexShaderOutputInformation.nAttributes; i++)
+    {
+        void* p_dest = va_arg(args, void*);
+        size_t nBytes = va_arg(args, size_t);
+
+        memcpy(p_dest, VertexPointerGetAttributePointerByIndex(
+            vertexBuffer, p_vertex, i
+        ), nBytes);
+    }
+
+    va_end(args);
+}
+
+void vertexShaderCopyToOutputBuffer(void* outputBuffer, ...)
+{
+    va_list args;
+    va_start(args, outputBuffer);
+
+    for (size_t i = 0; i < context.vertexShaderOutputInformation.nAttributes; i++)
+    {
+        void* p_data = va_arg(args, void*);
+        size_t nBytes = va_arg(args, size_t);
+
+        memcpy(indexVoidPointer(
+            outputBuffer, 
+            context.vertexShaderOutputInformation.attributeOffsets[i], 1
+        ), p_data, nBytes);
+    }
+
+    va_end(args);
+}
+

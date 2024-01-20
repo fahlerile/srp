@@ -21,15 +21,14 @@ void vertexShader(
     void* outputBuffer
 )
 {
-    // layout(location = 0) uniform mat4 MVP;
     Matrix4 MVP = *(Matrix4*) getUniform(uniforms, 0);
 
-    // layout(location = 0) in vec3 aPosition; 
-    Vector3d aPosition = *(Vector3d*) VertexPointerGetAttributePointerByIndex(
-        vertexBuffer, p_vertex, 0
-    );
-    Vector3d aColor = *(Vector3d*) VertexPointerGetAttributePointerByIndex(
-        vertexBuffer, p_vertex, 1
+    Vector3d aPosition;
+    Vector3d aColor;
+    vertexShaderLoadAttributesFromVertexPointer(
+        p_vertex, vertexBuffer,
+        &aPosition, sizeof(aPosition),
+        &aColor, sizeof(aColor)
     );
 
     Vector3d position = Vector4dHomogenousDivide(Matrix4MultiplyVector4dHomogeneous(
@@ -37,17 +36,9 @@ void vertexShader(
     ));
     Vector3d color = aColor;
 
-    // Copy everything to the output buffer
-    memcpy(
-        indexVoidPointer(
-            outputBuffer, context.vertexShaderOutputInformation.attributeOffsets[0], 1
-        ),
-        &position, sizeof(position)
-    );
-    memcpy(
-        indexVoidPointer(
-            outputBuffer, context.vertexShaderOutputInformation.attributeOffsets[1], 1
-        ),
+    vertexShaderCopyToOutputBuffer(
+        outputBuffer,
+        &position, sizeof(position),
         &color, sizeof(color)
     );
 }
@@ -63,6 +54,7 @@ int main(int argc, char** argv)
 {
     constructContext(&context);
 
+    // construct vertex buffer
     Vertex data[3] = {
         {{-0.5, -0.5, 0.}, {1.0, 0.0, 0.0}},
         {{ 0. ,  0.5, 0.}, {0.0, 1.0, 0.0}},
@@ -78,13 +70,14 @@ int main(int argc, char** argv)
         data, sizeof(Vertex), 3, attributeOffsets, 2
     );
 
-    Matrix4 rotation = Matrix4ConstructRotate(
-        (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(45.0)}
-    );
-    addUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
+    // construct index buffer
+    // size_t index[3] = {
+    //     0, 1, 2
+    // };
+    
+    // indexBuffer indexBuffer = newIndexBuffer(index, sizeof(size_t) * 3);
 
-    rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-
+    // bind the shaders and vertex shader output information
     size_t vsOutputAttributeOffsets[2] = {0, sizeof(Vector3d)};
     Type vsOutputAttributeTypes[2] = {TypeVector3d, TypeVector3d};
 
@@ -98,13 +91,17 @@ int main(int argc, char** argv)
     context.vertexShader = vertexShader;
     context.vertexShaderOutputInformation = vsOutputInfo;
     context.fragmentShader = fragmentShader;
+
+    // load the uniforms
+    Matrix4 rotation = Matrix4ConstructRotate(
+        (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(45.0)}
+    );
+    addUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
+
+    // draw the buffer
+    rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
     drawVertexBuffer(vertexBuffer, DRAW_MODE_TRIANGLES, 0, 3);
 
-    // size_t index[3] = {
-    //     0, 1, 2
-    // };
-    
-    // indexBuffer indexBuffer = newIndexBuffer(index, sizeof(size_t) * 3);
     // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
 
     rendererSaveBuffer(context.renderer, "screenshot.bmp");
@@ -115,43 +112,6 @@ int main(int argc, char** argv)
     }
 
     freeVertexBuffer(vertexBuffer);
-
-    // Matrix4 viewMatrix = Matrix4ConstructView(
-    //     (Vector3d) {0, 0, 0},
-    //     (Vector3d) {RADIANS(0), RADIANS(0), RADIANS(0)},
-    //     (Vector3d) {1, 1, 1}
-    // );  
-    // Matrix4 projectionMatrix = Matrix4ConstructPerspectiveProjection(
-    //     -1, 1,
-    //     -1, 1,
-    //      1, 50
-    // );
-
-    // Scene* world = newScene(viewMatrix, projectionMatrix);
-    // Model* teapot = newModel("res/models/utah_teapot.obj");
-    // 
-    // modelAddInstance(teapot, 
-    //     (Vector3d) {0, 0, 20},
-    //     (Vector3d) {RADIANS(0), RADIANS(0), RADIANS(0)},
-    //     (Vector3d) {1, 1, 1}
-    // );
-    // sceneAddModel(world, teapot);
-    // 
-    // rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-    // sceneRender(world);
-
-    // rendererSaveBuffer(context.renderer, "screenshot.bmp");
-    // rendererSwapBuffer(context.renderer);
-    // while (context.running)
-    // {
-    //     pollEvents();
-    //     #ifndef __linux__
-    //         rendererSwapBuffer(renderer);
-    //     #endif
-    // }
-
-    // freeSceneAndModels(world);
-
     return 0;
 }
 
