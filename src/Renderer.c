@@ -1,6 +1,5 @@
 #include "Renderer.h"
 #include "utils.h"
-#include "Texture.h"
 
 /**
  * @brief Construct a new `Renderer`

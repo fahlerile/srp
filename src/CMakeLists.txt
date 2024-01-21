@@ -9,9 +9,6 @@ set(
     Uniforms.c
     draw.c
     Shaders.c
-
-    Line.c
-    Texture.c
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
