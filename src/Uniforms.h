@@ -14,6 +14,8 @@ void freeUniforms(Uniforms* this);
 void reallocUniforms(Uniforms* this, size_t n);
 
 void addUniform(Uniforms* this, size_t index, void* p_element, size_t nBytes);
+// Assumes that `p_element` points to the same type as was stored in the uniform before
+void modifyUniform(Uniforms* this, size_t index, void* p_element, size_t nBytes);
 void deleteUniform(Uniforms* this, size_t index);
 void* getUniform(Uniforms* this, size_t index);
 

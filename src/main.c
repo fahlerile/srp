@@ -92,23 +92,27 @@ int main(int argc, char** argv)
     context.vertexShaderOutputInformation = vsOutputInfo;
     context.fragmentShader = fragmentShader;
 
-    // load the uniforms
-    Matrix4 rotation = Matrix4ConstructRotate(
-        (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(45.0)}
-    );
-    addUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
-
-    // draw the buffer
-    rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-    drawVertexBuffer(vertexBuffer, DRAW_MODE_TRIANGLES, 0, 3);
-
-    // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
+    Matrix4 identity = Matrix4ConstructIdentity();
+    addUniform(context.uniforms, 0, &identity, sizeof(Matrix4));
 
     rendererSaveBuffer(context.renderer, "screenshot.bmp");
-    rendererSwapBuffer(context.renderer);
+    size_t frameCount = 0;
     while (context.running)
     {
+        // load the uniforms
+        Matrix4 rotation = Matrix4ConstructRotate(
+            (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(frameCount)}
+        );
+        modifyUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
+
+        rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
+        drawVertexBuffer(vertexBuffer, DRAW_MODE_TRIANGLES, 0, 3);
+
+        // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
+
         pollEvents();
+        rendererSwapBuffer(context.renderer);
+        frameCount++;
     }
 
     freeVertexBuffer(vertexBuffer);

@@ -33,12 +33,20 @@ void reallocUniforms(Uniforms* this, size_t n)
 
 void addUniform(Uniforms* this, size_t index, void* p_element, size_t nBytes)
 {
-    // assert it is not already in use
+    // assert that this slot is not already in use
     assert(*(void**) indexDynamicArray(this->pointers, index) == NULL);
 
     void* buffer = xmalloc(nBytes);
     memcpy(buffer, p_element, nBytes);
     setInDynamicArray(this->pointers, &buffer, index);
+}
+
+void modifyUniform(Uniforms* this, size_t index, void* p_element, size_t nBytes)
+{
+    assert(*(void**) indexDynamicArray(this->pointers, index) != NULL);
+
+    void* buffer = *(void**) indexDynamicArray(this->pointers, index);
+    memcpy(buffer, p_element, nBytes);
 }
 
 void deleteUniform(Uniforms* this, size_t index)
