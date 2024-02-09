@@ -96,11 +96,9 @@ int main(int argc, char** argv)
     Matrix4 identity = Matrix4ConstructIdentity();
     addUniform(context.uniforms, 0, &identity, sizeof(Matrix4));
 
-    rendererSaveBuffer(context.renderer, "screenshot.bmp");
     size_t frameCount = 0;
-
     clock_t begin, end;
-    double frametime_ms;
+    double frametimeSec;
     while (context.running)
     {
         begin = clock();
@@ -118,11 +116,11 @@ int main(int argc, char** argv)
 
         pollEvents();
         rendererSwapBuffer(context.renderer);
-        frameCount++;
 
+        frameCount++;
         end = clock();
-        frametime_ms = ((double) (end - begin) / CLOCKS_PER_SEC) / 1000;
-        LOGI("Frametime: %lf ms\n", frametime_ms);
+        frametimeSec = (double) (end - begin) / CLOCKS_PER_SEC;
+        LOGI("Frametime: %lf s; FPS: %lf\n", frametimeSec, 1 / frametimeSec);
     }
 
     freeVertexBuffer(vertexBuffer);

@@ -14,7 +14,7 @@ void constructContext(Context* this)
         exit(SDL_INIT_FAIL);
     }
 
-    this->renderer = newRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_RENDERER_SDL_FLAGS);
+    this->renderer = newRenderer("Rasterizer", WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_RENDERER_SDL_FLAGS);
     this->uniforms = newUniforms(DEFAULT_N_UNIFORMS);
 
     if (this->renderer == NULL)

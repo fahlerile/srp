@@ -5,18 +5,19 @@
 // @brief A wrapper around default SDL Window and Renderer structures
 typedef struct
 {
-    SDL_Window* internal_window;
-    SDL_Renderer* internal_renderer;
+    SDL_Window* window;
+    SDL_Surface* screen;
+    SDL_Surface* pixels;
     Vector2i dimensions;
 } Renderer;
 
-Renderer* newRenderer(int width, int height, int flags);
+Renderer* newRenderer(const char* window_title, int width, int height, uint32_t flags);
 void freeRenderer(Renderer* this);
 
 void rendererSetDrawColor(Renderer* this, Color color);
 void rendererDrawPixel(Renderer* this, Vector2i point, Color color);
 
-void rendererSaveBuffer(Renderer* this, const char* filename);
+int rendererSaveBuffer(Renderer* this, const char* filename);
 void rendererSwapBuffer(Renderer* this);
 void rendererClearBuffer(Renderer* this, Color color);
 

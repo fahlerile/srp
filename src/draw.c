@@ -23,9 +23,6 @@ void drawTriangle(void* vsOutput)
 
     transformPositionsToScreenSpace(NDCPositions, 3, SSPositions);
     getBoundingPoints(SSPositions, 3, &minBoundingPoint, &maxBoundingPoint);
-    // We want to loop over centers of pixels, not over their edge
-    minBoundingPoint = Vector3dAdd(minBoundingPoint, (Vector3d) {0.5, 0.5, 0.});
-    maxBoundingPoint = Vector3dAdd(maxBoundingPoint, (Vector3d) {0.5, 0.5, 0.});
 
     calculateEdgeVectors(SSPositions, 3, edgeVectors);
 
@@ -118,8 +115,9 @@ static void getBoundingPoints(
             max.z = SSPositions[i].z;
     }
 
-    *minBoundingPoint = min;
-    *maxBoundingPoint = max;
+    // We want to loop over centers of pixels, not over their top-left point
+    *minBoundingPoint = Vector3dAdd(min, (Vector3d) {0.5, 0.5, 0.});
+    *maxBoundingPoint = Vector3dAdd(max, (Vector3d) {0.5, 0.5, 0.});
 }
 
 static void calculateEdgeVectors(
