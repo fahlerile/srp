@@ -1,4 +1,5 @@
 #define SDL_MAIN_HANDLED
+#include <time.h>
 #include "Renderer.h"
 #include "Context.h"
 #include "utils.h"
@@ -97,8 +98,13 @@ int main(int argc, char** argv)
 
     rendererSaveBuffer(context.renderer, "screenshot.bmp");
     size_t frameCount = 0;
+
+    clock_t begin, end;
+    double frametime_ms;
     while (context.running)
     {
+        begin = clock();
+
         // load the uniforms
         Matrix4 rotation = Matrix4ConstructRotate(
             (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(frameCount)}
@@ -113,6 +119,10 @@ int main(int argc, char** argv)
         pollEvents();
         rendererSwapBuffer(context.renderer);
         frameCount++;
+
+        end = clock();
+        frametime_ms = ((double) (end - begin) / CLOCKS_PER_SEC) / 1000;
+        LOGI("Frametime: %lf ms\n", frametime_ms);
     }
 
     freeVertexBuffer(vertexBuffer);
