@@ -2,7 +2,6 @@ add_subdirectory(c-codebase)
 
 target_link_libraries(
     ${EXECUTABLE_NAME}
-    Color
     Vector
     Matrix
     DynamicArray

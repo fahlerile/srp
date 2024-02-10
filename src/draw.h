@@ -23,10 +23,10 @@ static void calculateEdgeVectors(
 );
 
 // Calculate per-pixel delta values for barycentric coordinates for a triangle and barycentric coordinates for point (0, 0)
-static void triangleCalculateBarycenticDeltas(
+static void triangleCalculateBarycenticDeltasAndBarycentricCoordinatesForPoint(
     Vector3d* SSPositions, Vector3d* edgeVectors,
-    Vector3d* barycentricDeltaX, Vector3d* barycentricDeltaY,
-    Vector3d* barycentricCoordinatesZero
+    double* barycentricDeltaX, double* barycentricDeltaY,
+    double* barycentricCoordinates, Vector3d* point
 );
 // Calculate barycentric coordinates in a triangle for a point given per-pixel delta values
 static Vector3d triangleCalculateBarycentricCoordinatesForPoint(

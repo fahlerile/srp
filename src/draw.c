@@ -19,63 +19,59 @@ void drawTriangle(void* vsOutput)
     Vector3d SSPositions[3];
     Vector3d edgeVectors[3];
     Vector3d minBoundingPoint, maxBoundingPoint;
-    Vector3d barycentricCoordinates, barycentricDeltaX, barycentricDeltaY;
+    double barycentricCoordinates[3] = {0};
+    double barycentricDeltaX[3] = {0};
+    double barycentricDeltaY[3] = {0};
 
     transformPositionsToScreenSpace(NDCPositions, 3, SSPositions);
     getBoundingPoints(SSPositions, 3, &minBoundingPoint, &maxBoundingPoint);
-
     calculateEdgeVectors(SSPositions, 3, edgeVectors);
-
-    triangleCalculateBarycenticDeltas(
-        SSPositions, edgeVectors, &barycentricDeltaX, &barycentricDeltaY,
-        &barycentricCoordinates
-    );
-    barycentricCoordinates = triangleCalculateBarycentricCoordinatesForPoint(
-        barycentricCoordinates, barycentricDeltaX, barycentricDeltaY,
-        minBoundingPoint
+    triangleCalculateBarycenticDeltasAndBarycentricCoordinatesForPoint(
+        SSPositions, edgeVectors, barycentricDeltaX, barycentricDeltaY,
+        barycentricCoordinates, &minBoundingPoint
     );
 
-    for (double y = minBoundingPoint.y; y < maxBoundingPoint.y; y += 1.)
+    double barycentricCoordinatesAtBeginningOfTheRow[3];
+    bool isEdgeNotFlatTopOrLeft[3];
+    for (uint8_t i = 0; i < 3; i++)
     {
-        Vector3d barycentricCoordinatesAtBeginningOfTheRow = \
-            barycentricCoordinates;
-        for (double x = minBoundingPoint.x; x < maxBoundingPoint.x; x += 1.)
+        barycentricCoordinatesAtBeginningOfTheRow[i] = barycentricCoordinates[i];
+        isEdgeNotFlatTopOrLeft[i] = !triangleIsEdgeFlatTopOrLeft(edgeVectors[i]);
+    }
+
+    for (size_t y = minBoundingPoint.y; y < maxBoundingPoint.y; y += 1)
+    {
+        for (size_t x = minBoundingPoint.x; x < maxBoundingPoint.x; x += 1)
         {
-            double barycentricCoordinatesSum = 0.;
-            for (size_t i = 0; i < 3; i++)
+            // Rasterization rules
+            // If current point lies on the edge that is not flat top or left, do not draw the point
+            for (uint8_t i = 0; i < 3; i++)
             {
-                // index of edge in front of current vertex
-                size_t edgeIndex = (i+1) % 3;
-                bool isWrongHalfPlane = Vector3dIndex(barycentricCoordinates, i) < 0;
-                bool doesLieOnEdgeNotFlatTopOrLeft = \
-                    Vector3dIndex(barycentricCoordinates, i) == 0 && \
-                    !triangleIsEdgeFlatTopOrLeft(edgeVectors[edgeIndex]);
-                if (isWrongHalfPlane || doesLieOnEdgeNotFlatTopOrLeft)
+                if (barycentricCoordinates[i] == 0 && isEdgeNotFlatTopOrLeft[i])
                     goto nextPixel;
-                barycentricCoordinatesSum += Vector3dIndex(barycentricCoordinates, i);
             }
 
-            if (ROUGHLY_EQUAL(barycentricCoordinatesSum, 1.))
-            {
-                uint8_t interpolatedVSOutput[context.vertexShaderOutputInformation.nBytes];
-                interpolateVertexShaderOutputInTriangle(
-                    vsOutput, barycentricCoordinates, &interpolatedVSOutput
-                );
-
-                Color color = {0};
-                context.fragmentShader(interpolatedVSOutput, &color);
+            if (barycentricCoordinates[0] >= 0 && barycentricCoordinates[1] >= 0 && \
+                barycentricCoordinates[2] >= 0)
+            { 
+                // uint8_t interpolatedVSOutput[context.vertexShaderOutputInformation.nBytes];
+                // interpolateVertexShaderOutputInTriangle(
+                //     vsOutput, barycentricCoordinates, &interpolatedVSOutput
+                // );
+                Color color = {255, 255, 255, 255};
+                // context.fragmentShader(interpolatedVSOutput, &color);
                 rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
             }
-            
+
 nextPixel:
-            barycentricCoordinates = Vector3dAdd(
-                barycentricCoordinates, barycentricDeltaX
-            );
+            for (uint8_t i = 0; i < 3; i++)
+                barycentricCoordinates[i] += barycentricDeltaX[i];
         }
-        barycentricCoordinates = barycentricCoordinatesAtBeginningOfTheRow;
-        barycentricCoordinates = Vector3dAdd(
-            barycentricCoordinates, barycentricDeltaY
-        );
+        for (uint8_t i = 0; i < 3; i++)
+        {
+            barycentricCoordinatesAtBeginningOfTheRow[i] += barycentricDeltaY[i];;
+            barycentricCoordinates[i] = barycentricCoordinatesAtBeginningOfTheRow[i];
+        }
     }
 }
 
@@ -115,9 +111,8 @@ static void getBoundingPoints(
             max.z = SSPositions[i].z;
     }
 
-    // We want to loop over centers of pixels, not over their top-left point
-    *minBoundingPoint = Vector3dAdd(min, (Vector3d) {0.5, 0.5, 0.});
-    *maxBoundingPoint = Vector3dAdd(max, (Vector3d) {0.5, 0.5, 0.});
+    *minBoundingPoint = min;
+    *maxBoundingPoint = max;
 }
 
 static void calculateEdgeVectors(
@@ -132,59 +127,34 @@ static void calculateEdgeVectors(
     }
 }
 
-static void triangleCalculateBarycenticDeltas(
+static void triangleCalculateBarycenticDeltasAndBarycentricCoordinatesForPoint(
     Vector3d* SSPositions, Vector3d* edgeVectors,
-    Vector3d* barycentricDeltaX, Vector3d* barycentricDeltaY,
-    Vector3d* barycentricCoordinatesZero
+    double* barycentricDeltaX, double* barycentricDeltaY,
+    double* barycentricCoordinates, Vector3d* point
 )
 {
-    double areaX2 = Vector3dMagnitude(
-        Vector3dCross(edgeVectors[0], edgeVectors[2])
-    );
-
-    *barycentricCoordinatesZero = (Vector3d) {
-        Vector3dCross(
-            Vector3dZeroZ(edgeVectors[1]),
-            Vector3dZeroZ(Vector3dNegate(SSPositions[1]))
-        ).z / areaX2,
-        Vector3dCross(
-            Vector3dZeroZ(edgeVectors[2]),
-            Vector3dZeroZ(Vector3dNegate(SSPositions[2]))
-        ).z / areaX2,
-        Vector3dCross(
-            Vector3dZeroZ(edgeVectors[0]),
-            Vector3dZeroZ(Vector3dNegate(SSPositions[0]))
-        ).z / areaX2
-    };
+    double areaX2 = Vector3dMagnitude(Vector3dCross(edgeVectors[0], edgeVectors[2]));
+    barycentricCoordinates[0] = (
+        edgeVectors[1].x * (point->y - SSPositions[1].y) - \
+        edgeVectors[1].y * (point->x - SSPositions[1].x)
+    ) / areaX2;
+    barycentricCoordinates[1] = (
+        edgeVectors[2].x * (point->y - SSPositions[2].y) - \
+        edgeVectors[2].y * (point->x - SSPositions[2].x)
+    ) / areaX2;
+    barycentricCoordinates[2] = (
+        edgeVectors[0].x * (point->y - SSPositions[0].y) - \
+        edgeVectors[0].y * (point->x - SSPositions[0].x)
+    ) / areaX2;
 
     // see /docs/Triangle.md
-    *barycentricDeltaX = (Vector3d) {
-        SSPositions[1].y - SSPositions[2].y,
-        SSPositions[2].y - SSPositions[0].y,
-        SSPositions[0].y - SSPositions[1].y
-    };
-    *barycentricDeltaX = Vector3dDivideD(*barycentricDeltaX, areaX2);
+    barycentricDeltaX[0] = (SSPositions[1].y - SSPositions[2].y) / areaX2;
+    barycentricDeltaX[1] = (SSPositions[2].y - SSPositions[0].y) / areaX2;
+    barycentricDeltaX[2] = (SSPositions[0].y - SSPositions[1].y) / areaX2;
 
-    *barycentricDeltaY = (Vector3d) {
-        SSPositions[2].x - SSPositions[1].x,
-        SSPositions[0].x - SSPositions[2].x,
-        SSPositions[1].x - SSPositions[0].x
-    };
-    *barycentricDeltaY = Vector3dDivideD(*barycentricDeltaY, areaX2);
-}
-
-static Vector3d triangleCalculateBarycentricCoordinatesForPoint(
-    Vector3d barycentricCoordinatesZero, Vector3d barycentricDeltaX,
-    Vector3d barycentricDeltaY, Vector3d point
-)
-{
-    return Vector3dAdd(
-        Vector3dAdd(
-            barycentricCoordinatesZero,
-            Vector3dMultiplyD(barycentricDeltaX, point.x)
-        ),
-        Vector3dMultiplyD(barycentricDeltaY, point.y)
-    );
+    barycentricDeltaY[0] = (SSPositions[2].x - SSPositions[1].x) / areaX2;
+    barycentricDeltaY[1] = (SSPositions[0].x - SSPositions[2].x) / areaX2;
+    barycentricDeltaY[2] = (SSPositions[1].x - SSPositions[0].x) / areaX2;
 }
 
 static bool triangleIsEdgeFlatTopOrLeft(Vector3d edgeVector)
