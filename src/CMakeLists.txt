@@ -18,7 +18,7 @@ if(MSVC)
     target_compile_options(${EXECUTABLE_NAME} PRIVATE /W4 /WX)
 else()
     target_compile_options(${EXECUTABLE_NAME} PRIVATE
-        -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -O3 -march=native
+        -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native
     )
     if(UNIX AND CMAKE_BUILD_TYPE STREQUAL "Debug")
        target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=address)

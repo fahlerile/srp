@@ -104,10 +104,10 @@ int main(int argc, char** argv)
         begin = clock();
 
         // load the uniforms
-        Matrix4 rotation = Matrix4ConstructRotate(
-            (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(frameCount)}
-        );
-        modifyUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
+        // Matrix4 rotation = Matrix4ConstructRotate(
+        //     (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(frameCount)}
+        // );
+        // modifyUniform(context.uniforms, 0, &rotation, sizeof(Matrix4));
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
         drawVertexBuffer(vertexBuffer, DRAW_MODE_TRIANGLES, 0, 3);
