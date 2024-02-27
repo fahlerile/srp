@@ -33,7 +33,7 @@ void drawTriangle(void* vsOutput)
         SSPositions, edgeVectors, barycentricDeltaX, barycentricDeltaY,
         barycentricCoordinates, &minBoundingPoint
     );
-    calculatePositiveOnPlusYAndSlopeSigns(
+    triangleCalculatePositiveOnPlusYAndSlopeSigns(
         SSPositions, edgeVectors, positiveOnPlusY, edgeSlopePositiveOrZero
     );
 
@@ -66,6 +66,15 @@ void drawTriangle(void* vsOutput)
     {
         for (int xTile = 0; xTile < nTilesInBox.x; xTile++)
         {
+            Vector2d startPoint = {
+                minBoundingPoint.x + xTile * tileDimensions.x,
+                minBoundingPoint.y + yTile * tileDimensions.y
+            };
+            Vector2d endPoint = {
+                startPoint.x + tileDimensions.x,
+                startPoint.y + tileDimensions.y
+            };
+
             bool rejected[3] = {0};
             bool accepted[3] = {0};
             for (uint8_t iEdge = 0; iEdge < 3; iEdge++)
@@ -122,10 +131,19 @@ void drawTriangle(void* vsOutput)
                     rejected[iEdge] = true;
             }
 
+            double tempBaryCoords[3];
+            memcpy(tempBaryCoords, barycentricCoordinates, sizeof(double) * 3);
+
             if (accepted[0] && accepted[1] && accepted[2])
-                loopOverTileAndFillNoCheck(xTile, yTile, tileDimensions, minBoundingPoint);
+                loopOverTileAndFillNoCheck(
+                    startPoint, endPoint, tempBaryCoords,
+                    barycentricDeltaX, barycentricDeltaY
+                );
             else if (!(rejected[0] || rejected[1] || rejected[2]))
-                loopOverTileAndFill(xTile, yTile, tileDimensions, minBoundingPoint);
+                loopOverTileAndFill(
+                    startPoint, endPoint, edgeVectors, tempBaryCoords,
+                    barycentricDeltaX, barycentricDeltaY
+                );
 
             for (uint8_t i = 0; i < 3; i++)
                 barycentricCoordinates[i] += barycentricDeltaTileX[i];
@@ -137,91 +155,88 @@ void drawTriangle(void* vsOutput)
             barycentricCoordinates[i] = barycentricCoordinatesAtBeginningOfTheRow[i];
         }
     }
-
-    // double barycentricCoordinatesAtBeginningOfTheRow[3];
-    // bool isEdgeNotFlatTopOrLeft[3];
-    // for (uint8_t i = 0; i < 3; i++)
-    // {
-    //     barycentricCoordinatesAtBeginningOfTheRow[i] = barycentricCoordinates[i];
-    //     isEdgeNotFlatTopOrLeft[i] = !triangleIsEdgeFlatTopOrLeft(edgeVectors[i]);
-    // }
-
-    // for (size_t y = minBoundingPoint.y; y < maxBoundingPoint.y; y += 1)
-    // {
-    //     for (size_t x = minBoundingPoint.x; x < maxBoundingPoint.x; x += 1)
-    //     {
-    //         // Rasterization rules
-    //         // If current point lies on the edge that is not flat top or left, do not draw the point
-    //         for (uint8_t i = 0; i < 3; i++)
-    //         {
-    //             if (barycentricCoordinates[i] == 0 && isEdgeNotFlatTopOrLeft[i])
-    //                 goto nextPixel;
-    //         }
-
-    //         if (barycentricCoordinates[0] >= 0 && barycentricCoordinates[1] >= 0 && \
-    //             barycentricCoordinates[2] >= 0)
-    //         { 
-    //             // uint8_t interpolatedVSOutput[context.vertexShaderOutputInformation.nBytes];
-    //             // interpolateVertexShaderOutputInTriangle(
-    //             //     vsOutput, barycentricCoordinates, &interpolatedVSOutput
-    //             // );
-    //             Color color = {255, 255, 255, 255};
-    //             // context.fragmentShader(interpolatedVSOutput, &color);
-    //             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
-    //         }
-
-// nextPixel:
-    //         for (uint8_t i = 0; i < 3; i++)
-    //             barycentricCoordinates[i] += barycentricDeltaX[i];
-    //     }
-    //     for (uint8_t i = 0; i < 3; i++)
-    //     {
-    //         barycentricCoordinatesAtBeginningOfTheRow[i] += barycentricDeltaY[i];
-    //         barycentricCoordinates[i] = barycentricCoordinatesAtBeginningOfTheRow[i];
-    //     }
-    // }
 }
 
 static void loopOverTileAndFillNoCheck(
-    int xTile, int yTile, Vector2i tileDimensions, Vector2d minBoundingPoint
+    const Vector2d startPoint, const Vector2d endPoint,
+    double* barycentricCoordinates, const double* barycentricDeltaX,
+    const double* barycentricDeltaY
 )
 {
-    Vector2d begin = {
-        minBoundingPoint.x + xTile * tileDimensions.x,
-        minBoundingPoint.y + yTile * tileDimensions.y
-    };
-    Vector2d end = {
-        begin.x + tileDimensions.x,
-        begin.y + tileDimensions.y
-    };
+    double barycentricCoordinatesAtBeginningOfTheRow[3];
+    for (uint8_t i = 0; i < 3; i++)
+        barycentricCoordinatesAtBeginningOfTheRow[i] = barycentricCoordinates[i];
 
-    for (double y = begin.y; y < end.y; y += 1.)
+    for (size_t y = startPoint.y; y < endPoint.y; y += 1)
     {
-        for (double x = begin.x; x < end.x; x += 1.)
+        for (size_t x = startPoint.x; x < endPoint.x; x += 1)
         {
-            rendererDrawPixel(context.renderer, (Vector2i) {x, y}, (Color) {0, 255, 0, 255});
+            // uint8_t interpolatedVSOutput[context.vertexShaderOutputInformation.nBytes];
+            // interpolateVertexShaderOutputInTriangle(
+            //     vsOutput, barycentricCoordinates, &interpolatedVSOutput
+            // );
+            Color color = {255, 255, 255, 255};
+            // context.fragmentShader(interpolatedVSOutput, &color);
+            rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
+
+            for (uint8_t i = 0; i < 3; i++)
+                barycentricCoordinates[i] += barycentricDeltaX[i];
+        }
+        for (uint8_t i = 0; i < 3; i++)
+        {
+            barycentricCoordinatesAtBeginningOfTheRow[i] += barycentricDeltaY[i];
+            barycentricCoordinates[i] = barycentricCoordinatesAtBeginningOfTheRow[i];
         }
     }
 }
 
 static void loopOverTileAndFill(
-    int xTile, int yTile, Vector2i tileDimensions, Vector2d minBoundingPoint
+    const Vector2d startPoint, const Vector2d endPoint, const Vector2d* edgeVectors,
+    double* barycentricCoordinates, const double* barycentricDeltaX, 
+    const double* barycentricDeltaY
 )
 {
-    Vector2d begin = {
-        minBoundingPoint.x + xTile * tileDimensions.x,
-        minBoundingPoint.y + yTile * tileDimensions.y
-    };
-    Vector2d end = {
-        begin.x + tileDimensions.x,
-        begin.y + tileDimensions.y
-    };
-
-    for (double y = begin.y; y < end.y; y += 1.)
+    double barycentricCoordinatesAtBeginningOfTheRow[3];
+    bool isEdgeNotFlatTopOrLeft[3];
+    for (uint8_t i = 0; i < 3; i++)
     {
-        for (double x = begin.x; x < end.x; x += 1.)
+        barycentricCoordinatesAtBeginningOfTheRow[i] = barycentricCoordinates[i];
+        isEdgeNotFlatTopOrLeft[i] = !triangleIsEdgeFlatTopOrLeft(edgeVectors[i]);
+    }
+
+    for (size_t y = startPoint.y; y < endPoint.y; y += 1)
+    {
+        for (size_t x = startPoint.x; x < endPoint.x; x += 1)
         {
-            rendererDrawPixel(context.renderer, (Vector2i) {x, y}, (Color) {255, 0, 0, 255});
+            // Rasterization rules
+            // If current point lies on the edge that is not flat top or left, do not draw the point
+            for (uint8_t i = 0; i < 3; i++)
+            {
+                if (barycentricCoordinates[i] == 0 && isEdgeNotFlatTopOrLeft[i])
+                    goto nextPixel;
+            }
+
+            if (barycentricCoordinates[0] >= 0 && \
+                barycentricCoordinates[1] >= 0 && \
+                barycentricCoordinates[2] >= 0)
+            { 
+                // uint8_t interpolatedVSOutput[context.vertexShaderOutputInformation.nBytes];
+                // interpolateVertexShaderOutputInTriangle(
+                //     vsOutput, barycentricCoordinates, &interpolatedVSOutput
+                // );
+                Color color = {255, 255, 255, 255};
+                // context.fragmentShader(interpolatedVSOutput, &color);
+                rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
+            }
+
+nextPixel:
+            for (uint8_t i = 0; i < 3; i++)
+                barycentricCoordinates[i] += barycentricDeltaX[i];
+        }
+        for (uint8_t i = 0; i < 3; i++)
+        {
+            barycentricCoordinatesAtBeginningOfTheRow[i] += barycentricDeltaY[i];
+            barycentricCoordinates[i] = barycentricCoordinatesAtBeginningOfTheRow[i];
         }
     }
 }
@@ -231,7 +246,7 @@ static double signedAreaParallelogram(Vector2d a, Vector2d b)
     return a.y * b.x - a.x * b.y;
 }
 
-static void calculatePositiveOnPlusYAndSlopeSigns(
+static void triangleCalculatePositiveOnPlusYAndSlopeSigns(
     Vector3d* SSPositions, Vector2d* edgeVectors,
     bool* positiveOnPlusY, bool* edgeSlopePositiveOrZero
 )

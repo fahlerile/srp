@@ -20,7 +20,7 @@ static void triangleGetBoundingPoints(
 
 // Calculate edge vectors for a plain array of N screen space vertex positions
 static void triangleCalculateEdgeVectors(Vector3d* SSPositions, Vector2d* edgeVectors);
-static void calculatePositiveOnPlusYAndSlopeSigns(
+static void triangleCalculatePositiveOnPlusYAndSlopeSigns(
     Vector3d* SSPositions, Vector2d* edgeVectors,
     bool* positiveOnPlusY, bool* edgeSlopePositiveOrZero
 );
@@ -38,10 +38,14 @@ static Vector3d triangleCalculateBarycentricCoordinatesForPoint(
 );
 
 static void loopOverTileAndFillNoCheck(
-    int xTile, int yTile, Vector2i tileDimensions, Vector2d minBoundingPoint
+    const Vector2d startPoint, const Vector2d endPoint,
+    double* barycentricCoordinates, const double* barycentricDeltaX,
+    const double* barycentricDeltaY
 );
 static void loopOverTileAndFill(
-    int xTile, int yTile, Vector2i tileDimensions, Vector2d minBoundingPoint
+    const Vector2d startPoint, const Vector2d endPoint, const Vector2d* edgeVectors,
+    double* barycentricCoordinates, const double* barycentricDeltaX, 
+    const double* barycentricDeltaY
 );
 
 static bool triangleIsEdgeFlatTopOrLeft(Vector2d edgeVector);
