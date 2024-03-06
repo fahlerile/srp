@@ -120,7 +120,10 @@ int main(int argc, char** argv)
         frameCount++;
         end = clock();
         frametimeSec = (double) (end - begin) / CLOCKS_PER_SEC;
-        LOGI("Frametime: %lf s; FPS: %lf\n", frametimeSec, 1 / frametimeSec);
+        LOGI("Frametime: %lf s; FPS: %lf; Framecount: %zu\n", frametimeSec, 1 / frametimeSec, frameCount);
+
+        if (frameCount == 5000)
+            break;
     }
 
     freeVertexBuffer(vertexBuffer);
