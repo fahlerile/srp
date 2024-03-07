@@ -1,36 +1,34 @@
 #pragma once
-#include <stddef.h>
-#include <stdarg.h>
-#include "memoryUtils/memoryUtils.h"
 #include "VertexBuffer.h"
-#include "Type.h"
 
 typedef struct
 {
-    size_t nBytes;
+    void (*shader)(void* pVertex, void* pOutput);
+    size_t nBytesPerVertex;
     size_t nAttributes;
-    size_t* attributeOffsets;
-    Type* attributeTypes;
-} VertexShaderOutputInformation;
+    VertexAttribute* attributes;
+} VertexShader;
 
-// The first element in the output buffer MUST ALWAYS be the Vector3d position
-typedef void (*VertexShaderType)(
-    Uniforms* uniform, void* p_vertex, VertexBuffer* vertexBuffer,
-    void* outputBuffer
-);
-typedef void (*FragmentShaderType)(
-    void* interpolatedVSOutput, Color* color
-);
+typedef struct
+{
+    void (*shader)(void* pInput, void* pOutput);
+    size_t nBytesPerVertex;
+    size_t nAttributes;
+    VertexAttribute* attributes;
+    size_t nVertices;
+    Primitive inputPrimitive;
+    Primitive outputPrimitive;
+} GeometryShader;
 
-void* vertexShaderOutputGetAttributePointerByIndex(void* vsOutput, size_t index);
+typedef struct
+{
+    void (*shader)();
+} FragmentShader;
 
-// `vsOutput` is an array of 3 vertex shader outputs
-void interpolateVertexShaderOutputInTriangle(
-    void* threeVSOutput, Vector3d barycentricCoordinates, void* interpolatedVSOutput
-);
-
-void vertexShaderLoadAttributesFromVertexPointer(
-    void* p_vertex, VertexBuffer* vertexBuffer, ...
-);
-void vertexShaderCopyToOutputBuffer(void* outputBuffer, ...);
+typedef struct
+{
+    VertexShader vertexShader;
+    GeometryShader geometryShader;
+    FragmentShader fragmentShader;
+} ShaderProgram;
 

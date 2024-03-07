@@ -1,74 +1,66 @@
-#include <stdint.h>
-#include <string.h>
 #include <assert.h>
+#include <stdint.h>
 #include "memoryUtils/memoryUtils.h"
 #include "VertexBuffer.h"
-#include "draw.h"
-#include "Context.h"
 
 VertexBuffer* newVertexBuffer(
-    void* data, size_t nBytesPerVertex, size_t nVertices,
-    size_t* attributeOffsets, size_t nAttributes
+    size_t nBytesPerVertex, size_t nBytesData, void* data, 
+    size_t nAttributes, VertexAttribute* attributes
 )
 {
     VertexBuffer* this = xmalloc(sizeof(VertexBuffer));
 
-    this->buffer = xmalloc(nBytesPerVertex * nVertices);
-    memcpy(this->buffer, data, nBytesPerVertex * nVertices);
     this->nBytesPerVertex = nBytesPerVertex;
-    this->nVertices = nVertices;
-
-    this->attributeOffsets = xmalloc(sizeof(size_t) * nAttributes);
-    memcpy(
-        this->attributeOffsets, attributeOffsets,
-        sizeof(size_t) * nAttributes
-    );
+    this->nBytesData = nBytesData;
+    this->nVertices = nBytesData / nBytesPerVertex;
+    this->data = data;
     this->nAttributes = nAttributes;
+    this->attributes = attributes;
 
     return this;
 }
 
-void freeVertexBuffer(VertexBuffer* this)
-{
-    xfree(this->buffer);
-    xfree(this->attributeOffsets);
-    xfree(this);
-}
-
-void* VertexBufferGetVertexPointer(VertexBuffer* this, size_t i)
-{
-    assert(this->nVertices > i);
-    return indexVoidPointer(
-        this->buffer, i, this->nBytesPerVertex
-    );
-}
-
-void* VertexPointerGetAttributePointerByIndex(
-    VertexBuffer* this, void* p_vertex, size_t attributeI
-)
-{
-    assert(attributeI < this->nAttributes);
-    return ((char*) p_vertex) + this->attributeOffsets[attributeI];
-}
-
 void drawVertexBuffer(
-    VertexBuffer* vertexBuffer, DrawMode drawMode, size_t startIndex, size_t count
+    VertexBuffer* this, Primitive primitive, size_t startIndex, size_t count, 
+    ShaderProgram* shaderProgram
 )
 {
-    assert(drawMode == DRAW_MODE_TRIANGLES && "Only triangles are implemented");
+    assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
+#ifndef NDEBUG
+    if (shaderProgram->geometryShader.shader != NULL)
+        assert(
+            primitive == shaderProgram->geometryShader.inputPrimitive && \
+            "Primitive type mismatches in geometryShader and call to drawVertexBuffer"
+        );
+#endif
 
-    // 3 elements nBytes each
-    uint8_t vsOutputBuffers[3][context.vertexShaderOutputInformation.nBytes];
-    for (size_t i = startIndex, n = startIndex + count; i < n; i += 3)
+    size_t endIndex = startIndex + count;
+    void* triangleVsOutput = xmalloc(shaderProgram->vertexShader.nBytesPerVertex * 3);
+    void* gsOutput;
+    if (shaderProgram->geometryShader.shader == NULL)
+        gsOutput = triangleVsOutput;
+    else
+        gsOutput = xmalloc(
+            shaderProgram->geometryShader.nBytesPerVertex * \
+            shaderProgram->geometryShader.nVertices
+        );
+
+    assert(startIndex + count <= this->nVertices);
+    for (size_t i = startIndex; i < endIndex; i += 3)
     {
         for (size_t j = 0; j < 3; j++)
         {
-            context.vertexShader(
-                context.uniforms, VertexBufferGetVertexPointer(vertexBuffer, i+j),
-                vertexBuffer, &(vsOutputBuffers[j])
+            void* pVertex = (uint8_t*) this->data + (this->nBytesPerVertex * (i+j));
+            shaderProgram->vertexShader.shader(
+                pVertex, (char*) triangleVsOutput + \
+                shaderProgram->vertexShader.nBytesPerVertex * j
             );
         }
-        drawTriangle(vsOutputBuffers);
+
+        if (shaderProgram->geometryShader.shader != NULL)
+            shaderProgram->geometryShader.shader(triangleVsOutput, gsOutput);
     }
+
+    drawPrimitive(gsOutput, shaderProgram, primitive);
 }
 
