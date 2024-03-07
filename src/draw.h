@@ -37,15 +37,10 @@ static Vector3d triangleCalculateBarycentricCoordinatesForPoint(
     Vector3d barycentricDeltaY, Vector3d point
 );
 
-static void loopOverTileAndFillNoCheck(
-    const Vector2d startPoint, const Vector2d endPoint,
-    double* barycentricCoordinates, const double* barycentricDeltaX,
-    const double* barycentricDeltaY
-);
 static void loopOverTileAndFill(
-    const Vector2d startPoint, const Vector2d endPoint, const Vector2d* edgeVectors,
-    double* barycentricCoordinates, const double* barycentricDeltaX, 
-    const double* barycentricDeltaY
+    const bool check, const Vector2d startPoint, const Vector2d endPoint, 
+    const Vector2d* edgeVectors, double* barycentricCoordinates, 
+    const double* barycentricDeltaX, const double* barycentricDeltaY
 );
 
 static bool triangleIsEdgeFlatTopOrLeft(Vector2d edgeVector);
