@@ -126,21 +126,31 @@ static void drawTrianglePreparation(
     Vector3d* NDCPositions = (Vector3d*) ((uint8_t*) gsOutput + positionOffsetBytes);
 
     Vector3d SSPositions[3], edgeVectors[3];
-    Vector3d minBP, maxBP;
+    Vector2d minBP, maxBP;
+    Vector2i BBDimensions, tileDimensions, NTiles;
     bool posOnPlusY[3], slopeSigns[3];
+    double *barycentricCoordinates, *barycentricDeltaX, *barycentricDeltaY,
+           *barycentricTileDeltaX, *barycentricTileDeltaY;
 
     NDCToScreenSpaceArray(NDCPositions, SSPositions, 3);
-    getBoundingBoxArray(SSPositions, &minBP, &maxBP, 3);
+    getBoundingBoxArray(SSPositions, &minBP, &maxBP, &BBDimensions, 3);
     calculateEdgeVectors(SSPositions, edgeVectors, 3);
     calculatePositiveOnPlusYAndSlopeSignsArray(
         SSPositions, edgeVectors, posOnPlusY, slopeSigns, 3
     );
 
-    calculateBarycentricCoordinatesForPoint();
-    calculateBarycentricDeltas();
+    calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
+        SSPositions, edgeVectors, minBP, barycentricCoordinates, 
+        barycentricDeltaX, barycentricDeltaY
+    );
 
-    calculateTileDimensionsAndNTilesInBoundingBox();
-    calculateBarycentricTileDeltas();
+    calculateTileDimensionsAndNTilesInBoundingBox(
+        BBDimensions, &tileDimensions, &NTiles
+    );
+    calculateBarycentricTileDeltas(
+        tileDimensions, barycentricDeltaX, barycentricDeltaY,
+        barycentricTileDeltaX, barycentricTileDeltaY
+    );
 }
 
 static void drawTriangleRasterization(triangleData* data)
@@ -157,18 +167,17 @@ static void NDCToScreenSpaceArray(
 }
 
 static void getBoundingBoxArray(
-    Vector3d* SSPositions, Vector3d* min, Vector3d* max, size_t n
+    Vector3d* SSPositions, Vector2d* min, Vector2d* max,
+    Vector2i* BBDimensions, size_t n
 )
 {
     double xmin = SSPositions[0].x, xmax = SSPositions[0].x;
     double ymin = SSPositions[0].y, ymax = SSPositions[0].y;
-    double zmin = SSPositions[0].z, zmax = SSPositions[0].z;
 
     for (size_t i = 0; i < n; i++)
     {
         double x = SSPositions[i].x;
         double y = SSPositions[i].y;
-        double z = SSPositions[i].z;
 
         if (x < xmin)
             xmin = x;
@@ -178,13 +187,14 @@ static void getBoundingBoxArray(
             ymin = y;
         else if (y > ymax)
             ymax = y;
-        if (z < zmin)
-            zmin = z;
-        else if (z > zmax)
-            zmax = z;
     }
-    *min = (Vector3d) {xmin, ymin, zmin};
-    *max = (Vector3d) {xmax, ymax, zmax};
+
+    *min = (Vector2d) {xmin, ymin};
+    *max = (Vector2d) {xmax, ymax};
+    *BBDimensions = (Vector2i) {
+        xmax - xmin,
+        ymax - ymin,
+    };
 }
 
 static void calculateEdgeVectors(
@@ -237,5 +247,73 @@ static void calculatePositiveOnPlusYAndSlopeSignsArray(
         double slope = edgeVectors[iEdge].y / edgeVectors[iEdge].x;
         slopeSigns[iEdge] = slope >= 0;
     }
+}
+
+static double signedAreaParallelogram(Vector3d a, Vector3d b)
+{
+    return a.y * b.x - a.x * b.y;
+}
+
+static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
+    Vector3d* SSPositions, Vector3d* edgeVectors, Vector2d point, 
+    double* barycentricCoordinates, double* barycentricDeltaX, 
+    double* barycentricDeltaY
+)
+{
+    double areaX2 = fabs(signedAreaParallelogram(edgeVectors[0], edgeVectors[2]));
+
+    Vector3d AP = {
+        point.x - SSPositions[0].x,
+        point.y - SSPositions[0].y,
+        0
+    };
+    Vector3d BP = {
+        point.x - SSPositions[1].x,
+        point.y - SSPositions[1].y,
+        0
+    };
+    Vector3d CP = {
+        point.x - SSPositions[2].x,
+        point.y - SSPositions[2].y,
+        0
+    };
+
+    barycentricCoordinates[0] = signedAreaParallelogram(BP, edgeVectors[1]) / areaX2;
+    barycentricCoordinates[1] = signedAreaParallelogram(CP, edgeVectors[2]) / areaX2;
+    barycentricCoordinates[2] = signedAreaParallelogram(AP, edgeVectors[0]) / areaX2;
+
+    barycentricDeltaX[0] = -edgeVectors[1].y / areaX2;
+    barycentricDeltaX[1] = -edgeVectors[2].y / areaX2;
+    barycentricDeltaX[2] = -edgeVectors[0].y / areaX2;
+
+    barycentricDeltaY[0] = edgeVectors[1].x / areaX2;
+    barycentricDeltaY[1] = -edgeVectors[2].x / areaX2;
+    barycentricDeltaY[2] = edgeVectors[0].x / areaX2;
+}
+
+static void calculateTileDimensionsAndNTilesInBoundingBox(
+    Vector2i BBDimensions, Vector2i* tileDimensions, Vector2i* NTiles
+)
+{
+    // TODO choose tile size
+    *tileDimensions = (Vector2i) {32, 32};
+    *NTiles = (Vector2i) {
+        ceil(BBDimensions.x / tileDimensions->x),
+        ceil(BBDimensions.y / tileDimensions->y)
+    };
+}
+
+static void calculateBarycentricTileDeltas(
+    Vector2i tileDimensions, double* barycentricDeltaX, double* barycentricDeltaY,
+    double* barycentricTileDeltaX, double* barycentricTileDeltaY
+)
+{
+    barycentricTileDeltaX[0] = barycentricDeltaX[0] * tileDimensions.x;
+    barycentricTileDeltaX[1] = barycentricDeltaX[1] * tileDimensions.x;
+    barycentricTileDeltaX[2] = barycentricDeltaX[2] * tileDimensions.x;
+
+    barycentricTileDeltaY[0] = barycentricDeltaY[0] * tileDimensions.y;
+    barycentricTileDeltaY[1] = barycentricDeltaY[1] * tileDimensions.y;
+    barycentricTileDeltaY[2] = barycentricDeltaY[2] * tileDimensions.y;
 }
 
