@@ -9,7 +9,7 @@ typedef struct
     size_t nAttributes;
     VertexAttribute* attributes;
     size_t indexOfPositionAttribute;
-} VertexShader;
+} VertexShaderType;
 
 typedef struct
 {
@@ -23,17 +23,17 @@ typedef struct
     size_t nVertices;
     Primitive inputPrimitive;
     Primitive outputPrimitive;
-} GeometryShader;
+} GeometryShaderType;
 
 typedef struct
 {
     void (*shader)();
-} FragmentShader;
+} FragmentShaderType;
 
 typedef struct
 {
-    VertexShader vertexShader;
-    GeometryShader geometryShader;
-    FragmentShader fragmentShader;
+    VertexShaderType vertexShader;
+    GeometryShaderType geometryShader;
+    FragmentShaderType fragmentShader;
 } ShaderProgram;
 

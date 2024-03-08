@@ -4,6 +4,7 @@
 #include "Context.h"
 #include "NDC.h"
 #include "triangle.h"
+#include "log.h"
 
 void drawTriangle(void* gsOutput, ShaderProgram* sp)
 {
@@ -91,6 +92,11 @@ static void drawTriangleRasterization(triangleData* data)
             bool fullyAccepted = accepted[0] && accepted[1] && accepted[2];
             bool fullyRejected = rejected[0] || rejected[1] || rejected[2];
             bool check = !fullyAccepted;
+
+            if (fullyAccepted)
+                LOGD("fully accepted tile (%i, %i)\n", xTile, yTile);
+            if (fullyRejected)
+                LOGD("fully rejected tile (%i, %i)\n", xTile, yTile);
 
             if (fullyAccepted || !fullyRejected)
                 triangleLoopOverTileAndFill(check, startPoint, endPoint, data);
@@ -240,7 +246,7 @@ static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
     barycentricDeltaX[2] = -edgeVectors[0].y / areaX2;
 
     barycentricDeltaY[0] = edgeVectors[1].x / areaX2;
-    barycentricDeltaY[1] = -edgeVectors[2].x / areaX2;
+    barycentricDeltaY[1] = edgeVectors[2].x / areaX2;
     barycentricDeltaY[2] = edgeVectors[0].x / areaX2;
 }
 
@@ -367,7 +373,12 @@ static void triangleLoopOverTileAndFill(
 
 
             // TODO call fragment shader
-            Color color = {255, 255, 255, 255};
+            Color color;
+            // debug stuff
+            if (check)
+                color = (Color) {255, 0, 0, 255};
+            else
+                color = (Color) {0, 255, 0, 255};
             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
 
 nextPixel:

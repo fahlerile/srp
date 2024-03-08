@@ -14,6 +14,11 @@ typedef struct
     double position[3];
 } Vertex;
 
+void vertexShader(void* pVertex, void* pOutput)
+{
+    memcpy(pOutput, pVertex, sizeof(double) * 3);
+}
+
 int main(int argc, char** argv)
 {
     constructContext(&context);
@@ -34,17 +39,19 @@ int main(int argc, char** argv)
 
     ShaderProgram shaderProgram = {
         .vertexShader = {
-            .shader = NULL
+            .shader = vertexShader,
+            .nBytesPerVertex = sizeof(double) * 3,
+            .nAttributes = 1,
+            .attributes = attributes,
+            .indexOfPositionAttribute = 0
         },
         .geometryShader = {
-            .shader = NULL
+            .shader = NULL,
         },
         .fragmentShader = {
             .shader = NULL
         }
     };
-
-    // construct index buffer
 
     size_t frameCount = 0;
     clock_t begin, end;
@@ -55,7 +62,7 @@ int main(int argc, char** argv)
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
         drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
-        // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
+        // drawIndexBuffer();
 
         pollEvents();
         rendererSwapBuffer(context.renderer);
@@ -63,8 +70,12 @@ int main(int argc, char** argv)
         frameCount++;
         end = clock();
         frametimeSec = (double) (end - begin) / CLOCKS_PER_SEC;
-        LOGI("Frametime: %lf s; FPS: %lf; Framecount: %zu\n", frametimeSec, 1 / frametimeSec, frameCount);
+        LOGI(
+            "Frametime: %lf s; FPS: %lf; Framecount: %zu\n", 
+            frametimeSec, 1 / frametimeSec, frameCount
+        );
 
+        break;
         if (frameCount == 5000)
             break;
     }

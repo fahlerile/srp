@@ -47,6 +47,8 @@ void drawVertexBuffer(
 #endif
 
     size_t endIndex = startIndex + count;
+    assert(endIndex <= this->nVertices);
+
     void* triangleVsOutput = xmalloc(sp->vertexShader.nBytesPerVertex * 3);
     void* gsOutput;
     if (sp->geometryShader.shader == NULL)
@@ -57,7 +59,6 @@ void drawVertexBuffer(
             sp->geometryShader.nVertices
         );
 
-    assert(startIndex + count <= this->nVertices);
     for (size_t i = startIndex; i < endIndex; i += 3)
     {
         for (size_t j = 0; j < 3; j++)
