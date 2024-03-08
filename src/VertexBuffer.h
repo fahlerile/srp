@@ -58,6 +58,26 @@ typedef struct
 } triangleData;
 
 static void drawTriangle(void* gsOutput, ShaderProgram* sp);
-static void drawTrianglePreparation(void* gsOutput, triangleData* returnData);
+static void drawTrianglePreparation(
+    void* gsOutput, ShaderProgram* sp, triangleData* returnData
+);
 static void drawTriangleRasterization(triangleData* data);
+
+static void NDCToScreenSpaceArray(
+    Vector3d* NDCPositions, Vector3d* SSPositions, size_t n
+);
+static void getBoundingBoxArray(
+    Vector3d* SSPositions, Vector3d* min, Vector3d* max, size_t n
+);
+static void calculateEdgeVectors(
+    Vector3d* SSPositions, Vector3d* edgeVectors, size_t n
+);
+static void calculatePositiveOnPlusYAndSlopeSignsArray(
+    Vector3d* SSPositions, Vector3d* edgeVectors,
+    bool* posOnPlusY, bool* slopeSigns, size_t n
+);
+static void calculateBarycentricCoordinatesForPoint();
+static void calculateBarycentricDeltas();
+static void calculateTileDimensionsAndNTilesInBoundingBox();
+static void calculateBarycentricTileDeltas();
 

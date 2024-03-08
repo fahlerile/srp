@@ -7,6 +7,7 @@ typedef struct
     size_t nBytesPerVertex;
     size_t nAttributes;
     VertexAttribute* attributes;
+    size_t indexOfPositionAttribute;
 } VertexShader;
 
 typedef struct
@@ -15,6 +16,9 @@ typedef struct
     size_t nBytesPerVertex;
     size_t nAttributes;
     VertexAttribute* attributes;
+    size_t indexOfPositionAttribute;
+
+    // Geometry shader specific
     size_t nVertices;
     Primitive inputPrimitive;
     Primitive outputPrimitive;
