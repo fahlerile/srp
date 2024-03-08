@@ -2,7 +2,6 @@
 #include <time.h>
 #include "Renderer.h"
 #include "Context.h"
-#include "utils.h"
 
 #include "VertexBuffer.h"
 #include "draw.h"
@@ -25,7 +24,7 @@ int main(int argc, char** argv)
         {.position = { 0.0,  0.5,  0.0}},
         {.position = { 0.5, -0.5,  0.0}}
     };
-    VertexAttributeData attributes[1] = {{
+    VertexAttribute attributes[1] = {{
         .nItems = 3,
         .type = TYPE_DOUBLE,
         .offsetBytes = 0
@@ -35,9 +34,15 @@ int main(int argc, char** argv)
     );
 
     ShaderProgram shaderProgram = {
-        .vertexShader = NULL,
-        .geometryShader = NULL,
-        .fragmentShader = NULL
+        .vertexShader = {
+            .shader = NULL
+        },
+        .geometryShader = {
+            .shader = NULL
+        },
+        .fragmentShader = {
+            .shader = NULL
+        }
     };
 
     // construct index buffer
@@ -50,7 +55,7 @@ int main(int argc, char** argv)
         begin = clock();
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-        drawVertexBuffer(vb, DRAW_MODE_TRIANGLES, 0, 3, &shaderProgram);
+        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
         // drawIndexBuffer(indexBuffer, vertexBuffer, context.renderer);
 
         pollEvents();
