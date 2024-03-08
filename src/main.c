@@ -1,12 +1,11 @@
 #define SDL_MAIN_HANDLED
 #include <time.h>
 #include "Renderer.h"
-#include "Context.h"
-
 #include "VertexBuffer.h"
-#include "draw.h"
-#include "Type.h"
 #include "Shaders.h"
+#include "Context.h"
+#include "Type.h"
+#include "log.h"
 
 Context context;
 
@@ -70,7 +69,7 @@ int main(int argc, char** argv)
             break;
     }
 
-    freeVertexBuffer(vertexBuffer);
+    freeVertexBuffer(vb);
     return 0;
 }
 

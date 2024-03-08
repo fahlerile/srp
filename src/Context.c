@@ -15,8 +15,6 @@ void constructContext(Context* this)
     }
 
     this->renderer = newRenderer("Rasterizer", WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_RENDERER_SDL_FLAGS);
-    this->uniforms = newUniforms(DEFAULT_N_UNIFORMS);
-
     if (this->renderer == NULL)
     {
         fprintf(stderr, "Failed to initialize SDL_Window or SDL_Renderer: %s\n", SDL_GetError());
@@ -24,13 +22,7 @@ void constructContext(Context* this)
     }
 
     atexit(destroyContext);
-
     this->running = true;
-    this->drawingMode = DRAWING_MODE;
-
-    this->vertexShader = NULL;
-    memset(&this->vertexShaderOutputInformation, '\0', sizeof(this->vertexShaderOutputInformation));
-    this->fragmentShader = NULL;
 }
 
 void pollEvents()
@@ -49,6 +41,5 @@ void pollEvents()
 void destroyContext()
 {
     freeRenderer(context.renderer);
-    freeUniforms(context.uniforms);
 }
 

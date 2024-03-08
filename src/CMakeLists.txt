@@ -5,9 +5,7 @@ set(
     Context.c
     Renderer.c
     VertexBuffer.c
-    Uniforms.c
-    draw.c
-    Shaders.c
+    triangle.c
 )
 
 add_executable(${EXECUTABLE_NAME} ${SOURCES})

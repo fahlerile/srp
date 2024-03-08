@@ -1,5 +1,6 @@
 #pragma once
-#include "VertexBuffer.h"
+#include "VertexAttribute.h"
+#include "Primitive.h"
 
 typedef struct
 {
