@@ -23,10 +23,26 @@ int main(int argc, char** argv)
 {
     constructContext(&context);
 
-    Vertex data[3] = {
-        {.position = {-0.5, -0.5,  0.0}},
-        {.position = { 0.0,  0.5,  0.0}},
-        {.position = { 0.5, -0.5,  0.0}}
+    Vertex data[15] = {
+        {.position = {-0.25, -0.25,  0.0}},
+        {.position = { 0.  ,  0.25,  0.0}},
+        {.position = { 0.25, -0.25,  0.0}},
+
+        {.position = {-0.75,  0.10,  0.0}},
+        {.position = {-0.75,  0.90,  0.0}},
+        {.position = {-0.40,  0.10,  0.0}},
+
+        {.position = { 0.40,  0.25,  0.0}},
+        {.position = { 0.50,  0.60,  0.0}},
+        {.position = { 0.80,  0.25,  0.0}},
+
+        {.position = {-0.50, -0.75,  0.0}},
+        {.position = {-0.75, -0.25,  0.0}},
+        {.position = {-0.25, -0.75,  0.0}},
+
+        {.position = { 0.10, -0.80,  0.0}},
+        {.position = { 0.50, -0.10,  0.0}},
+        {.position = { 0.90, -0.10,  0.0}}
     };
     VertexAttribute attributes[1] = {{
         .nItems = 3,
@@ -61,7 +77,7 @@ int main(int argc, char** argv)
         begin = clock();
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 15, &shaderProgram);
         // drawIndexBuffer();
 
         pollEvents();
