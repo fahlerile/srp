@@ -249,8 +249,13 @@ static void calculateTileDimensionsAndNTilesInBoundingBox(
     Vector2i BBDimensions, Vector2i* tileDimensions, Vector2i* nTiles
 )
 {
-    // TODO choose tile size
-    *tileDimensions = (Vector2i) {32, 32};
+    // linear regression (boundingBoxDimension -> tileDimension)
+    const double coefficient = 0.021;
+    const double intercept = 14.87;
+    *tileDimensions = (Vector2i) {
+        round(coefficient * BBDimensions.x + intercept),
+        round(coefficient * BBDimensions.y + intercept)
+    };
     *nTiles = (Vector2i) {
         ceil((double) BBDimensions.x / tileDimensions->x),
         ceil((double) BBDimensions.y / tileDimensions->y)
