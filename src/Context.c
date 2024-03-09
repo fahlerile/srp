@@ -15,8 +15,6 @@ void constructContext(Context* this)
     }
 
     this->renderer = newRenderer("Rasterizer", WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_RENDERER_SDL_FLAGS);
-    this->uniforms = newUniforms(DEFAULT_N_UNIFORMS);
-
     if (this->renderer == NULL)
     {
         fprintf(stderr, "Failed to initialize SDL_Window or SDL_Renderer: %s\n", SDL_GetError());
@@ -24,24 +22,35 @@ void constructContext(Context* this)
     }
 
     atexit(destroyContext);
-
     this->running = true;
-    this->drawingMode = DRAWING_MODE;
 
-    this->vertexShader = NULL;
-    memset(&this->vertexShaderOutputInformation, '\0', sizeof(this->vertexShaderOutputInformation));
-    this->fragmentShader = NULL;
+#ifndef NDEBUG
+    this->debug.colorRasterizerTiles = false;
+#endif
 }
 
 void pollEvents()
 {
-    while (SDL_PollEvent(&context.event) != 0)
+    SDL_Event* const e = &context.event;
+    while (SDL_PollEvent(e) != 0)
     {
-        if (context.event.type == SDL_QUIT ||
-            (context.event.type == SDL_KEYDOWN &&
-             context.event.key.keysym.sym == SDLK_ESCAPE))
+        if (
+            e->type == SDL_QUIT || \
+            (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE)
+        )
         {
             context.running = false;
+        }
+        if (e->type == SDL_KEYDOWN)
+        {
+            switch (e->key.keysym.sym)
+            {
+#ifndef NDEBUG
+                case SDLK_SPACE:
+                    context.debug.colorRasterizerTiles = \
+                        !context.debug.colorRasterizerTiles;
+#endif
+            }
         }
     }
 }
@@ -49,6 +58,5 @@ void pollEvents()
 void destroyContext()
 {
     freeRenderer(context.renderer);
-    freeUniforms(context.uniforms);
 }
 

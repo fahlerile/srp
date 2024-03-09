@@ -1,74 +1,100 @@
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#include <assert.h>
 #include "memoryUtils/memoryUtils.h"
 #include "VertexBuffer.h"
-#include "draw.h"
+#include "log.h"
 #include "Context.h"
+#include "triangle.h"
 
 VertexBuffer* newVertexBuffer(
-    void* data, size_t nBytesPerVertex, size_t nVertices,
-    size_t* attributeOffsets, size_t nAttributes
+    size_t nBytesPerVertex, size_t nBytesData, void* data, 
+    size_t nAttributes, VertexAttribute* attributes
 )
 {
     VertexBuffer* this = xmalloc(sizeof(VertexBuffer));
 
-    this->buffer = xmalloc(nBytesPerVertex * nVertices);
-    memcpy(this->buffer, data, nBytesPerVertex * nVertices);
     this->nBytesPerVertex = nBytesPerVertex;
-    this->nVertices = nVertices;
-
-    this->attributeOffsets = xmalloc(sizeof(size_t) * nAttributes);
-    memcpy(
-        this->attributeOffsets, attributeOffsets,
-        sizeof(size_t) * nAttributes
-    );
+    this->nBytesData = nBytesData;
+    this->nVertices = nBytesData / nBytesPerVertex;
+    this->data = xmalloc(nBytesData);
+    memcpy(this->data, data, nBytesData);
     this->nAttributes = nAttributes;
+    this->attributes = attributes;
 
     return this;
 }
 
 void freeVertexBuffer(VertexBuffer* this)
 {
-    xfree(this->buffer);
-    xfree(this->attributeOffsets);
+    xfree(this->data);
     xfree(this);
 }
 
-void* VertexBufferGetVertexPointer(VertexBuffer* this, size_t i)
-{
-    assert(this->nVertices > i);
-    return indexVoidPointer(
-        this->buffer, i, this->nBytesPerVertex
-    );
-}
-
-void* VertexPointerGetAttributePointerByIndex(
-    VertexBuffer* this, void* p_vertex, size_t attributeI
-)
-{
-    assert(attributeI < this->nAttributes);
-    return ((char*) p_vertex) + this->attributeOffsets[attributeI];
-}
-
 void drawVertexBuffer(
-    VertexBuffer* vertexBuffer, DrawMode drawMode, size_t startIndex, size_t count
+    VertexBuffer* this, Primitive primitive, size_t startIndex, size_t count, 
+    ShaderProgram* sp
 )
 {
-    assert(drawMode == DRAW_MODE_TRIANGLES && "Only triangles are implemented");
+    assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
+#ifndef NDEBUG
+    if (sp->geometryShader.shader != NULL)
+        assert(
+            primitive == sp->geometryShader.inputPrimitive && \
+            "Input primitive type for geometry shader and primitive passed to \
+            drawVertexBuffer mismatch"
+        );
+#endif
 
-    // 3 elements nBytes each
-    uint8_t vsOutputBuffers[3][context.vertexShaderOutputInformation.nBytes];
-    for (size_t i = startIndex, n = startIndex + count; i < n; i += 3)
+    size_t endIndex = startIndex + count;
+    assert(endIndex <= this->nVertices);
+
+    void* triangleVsOutput = xmalloc(sp->vertexShader.nBytesPerVertex * 3);
+    void* gsOutput;
+    if (sp->geometryShader.shader == NULL)
+        gsOutput = triangleVsOutput;
+    else
+        gsOutput = xmalloc(
+            sp->geometryShader.nBytesPerVertex * \
+            sp->geometryShader.nVertices
+        );
+
+    for (size_t i = startIndex; i < endIndex; i += 3)
     {
         for (size_t j = 0; j < 3; j++)
         {
-            context.vertexShader(
-                context.uniforms, VertexBufferGetVertexPointer(vertexBuffer, i+j),
-                vertexBuffer, &(vsOutputBuffers[j])
+            void* pVertex = (uint8_t*) this->data + (this->nBytesPerVertex * (i+j));
+            sp->vertexShader.shader(
+                pVertex, (char*) triangleVsOutput + \
+                sp->vertexShader.nBytesPerVertex * j
             );
         }
-        drawTriangle(vsOutputBuffers);
+
+        Primitive newPrimitive;
+        if (sp->geometryShader.shader != NULL)
+        {
+            sp->geometryShader.shader(triangleVsOutput, gsOutput);
+            newPrimitive = sp->geometryShader.outputPrimitive;
+        }
+        else
+            newPrimitive = primitive;
+
+        drawPrimitive(gsOutput, sp, newPrimitive);
+    }
+}
+
+static void drawPrimitive(void* gsOutput, ShaderProgram* sp, Primitive primitive)
+{
+    assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
+    
+    switch (primitive)
+    {
+        case PRIMITIVE_TRIANGLES:
+            drawTriangle(gsOutput, sp);
+            break;
+        default:
+            LOGE("Unknown primitive type (%i) in drawPrimitive", primitive);
+            break;
     }
 }
 

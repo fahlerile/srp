@@ -2,27 +2,22 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include "Renderer.h"
-#include "Uniforms.h"
-#include "Shaders.h"
 
-typedef enum
+#ifndef NDEBUG
+typedef struct
 {
-    drawingModeFill = 0,
-    drawingModeLine
-} drawingMode;
+    bool colorRasterizerTiles;
+} DebugOptions;
+#endif
 
 typedef struct
 {
     bool running;
     Renderer* renderer;
     SDL_Event event;
-    
-    Uniforms* uniforms;
-    drawingMode drawingMode;
-
-    VertexShaderType vertexShader;
-    VertexShaderOutputInformation vertexShaderOutputInformation;
-    FragmentShaderType fragmentShader;
+#ifndef NDEBUG
+    DebugOptions debug;
+#endif
 } Context;
 
 extern Context context;

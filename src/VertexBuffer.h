@@ -1,38 +1,28 @@
 #pragma once
-#include "Vector/Vector.h"
-#include "DynamicArray/DynamicArray.h"
-#include "Uniforms.h"
+#include <stddef.h>
+#include "Type.h"
+#include "Shaders.h"
 
 typedef struct
 {
-    void* buffer;
     size_t nBytesPerVertex;
+    size_t nBytesData;
     size_t nVertices;
-    size_t* attributeOffsets;
+    void* data;
     size_t nAttributes;
+    VertexAttribute* attributes;
 } VertexBuffer;
 
-#include "Shaders.h"
-
-typedef enum
-{
-    DRAW_MODE_LINES = 0,
-    DRAW_MODE_TRIANGLES
-} DrawMode;
-
-// `attributeOffsets` is assumed to be sorted
 VertexBuffer* newVertexBuffer(
-    void* data, size_t nBytesPerVertex, size_t nVertices,
-    size_t* attributeOffsets, size_t nAttributes
+    size_t nBytesPerVertex, size_t nBytesData, void* data, 
+    size_t nAttributes, VertexAttribute* attributes
 );
 void freeVertexBuffer(VertexBuffer* this);
 
-void* VertexBufferGetVertexPointer(VertexBuffer* vertexBuffer, size_t i);
-void* VertexPointerGetAttributePointerByIndex(
-    VertexBuffer* vertexBuffer, void* p_vertex, size_t attributeI
+void drawVertexBuffer(
+    VertexBuffer* this, Primitive drawMode, size_t startIndex, size_t count, 
+    ShaderProgram* shaderProgram
 );
 
-void drawVertexBuffer(
-    VertexBuffer* vertexBuffer, DrawMode drawMode, size_t startIndex, size_t count
-);
+static void drawPrimitive(void* gsOutput, ShaderProgram* sp, Primitive primitive);
 
