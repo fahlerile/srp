@@ -252,8 +252,8 @@ static void calculateTileDimensionsAndNTilesInBoundingBox(
     // TODO choose tile size
     *tileDimensions = (Vector2i) {32, 32};
     *nTiles = (Vector2i) {
-        ceil(BBDimensions.x / tileDimensions->x),
-        ceil(BBDimensions.y / tileDimensions->y)
+        ceil((double) BBDimensions.x / tileDimensions->x),
+        ceil((double) BBDimensions.y / tileDimensions->y)
     };
 }
 
