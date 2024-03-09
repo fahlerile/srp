@@ -75,9 +75,8 @@ int main(int argc, char** argv)
             frametimeSec, 1 / frametimeSec, frameCount
         );
 
-        break;
-        if (frameCount == 5000)
-            break;
+        // if (frameCount == 5000)
+        //     break;
     }
 
     freeVertexBuffer(vb);

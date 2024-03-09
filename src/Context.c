@@ -23,17 +23,34 @@ void constructContext(Context* this)
 
     atexit(destroyContext);
     this->running = true;
+
+#ifndef NDEBUG
+    this->debug.colorRasterizerTiles = false;
+#endif
 }
 
 void pollEvents()
 {
-    while (SDL_PollEvent(&context.event) != 0)
+    SDL_Event* const e = &context.event;
+    while (SDL_PollEvent(e) != 0)
     {
-        if (context.event.type == SDL_QUIT ||
-            (context.event.type == SDL_KEYDOWN &&
-             context.event.key.keysym.sym == SDLK_ESCAPE))
+        if (
+            e->type == SDL_QUIT || \
+            (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE)
+        )
         {
             context.running = false;
+        }
+        if (e->type == SDL_KEYDOWN)
+        {
+            switch (e->key.keysym.sym)
+            {
+#ifndef NDEBUG
+                case SDLK_SPACE:
+                    context.debug.colorRasterizerTiles = \
+                        !context.debug.colorRasterizerTiles;
+#endif
+            }
         }
     }
 }

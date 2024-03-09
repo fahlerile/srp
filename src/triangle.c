@@ -93,11 +93,6 @@ static void drawTriangleRasterization(triangleData* data)
             bool fullyRejected = rejected[0] || rejected[1] || rejected[2];
             bool check = !fullyAccepted;
 
-            if (fullyAccepted)
-                LOGD("fully accepted tile (%i, %i)\n", xTile, yTile);
-            if (fullyRejected)
-                LOGD("fully rejected tile (%i, %i)\n", xTile, yTile);
-
             if (fullyAccepted || !fullyRejected)
                 triangleLoopOverTileAndFill(check, startPoint, endPoint, data);
 
@@ -329,9 +324,20 @@ static void triangleRejectionAcceptionTests(
         }
 
         if (barycentricAcception > 0)
+        {
             accepted[iEdge] = true;
+            rejected[iEdge] = false;
+        }
         else if (barycentricRejection <= 0)
+        {
+            accepted[iEdge] = false;
             rejected[iEdge] = true;
+        }
+        else  // TODO how tile can be neither accepted nor rejected?
+        {
+            accepted[iEdge] = false;
+            rejected[iEdge] = false;
+        }
     }
 }
 
@@ -365,20 +371,28 @@ static void triangleLoopOverTileAndFill(
                         data->isEdgeNotFlatTopOrLeft[i])
                         goto nextPixel;
 
-                if (data->barycentricCoordinatesCopy[0] >= 0 && \
-                    data->barycentricCoordinatesCopy[1] >= 0 && \
-                    data->barycentricCoordinatesCopy[2] >= 0)
+                if (data->barycentricCoordinatesCopy[0] < 0 || \
+                    data->barycentricCoordinatesCopy[1] < 0 || \
+                    data->barycentricCoordinatesCopy[2] < 0)
                     goto nextPixel;
             }
 
-
-            // TODO call fragment shader
             Color color;
-            // debug stuff
-            if (check)
-                color = (Color) {255, 0, 0, 255};
+#ifndef NDEBUG
+            if (context.debug.colorRasterizerTiles)
+            {
+                if (check)
+                    color = (Color) {255, 0, 0, 255};
+                else
+                    color = (Color) {0, 255, 0, 255};
+            }
             else
-                color = (Color) {0, 255, 0, 255};
+#endif
+            {
+                // TODO call fragment shader
+                color = (Color) {255, 255, 255, 255};
+            }
+
             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
 
 nextPixel:
