@@ -10,7 +10,7 @@ void drawTriangle(void* gsOutput, ShaderProgram* sp)
 {
     triangleData data;
     drawTrianglePreparation(gsOutput, sp, &data);
-    drawTriangleRasterization(&data);
+    drawTriangleRasterization(gsOutput, &data, sp);
 }
 
 static void drawTrianglePreparation(
@@ -18,21 +18,34 @@ static void drawTrianglePreparation(
 )
 {
     VertexAttribute positionAttribute;
+    size_t nBytesPerVertex;
     if (sp->geometryShader.shader == NULL)
+    {
         positionAttribute = sp->vertexShader.attributes[
-            sp->geometryShader.indexOfPositionAttribute
+            sp->vertexShader.indexOfPositionAttribute
         ];
+        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
+    }
     else
+    {
         positionAttribute = sp->geometryShader.attributes[
             sp->geometryShader.indexOfPositionAttribute
         ];
+        nBytesPerVertex = sp->geometryShader.nBytesPerVertex;
+    }
 
     // TODO add this assert to docs
     assert(positionAttribute.nItems == 3);
     assert(positionAttribute.type == TYPE_DOUBLE);
 
     size_t positionOffsetBytes = positionAttribute.offsetBytes;
-    Vector3d* NDCPositions = (Vector3d*) ((uint8_t*) gsOutput + positionOffsetBytes);
+    Vector3d NDCPositions[3];
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        void* pVertex = (uint8_t*) gsOutput + (i * nBytesPerVertex);
+        NDCPositions[i] = \
+            *(Vector3d*) ((uint8_t*) pVertex + positionOffsetBytes);
+    }
 
     Vector3d SSPositions[3], edgeVectors[3];
     Vector2d maxBP;
@@ -64,7 +77,9 @@ static void drawTrianglePreparation(
             !triangleIsEdgeFlatTopOrLeft(edgeVectors[i]);
 }
 
-static void drawTriangleRasterization(triangleData* data)
+static void drawTriangleRasterization(
+    void* gsOutput, triangleData* data, ShaderProgram* sp
+)
 {
     double barycentricCoordinatesAtBeginningOfTheRow[3];
     memcpy(
@@ -94,7 +109,9 @@ static void drawTriangleRasterization(triangleData* data)
             bool check = !fullyAccepted;
 
             if (fullyAccepted || !fullyRejected)
-                triangleLoopOverTileAndFill(check, startPoint, endPoint, data);
+                triangleLoopOverTileAndFill(
+                    check, startPoint, endPoint, data, sp, gsOutput
+                );
 
             for (uint8_t i = 0; i < 3; i++)
                 data->barycentricCoordinates[i] += data->barycentricTileDeltaX[i];
@@ -347,7 +364,8 @@ static void triangleRejectionAcceptionTests(
 }
 
 static void triangleLoopOverTileAndFill(
-    bool check, Vector2d startPoint, Vector2d endPoint, triangleData* data
+    bool check, Vector2d startPoint, Vector2d endPoint, triangleData* data,
+    ShaderProgram* sp, void* gsOutput
 )
 {
     double barycentricCoordinatesAtBeginningOfTheRow[3];
@@ -368,9 +386,8 @@ static void triangleLoopOverTileAndFill(
         {
             if (check)
             {
-                // Rasterization rules
-                // If current point lies on the edge that is not flat top or left, 
-                // do not draw the point
+                // If current point lies on the edge that is not flat top or 
+                // left, do not draw the point (rasterization rules)
                 for (uint8_t i = 0; i < 3; i++)
                     if (data->barycentricCoordinatesCopy[i] == 0 && \
                         data->isEdgeNotFlatTopOrLeft[i])
@@ -394,8 +411,18 @@ static void triangleLoopOverTileAndFill(
             else
 #endif
             {
-                // TODO call fragment shader
-                color = (Color) {255, 255, 255, 255};
+                // TODO avoid VLA (custom allocator?)
+                size_t n;
+                if (sp->geometryShader.shader != NULL)
+                    n = sp->geometryShader.nBytesPerVertex;
+                else
+                    n = sp->vertexShader.nBytesPerVertex;
+                uint8_t interpolated[n];
+
+                triangleInterpolateGsOutput(
+                    gsOutput, data->barycentricCoordinatesCopy, sp, interpolated
+                );
+                sp->fragmentShader.shader(interpolated, &color);
             }
 
             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
@@ -420,5 +447,64 @@ nextPixel:
 static bool triangleIsEdgeFlatTopOrLeft(Vector3d edgeVector)
 {
     return ((edgeVector.x > 0) && (edgeVector.y == 0)) || (edgeVector.y < 0);
+}
+
+static void triangleInterpolateGsOutput(
+    void* gsOutput, double* barycentricCoordinates, ShaderProgram* sp,
+    void* interpolated
+)
+{
+    size_t nAttributes, nBytesPerVertex;
+    VertexAttribute* attributes;
+    if (sp->geometryShader.shader == NULL)
+    {
+        nAttributes = sp->vertexShader.nAttributes;
+        attributes = sp->vertexShader.attributes;
+        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
+    }
+    else
+    {
+        nAttributes = sp->geometryShader.nAttributes;
+        attributes = sp->geometryShader.attributes;
+        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
+    }
+
+    for (size_t attrI = 0; attrI < nAttributes; attrI++)
+    {
+        size_t attrOffset = attributes[attrI].offsetBytes;
+        Type elemType = attributes[attrI].type;
+        size_t elemSize;
+
+        switch (elemType)
+        {
+            case TYPE_DOUBLE:
+                elemSize = sizeof(double);
+                break;
+            default:
+                LOGE("Unknown type (%i) in triangleInterpolateGsOutput", elemType);
+                break;
+        }
+
+        for (size_t elemI = 0; elemI < attributes[attrI].nItems; elemI++)
+        {
+            size_t elemOffset = attrOffset + (elemI * elemSize);
+            void* pInterpolatedElem = (uint8_t*) interpolated + elemOffset;
+            switch (elemType)
+            {
+            case TYPE_DOUBLE:
+            {
+                double interpolatedElem = 0;
+                for (size_t vertexI = 0; vertexI < 3; vertexI++)
+                {
+                    size_t vertexOffset = vertexI * nBytesPerVertex;
+                    double elem = *(double*) ((uint8_t*) gsOutput + vertexOffset + elemOffset);
+                    interpolatedElem += elem * barycentricCoordinates[vertexI];
+                }
+                memcpy(pInterpolatedElem, &interpolatedElem, elemSize);
+                break;
+            }
+            }
+        }
+    }
 }
 

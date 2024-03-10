@@ -26,7 +26,9 @@ void drawTriangle(void* gsOutput, ShaderProgram* sp);
 static void drawTrianglePreparation(
     void* gsOutput, ShaderProgram* sp, triangleData* returnData
 );
-static void drawTriangleRasterization(triangleData* data);
+static void drawTriangleRasterization(
+    void* gsOutput, triangleData* data, ShaderProgram* sp
+);
 
 static void NDCToScreenSpaceArray(
     Vector3d* NDCPositions, Vector3d* SSPositions, size_t n
@@ -60,7 +62,12 @@ static void triangleRejectionAcceptionTests(
     triangleData* data, bool* rejected, bool* accepted
 );
 static void triangleLoopOverTileAndFill(
-    bool check, Vector2d startPoint, Vector2d endPoint, triangleData* data
+    bool check, Vector2d startPoint, Vector2d endPoint, triangleData* data,
+    ShaderProgram* sp, void* gsOutput
 );
 
+static void triangleInterpolateGsOutput(
+    void* gsOutput, double* barycentricCoordinates, ShaderProgram* sp,
+    void* interpolated
+);
 

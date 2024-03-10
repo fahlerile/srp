@@ -1,6 +1,7 @@
 #pragma once
 #include "VertexAttribute.h"
 #include "Primitive.h"
+#include "Color/Color.h"
 
 typedef struct
 {
@@ -27,7 +28,7 @@ typedef struct
 
 typedef struct
 {
-    void (*shader)();
+    void (*shader)(void* pInterpolated, Color* color);
 } FragmentShaderType;
 
 typedef struct
