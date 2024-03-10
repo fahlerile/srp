@@ -1,6 +1,5 @@
 #include "Renderer.h"
 #include "utils.h"
-#include "Texture.h"
 
 /**
  * @brief Construct a new `Renderer`
@@ -8,19 +7,35 @@
  * @param width width of a window
  * @param height height of a window
  * @param flags SDL flags to pass to `SDL_CreateWindowAndRenderer`
- * @return Renderer* a pointer to constructed `Renderer`
+ * @return Renderer* a pointer to constructed `Renderer` or NULL on error (call SDL_GetError)
  */
-Renderer* newRenderer(int width, int height, int flags)
+Renderer* newRenderer(const char* window_title, int width, int height, uint32_t flags)
 {
-    SDL_Window* int_window;
-    SDL_Renderer* int_renderer;
-    if (SDL_CreateWindowAndRenderer(width, height, flags, &int_window, &int_renderer) != 0)
+    SDL_Window* window;
+    if ((window = SDL_CreateWindow(
+        window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        width, height, flags
+    )) == NULL)
         return NULL;
 
+    SDL_Surface* screen;
+    SDL_Surface* pixels;
+    screen = SDL_GetWindowSurface(window);
+    pixels = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGBX8888);
+    if (screen == NULL || pixels == NULL)
+    {
+        SDL_DestroyWindow(window);
+        return NULL;
+    }
+
     Renderer* renderer = xmalloc(sizeof(Renderer));
+    size_t zBufferSize = width * height;
     *renderer = (Renderer) {
-        .internal_window = int_window,
-        .internal_renderer = int_renderer,
+        .window = window,
+        .screen = screen,
+        .pixels = pixels,
+        .zBuffer = xmalloc(zBufferSize * sizeof(double)),
+        .zBufferSize = zBufferSize,
         .dimensions = (Vector2i) {width, height}
     };
     return renderer;
@@ -28,39 +43,50 @@ Renderer* newRenderer(int width, int height, int flags)
 
 void freeRenderer(Renderer* this)
 {
+    SDL_FreeSurface(this->pixels);
+    SDL_DestroyWindow(this->window);
+    xfree(this->zBuffer);
     xfree(this);
 }
 
-void rendererSetDrawColor(Renderer* this, Color color)
+void rendererDrawPixel(Renderer* this, Vector2i point, double depth, Color color)
 {
-    SDL_SetRenderDrawColor(
-        this->internal_renderer,
-        color.r, color.g, color.b, color.a
-    );
-}
+    assert(-1 < depth || ROUGHLY_EQUAL(-1, depth));
+    assert(depth < 1 || ROUGHLY_EQUAL(1, depth));
 
-void rendererDrawPixel(Renderer* this, Vector2i point, Color color)
-{
-    rendererSetDrawColor(this, color);
-    SDL_RenderDrawPoint(this->internal_renderer, point.x, point.y);
+    // closer to +1 = closer to the viewer
+    size_t i = rendererPointToZBufferIndex(this, point);
+    if (depth < this->zBuffer[i])
+        return;
+    this->zBuffer[i] = depth;
+
+    SDL_LockSurface(this->pixels);
+    {
+        uint32_t* row = (uint32_t*) ((char*) this->pixels->pixels + this->pixels->pitch * point.y);
+        row[point.x] = ColorToUint32RGBA(color);
+    }
+    SDL_UnlockSurface(this->pixels);
 }
 
 // @brief Save current buffer state as BMP
-void rendererSaveBuffer(Renderer* this, const char* filename)
+// @return 0 on success, -1 on error
+int rendererSaveBuffer(Renderer* this, const char* filename)
 {
-    SDL_Surface* shot = SDL_CreateRGBSurface(0, this->dimensions.x, this->dimensions.y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-    SDL_RenderReadPixels(this->internal_renderer, NULL, SDL_PIXELFORMAT_ARGB8888, shot->pixels, shot->pitch);
-    SDL_SaveBMP(shot, filename);
-    SDL_FreeSurface(shot);
+    if (SDL_SaveBMP(this->screen, filename) != 0)
+        return -1;
+    return 0;
 }
 
 void rendererSwapBuffer(Renderer* this)
 {
-    SDL_RenderPresent(this->internal_renderer);
+    SDL_BlitSurface(this->pixels, NULL, this->screen, NULL);
+    SDL_UpdateWindowSurface(this->window);
 }
 
 void rendererClearBuffer(Renderer* this, Color color)
 {
-    rendererSetDrawColor(this, color);
-    SDL_RenderClear(this->internal_renderer);
+    SDL_FillRect(this->pixels, NULL, ColorToUint32RGBA(color));
+    for (size_t i = 0; i < this->zBufferSize; i++)
+        this->zBuffer[i] = -1;
 }
+

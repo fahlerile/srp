@@ -1,49 +1,184 @@
+#define SDL_MAIN_HANDLED
+#include <time.h>
 #include "Renderer.h"
-#include "Scene.h"
-#include "Model.h"
+#include "VertexBuffer.h"
+#include "Shaders.h"
 #include "Context.h"
-#include "utils.h"
+#include "Type.h"
+#include "log.h"
 
 Context context;
+
+#pragma pack(push, 1)
+typedef struct
+{
+    double position[3];
+    double color[3];
+} Vertex;
+#pragma pack(pop)
+
+void vertexShader(void* shaderProgram, void* pVertex, void* pOutput)
+{
+    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
+    memcpy(pOutput, pVertex, sp->vertexShader.nBytesPerOutputVertex);
+}
+
+void geometryShader(void* shaderProgram, void* pInput, void* pOutput)
+{
+    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
+
+    VertexAttribute inputPosition = sp->vertexShader.outputAttributes[
+        sp->vertexShader.indexOfOutputPositionAttribute
+    ];
+
+    assert(
+        sp->vertexShader.nBytesPerOutputVertex == \
+        sp->geometryShader.nBytesPerOutputVertex
+    );
+    assert(inputPosition.nItems == 3 && inputPosition.type == TYPE_DOUBLE);
+
+    size_t nBytesPerVertex = sp->vertexShader.nBytesPerOutputVertex;
+    
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        size_t inputVertexOffset = i * nBytesPerVertex;
+        void* pInputVertex = (uint8_t*) pInput + inputVertexOffset;
+
+        void* pOutputVertex[2] = {
+            (uint8_t*) pOutput + i * nBytesPerVertex,
+            (uint8_t*) pOutput + (i+3) * nBytesPerVertex
+        };
+
+        double* oldPosition = (double*) ((uint8_t*) pInputVertex + inputPosition.offsetBytes);
+        double newPosition[3] = {
+            oldPosition[0] + 0.5,
+            oldPosition[1],
+            oldPosition[2]
+        };
+
+        memcpy(pOutputVertex[0], pInputVertex, nBytesPerVertex);
+        memcpy(
+            (uint8_t*) pOutputVertex[1] + inputPosition.offsetBytes,
+            newPosition,
+            inputPosition.nItems * sizeof(double)
+        );
+        memcpy(
+            (uint8_t*) pOutputVertex[1] + sp->geometryShader.outputAttributes[1].offsetBytes,
+            (uint8_t*) pInputVertex + sp->vertexShader.outputAttributes[1].offsetBytes,
+            sp->vertexShader.outputAttributes[1].nItems * sizeof(double)
+        );
+    }
+}
+
+void fragmentShader(void* shaderProgram, void* pInterpolated, Color* color)
+{
+    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
+    Vector3d colorVec = *(Vector3d*) (
+        (uint8_t*) pInterpolated + \
+        sp->geometryShader.outputAttributes[1].offsetBytes
+    );
+    *color = (Color) {
+        round(colorVec.x * 255),
+        round(colorVec.y * 255),
+        round(colorVec.z * 255),
+        255
+    };
+}
+
+void fragmentShaderZ(void* shaderProgram, void* pInterpolated, Color* color)
+{
+    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
+    double* position = (double*) ((uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
+        sp->geometryShader.indexOfOutputPositionAttribute
+    ].offsetBytes);
+    *color = (Color) {
+        (position[2] + 1) / 2 * 255,
+        (position[2] + 1) / 2 * 255,
+        (position[2] + 1) / 2 * 255,
+        255
+    };
+}
 
 int main(int argc, char** argv)
 {
     constructContext(&context);
+    
+    Vertex data[6] = {
+        {.position = {-0.75, -0.75, 0}, .color = {1., 0., 0.}},
+        {.position = { 0   ,  0.75, 0}, .color = {0., 1., 0.}},
+        {.position = { 0.75, -0.75, 0}, .color = {0., 0., 1.}},
 
-    Matrix4 viewMatrix = Matrix4ConstructView(
-        (Vector3d) {0, 0, 0},
-        (Vector3d) {RADIANS(0), RADIANS(0), RADIANS(0)},
-        (Vector3d) {1, 1, 1}
-    );  
-    Matrix4 projectionMatrix = Matrix4ConstructPerspectiveProjection(
-        -1, 1,
-        -1, 1,
-         1, 50
+        {.position = {0.5, -1, -1}, .color = {1., 1., 1.}},
+        {.position = {0  ,  0,  1}, .color = {1., 1., 1.}},
+        {.position = {1  ,  0, -1}, .color = {1., 1., 1.}}
+    };
+    VertexAttribute attributes[2] = {
+        {
+            .nItems = 3,
+            .type = TYPE_DOUBLE,
+            .offsetBytes = 0
+        },
+        {
+            .nItems = 3,
+            .type = TYPE_DOUBLE,
+            .offsetBytes = sizeof(double) * 3
+        }
+    };
+
+    VertexBuffer* vb = newVertexBuffer(
+        sizeof(Vertex), sizeof(data), data, 1, attributes
     );
 
-    Scene* world = newScene(viewMatrix, projectionMatrix);
-    Model* teapot = newModel("res/models/utah_teapot.obj");
-    
-    modelAddInstance(teapot, 
-        (Vector3d) {0, 0, 20},
-        (Vector3d) {RADIANS(0), RADIANS(0), RADIANS(0)},
-        (Vector3d) {1, 1, 1}
-    );
-    sceneAddModel(world, teapot);
-    
-    rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-    sceneRender(world);
+    ShaderProgram shaderProgram = {
+        .vertexShader = {
+            .shader = vertexShader,
+            .nBytesPerOutputVertex = sizeof(double) * 6,
+            .nOutputAttributes = 2,
+            .outputAttributes = attributes,
+            .indexOfOutputPositionAttribute = 0
+        },
+        .geometryShader = {
+            .shader = NULL
+            // .shader = geometryShader,
+            // .nBytesPerOutputVertex = sizeof(double) * 6,
+            // .nOutputAttributes = 2,
+            // .outputAttributes = attributes,
+            // .indexOfOutputPositionAttribute = 0,
+            // .nOutputVertices = 6,
+            // .inputPrimitive = PRIMITIVE_TRIANGLES,
+            // .outputPrimitive = PRIMITIVE_TRIANGLES
+        },
+        .fragmentShader = {
+            .shader = fragmentShader
+        }
+    };
 
-    rendererSaveBuffer(context.renderer, "screenshot.bmp");
-    rendererSwapBuffer(context.renderer);
+    size_t frameCount = 0;
+    clock_t begin, end;
+    double frametimeSec;
     while (context.running)
     {
+        begin = clock();
+
+        rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
+        shaderProgram.fragmentShader.shader = fragmentShader;
+        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+        shaderProgram.fragmentShader.shader = fragmentShaderZ;
+        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 3, 3, &shaderProgram);
+
         pollEvents();
-#ifndef __linux__
-        rendererSwapBuffer(renderer);
-#endif
+        rendererSwapBuffer(context.renderer);
+
+        frameCount++;
+        end = clock();
+        frametimeSec = (double) (end - begin) / CLOCKS_PER_SEC;
+        LOGI(
+            "Frametime: %lf s; FPS: %lf; Framecount: %zu\n", 
+            frametimeSec, 1 / frametimeSec, frameCount
+        );
     }
 
-    freeSceneAndModels(world);
+    freeVertexBuffer(vb);
+    return 0;
 }
 

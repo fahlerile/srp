@@ -4,8 +4,6 @@ project(rasterizer)
 set(EXECUTABLE_NAME rasterizer)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
 
-add_compile_definitions(NO_LOG_MEMORY)
-
 add_subdirectory(src)
 add_subdirectory(lib)
 

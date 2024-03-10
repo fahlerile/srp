@@ -1,6 +1,6 @@
 # rasterizer
 
-A rasterizer in C that uses right-hand coordinate system (camera looks in +Z).
+A rasterizer in C that uses right-hand coordinate system ([just like in OpenGL](https://learnopengl.com/Getting-started/Coordinate-Systems): +X on the right, +Y on the top and +Z behind the camera).
 
 ## Building
 
@@ -8,7 +8,7 @@ Prerequsites:
 - SDL2 installed in C compiler path
 
 ```bash
-git clone ...
+git clone https://www.github.com/fahlerile/rasterizer --recursive
 cd rasterizer
 mkdir build
 cd build
@@ -19,26 +19,25 @@ cd bin
 ```
 
 ## TODO
-- [x] `triangulateFace` (NOT TESTED!)
-- [x] Projection matrices
-- [x] Test wireframe rendering on various models
-- [ ] Refactor & optimize
-    - [x] Remove `Face` structure, create `Triangle` typedef for `Vertex[3]`
-    - [x] Rewrite `.obj` parser for `f` line type
-    - [x] Avoid heap allocation in `modelRender`
-    - [ ] Make `modelRender` to draw ONLY ONE instance of a model (remove `matrices` field in `Model` structure)
-    - [ ] Think about "shader support" (a function that gets called in `modelRender`? Then how to implement "uniforms"?)
-    - [ ] Think about "`Vertex` variability" (e.g. having color data instead of UV, adding additional data to vertices and etc. like in OpenGL)
-    - [ ] Optimize Bresenham's line drawing algorithm implementation
-- [ ] DOCUMENTATION!
-- [ ] Depth buffer
-- [ ] Shaders
-    - [ ] Color interpolation
-    - [ ] Textures, UV-mapping
-- [ ] Lighting
-- [ ] Shadows
-- [ ] Testing
-    - Check whether or not drawn triangle/polygon/model correctly (image comparison?)
+- [x] Rewrite tile-based rasterizer and shader utilities
+- [x] Add fragment shader call and interpolation in `triangleLoopOverTileAndFill`
+- [x] Replace the 100500 `if (sp->geometryShader.shader == NULL)` checks with default geometry shader if it is not initialized by the user
+- [x] Add more "sanity checks" to avoid the user to shoot themselves in the foot
+    - Pass `ShaderProgram*` to shaders to avoid repetition
+- [x] Test vertex, geometry and fragment shaders
+- [x] Implement Z-buffer
+- [ ] Investigate #8
+- [ ] Optimize the rasterizer
+    - Ideas:
+        - Assembly-level optimizations
+        - Play around with `tileDimensions` computation (`calculateTileDimensionsAndNTilesInBoundingBox`)
+        - Draw multiple primitives at the same tile (z-buffer issue)
+        - Draw multiple tiles at the same time
+- [ ] Write implementation-level documentation
+- [ ] Add `indexBuffer`
+- [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
+- [ ] Extensively test shader with new primitives and using `indexBuffer`
+- [ ] Add convenience macros/functions to avoid giving the user an ability to ~~shoot themselves in the foot~~ blow their whole leg off
+- [ ] Prettify the API, write the use-level documentation
+- [ ] Write some examples
 
-## Issues
-- SEGV if `-march=native` compiler flag is set

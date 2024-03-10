@@ -1,21 +1,23 @@
 #pragma once
-
 #include <stdbool.h>
+#include <SDL2/SDL.h>
 #include "Renderer.h"
-#include "SDL2/SDL.h"
 
-typedef enum
+#ifndef NDEBUG
+typedef struct
 {
-    drawingModeFill = 0,
-    drawingModeLine
-} drawingMode;
+    bool colorRasterizerTiles;
+} DebugOptions;
+#endif
 
 typedef struct
 {
     bool running;
     Renderer* renderer;
     SDL_Event event;
-    drawingMode drawingMode;
+#ifndef NDEBUG
+    DebugOptions debug;
+#endif
 } Context;
 
 extern Context context;
