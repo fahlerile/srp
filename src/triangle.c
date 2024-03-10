@@ -381,9 +381,8 @@ static void triangleLoopOverTileAndFill(
         {
             if (check)
             {
-                // Rasterization rules
-                // If current point lies on the edge that is not flat top or left, 
-                // do not draw the point
+                // If current point lies on the edge that is not flat top or 
+                // left, do not draw the point (rasterization rules)
                 for (uint8_t i = 0; i < 3; i++)
                     if (data->barycentricCoordinatesCopy[i] == 0 && \
                         data->isEdgeNotFlatTopOrLeft[i])
