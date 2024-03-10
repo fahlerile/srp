@@ -19,6 +19,17 @@ void vertexShader(void* pVertex, void* pOutput)
     memcpy(pOutput, pVertex, sizeof(double) * 3);
 }
 
+void fragmentShader(void* pInterpolated, Color* color)
+{
+    Vector3d interpolatedNDC = *(Vector3d*) pInterpolated;
+    *color = (Color) {
+        (interpolatedNDC.x + 1) / 2 * 255,
+        (interpolatedNDC.y + 1) / 2 * 255,
+        (interpolatedNDC.z + 1) / 2 * 255,
+        255
+    };
+}
+
 int main(int argc, char** argv)
 {
     constructContext(&context);
@@ -65,7 +76,7 @@ int main(int argc, char** argv)
             .shader = NULL,
         },
         .fragmentShader = {
-            .shader = NULL
+            .shader = fragmentShader
         }
     };
 
