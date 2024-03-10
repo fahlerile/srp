@@ -1,6 +1,6 @@
 # rasterizer
 
-A rasterizer in C that uses right-hand coordinate system (camera looks in +Z).
+A rasterizer in C that uses right-hand coordinate system ([just like in OpenGL](https://learnopengl.com/Getting-started/Coordinate-Systems): +X on the right, +Y on the top and +Z behind the camera).
 
 ## Building
 
@@ -25,7 +25,7 @@ cd bin
 - [x] Add more "sanity checks" to avoid the user to shoot themselves in the foot
     - Pass `ShaderProgram*` to shaders to avoid repetition
 - [x] Test vertex, geometry and fragment shaders
-- [ ] Implement z-buffer
+- [x] Implement Z-buffer
 - [ ] Optimize the rasterizer
     - Ideas:
         - Play around with `tileDimensions` computation (`calculateTileDimensionsAndNTilesInBoundingBox`)

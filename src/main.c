@@ -85,14 +85,32 @@ void fragmentShader(void* shaderProgram, void* pInterpolated, Color* color)
     };
 }
 
+void fragmentShaderZ(void* shaderProgram, void* pInterpolated, Color* color)
+{
+    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
+    double* position = (double*) ((uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
+        sp->geometryShader.indexOfOutputPositionAttribute
+    ].offsetBytes);
+    *color = (Color) {
+        (position[2] + 1) / 2 * 255,
+        (position[2] + 1) / 2 * 255,
+        (position[2] + 1) / 2 * 255,
+        255
+    };
+}
+
 int main(int argc, char** argv)
 {
     constructContext(&context);
     
-    Vertex data[3] = {
-        {.position = {-0.5 , -0.25,  0.0}, .color = {1., 0., 0.}},
-        {.position = {-0.25,  0.25,  0.0}, .color = {0., 1., 0.}},
-        {.position = { 0.  , -0.25,  0.0}, .color = {0., 0., 1.}}
+    Vertex data[6] = {
+        {.position = {-0.75, -0.75, 0}, .color = {1., 0., 0.}},
+        {.position = { 0   ,  0.75, 0}, .color = {0., 1., 0.}},
+        {.position = { 0.75, -0.75, 0}, .color = {0., 0., 1.}},
+
+        {.position = {0.5, -1, -1}, .color = {1., 1., 1.}},
+        {.position = {0  ,  0,  1}, .color = {1., 1., 1.}},
+        {.position = {1  ,  0, -1}, .color = {1., 1., 1.}}
     };
     VertexAttribute attributes[2] = {
         {
@@ -120,14 +138,15 @@ int main(int argc, char** argv)
             .indexOfOutputPositionAttribute = 0
         },
         .geometryShader = {
-            .shader = geometryShader,
-            .nBytesPerOutputVertex = sizeof(double) * 6,
-            .nOutputAttributes = 2,
-            .outputAttributes = attributes,
-            .indexOfOutputPositionAttribute = 0,
-            .nOutputVertices = 6,
-            .inputPrimitive = PRIMITIVE_TRIANGLES,
-            .outputPrimitive = PRIMITIVE_TRIANGLES
+            .shader = NULL
+            // .shader = geometryShader,
+            // .nBytesPerOutputVertex = sizeof(double) * 6,
+            // .nOutputAttributes = 2,
+            // .outputAttributes = attributes,
+            // .indexOfOutputPositionAttribute = 0,
+            // .nOutputVertices = 6,
+            // .inputPrimitive = PRIMITIVE_TRIANGLES,
+            // .outputPrimitive = PRIMITIVE_TRIANGLES
         },
         .fragmentShader = {
             .shader = fragmentShader
@@ -142,7 +161,10 @@ int main(int argc, char** argv)
         begin = clock();
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
+        shaderProgram.fragmentShader.shader = fragmentShader;
         drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+        shaderProgram.fragmentShader.shader = fragmentShaderZ;
+        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 3, 3, &shaderProgram);
 
         pollEvents();
         rendererSwapBuffer(context.renderer);
