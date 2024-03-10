@@ -23,6 +23,5 @@ void drawVertexBuffer(
     VertexBuffer* this, Primitive drawMode, size_t startIndex, size_t count, 
     ShaderProgram* shaderProgram
 );
-
-static void drawPrimitive(void* gsOutput, ShaderProgram* sp, Primitive primitive);
+static void drawRawVertexBuffer(void* gsOutput, ShaderProgram* sp, Primitive primitive);
 

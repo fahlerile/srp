@@ -79,7 +79,7 @@ void drawVertexBuffer(
         else
             newPrimitive = primitive;
 
-        drawPrimitive(gsOutput, sp, newPrimitive);
+        drawRawVertexBuffer(gsOutput, sp, newPrimitive);
     }
 
     if (triangleVsOutput != gsOutput)
@@ -87,18 +87,23 @@ void drawVertexBuffer(
     xfree(triangleVsOutput);
 }
 
-static void drawPrimitive(void* gsOutput, ShaderProgram* sp, Primitive primitive)
+// @brief Draw vertex array without calling vertex and geometry shaders
+// Needed because geometry shader can output multiple primitives to draw
+// Intended to use inside `drawVertexBuffer` after calling these shaders
+static void drawRawVertexBuffer(void* gsOutput, ShaderProgram* sp, Primitive primitive)
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
-    
-    switch (primitive)
+
+    size_t n;
+    if (sp->geometryShader.shader == NULL)
+        n = 3;
+    else
+        n = sp->geometryShader.nVertices;
+    for (size_t i = 0; i < n; i += 3)
     {
-        case PRIMITIVE_TRIANGLES:
-            drawTriangle(gsOutput, sp);
-            break;
-        default:
-            LOGE("Unknown primitive type (%i) in drawPrimitive", primitive);
-            break;
+        drawTriangle(
+            (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerVertex), sp
+        );
     }
 }
 
