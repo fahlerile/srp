@@ -3,11 +3,7 @@ add_subdirectory(c-codebase)
 target_link_libraries(
     ${EXECUTABLE_NAME}
     Vector
-    Matrix
-    DynamicArray
-    fileUtils
     memoryUtils
-    stringUtils
 )
 
 target_link_libraries(
