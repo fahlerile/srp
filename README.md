@@ -22,7 +22,8 @@ cd bin
 - [x] Rewrite tile-based rasterizer and shader utilities
 - [x] Add fragment shader call and interpolation in `triangleLoopOverTileAndFill`
 - [x] Replace the 100500 `if (sp->geometryShader.shader == NULL)` checks with default geometry shader if it is not initialized by the user
-- [ ] Add more "sanity checks" to avoid the user to shoot themselves in the foot
+- [x] Add more "sanity checks" to avoid the user to shoot themselves in the foot
+    - Pass `ShaderProgram*` to shaders to avoid repetition
 - [ ] Test vertex, geometry and fragment shaders
 - [ ] Implement z-buffer
 - [ ] Optimize the rasterizer

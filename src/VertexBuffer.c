@@ -83,14 +83,13 @@ void drawVertexBuffer(
         {
             void* pVertex = (uint8_t*) this->data + (this->nBytesPerVertex * (i+j));
             sp->vertexShader.shader(
-                pVertex, (char*) triangleVsOutput + \
-                sp->vertexShader.nBytesPerVertex * j
+                sp, pVertex, (char*) triangleVsOutput + sp->vertexShader.nBytesPerVertex * j
             );
         }
 
         Primitive newPrimitive = sp->geometryShader.outputPrimitive;;
         if (sp->geometryShader.shader != NULL)
-            sp->geometryShader.shader(triangleVsOutput, gsOutput);
+            sp->geometryShader.shader(sp, triangleVsOutput, gsOutput);
 
         drawRawVertexBuffer(gsOutput, sp, newPrimitive);
     }

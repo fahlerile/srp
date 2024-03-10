@@ -403,7 +403,7 @@ static void triangleLoopOverTileAndFill(
                 triangleInterpolateGsOutput(
                     gsOutput, data->barycentricCoordinatesCopy, sp, interpolated
                 );
-                sp->fragmentShader.shader(interpolated, &color);
+                sp->fragmentShader.shader(sp, interpolated, &color);
             }
 
             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
