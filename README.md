@@ -24,7 +24,7 @@ cd bin
 - [x] Replace the 100500 `if (sp->geometryShader.shader == NULL)` checks with default geometry shader if it is not initialized by the user
 - [x] Add more "sanity checks" to avoid the user to shoot themselves in the foot
     - Pass `ShaderProgram*` to shaders to avoid repetition
-- [ ] Test vertex, geometry and fragment shaders
+- [x] Test vertex, geometry and fragment shaders
 - [ ] Implement z-buffer
 - [ ] Optimize the rasterizer
     - Ideas:
