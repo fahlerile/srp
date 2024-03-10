@@ -81,6 +81,10 @@ void drawVertexBuffer(
 
         drawPrimitive(gsOutput, sp, newPrimitive);
     }
+
+    if (triangleVsOutput != gsOutput)
+        xfree(gsOutput);
+    xfree(triangleVsOutput);
 }
 
 static void drawPrimitive(void* gsOutput, ShaderProgram* sp, Primitive primitive)
