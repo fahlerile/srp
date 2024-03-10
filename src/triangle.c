@@ -20,7 +20,7 @@ static void drawTrianglePreparation(
     VertexAttribute positionAttribute;
     if (sp->geometryShader.shader == NULL)
         positionAttribute = sp->vertexShader.attributes[
-            sp->geometryShader.indexOfPositionAttribute
+            sp->vertexShader.indexOfPositionAttribute
         ];
     else
         positionAttribute = sp->geometryShader.attributes[
