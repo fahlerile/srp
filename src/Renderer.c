@@ -29,10 +29,13 @@ Renderer* newRenderer(const char* window_title, int width, int height, uint32_t 
     }
 
     Renderer* renderer = xmalloc(sizeof(Renderer));
+    size_t zBufferSize = width * height;
     *renderer = (Renderer) {
         .window = window,
         .screen = screen,
         .pixels = pixels,
+        .zBuffer = xmalloc(zBufferSize * sizeof(double)),
+        .zBufferSize = zBufferSize,
         .dimensions = (Vector2i) {width, height}
     };
     return renderer;
@@ -42,11 +45,21 @@ void freeRenderer(Renderer* this)
 {
     SDL_FreeSurface(this->pixels);
     SDL_DestroyWindow(this->window);
+    xfree(this->zBuffer);
     xfree(this);
 }
 
-void rendererDrawPixel(Renderer* this, Vector2i point, Color color)
+void rendererDrawPixel(Renderer* this, Vector2i point, double depth, Color color)
 {
+    assert(-1 < depth || ROUGHLY_EQUAL(-1, depth));
+    assert(depth < 1 || ROUGHLY_EQUAL(1, depth));
+
+    // closer to +1 = closer to the viewer
+    size_t i = rendererPointToZBufferIndex(this, point);
+    if (depth < this->zBuffer[i])
+        return;
+    this->zBuffer[i] = depth;
+
     SDL_LockSurface(this->pixels);
     {
         uint32_t* row = (uint32_t*) ((char*) this->pixels->pixels + this->pixels->pitch * point.y);
@@ -73,5 +86,7 @@ void rendererSwapBuffer(Renderer* this)
 void rendererClearBuffer(Renderer* this, Color color)
 {
     SDL_FillRect(this->pixels, NULL, ColorToUint32RGBA(color));
+    for (size_t i = 0; i < this->zBufferSize; i++)
+        this->zBuffer[i] = -1;
 }
 

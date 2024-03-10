@@ -387,6 +387,7 @@ static void triangleLoopOverTileAndFill(
             }
 
             Color color;
+            double depth;
 #ifndef NDEBUG
             if (context.debug.colorRasterizerTiles)
             {
@@ -394,6 +395,7 @@ static void triangleLoopOverTileAndFill(
                     color = (Color) {255, 0, 0, 255};
                 else
                     color = (Color) {0, 255, 0, 255};
+                depth = 1;
             }
             else
 #endif
@@ -403,10 +405,15 @@ static void triangleLoopOverTileAndFill(
                 triangleInterpolateGsOutput(
                     gsOutput, data->barycentricCoordinatesCopy, sp, pInterpolated
                 );
+                depth = ((double*) (
+                    pInterpolated + sp->geometryShader.outputAttributes[
+                        sp->geometryShader.indexOfOutputPositionAttribute
+                    ].offsetBytes
+                ))[2];
                 sp->fragmentShader.shader(sp, pInterpolated, &color);
             }
 
-            rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
+            rendererDrawPixel(context.renderer, (Vector2i) {x, y}, depth, color);
 
 nextPixel:
             for (uint8_t i = 0; i < 3; i++)
