@@ -9,23 +9,26 @@
 
 Context context;
 
+#pragma pack(push, 1)
 typedef struct
 {
     double position[3];
+    double color[3];
 } Vertex;
+#pragma pack(pop)
 
 void vertexShader(void* pVertex, void* pOutput)
 {
-    memcpy(pOutput, pVertex, sizeof(double) * 3);
+    memcpy(pOutput, pVertex, sizeof(double) * 6);
 }
 
 void fragmentShader(void* pInterpolated, Color* color)
 {
-    Vector3d interpolatedNDC = *(Vector3d*) pInterpolated;
+    Vector3d colorVec = *(Vector3d*) ((uint8_t*) pInterpolated + (sizeof(double) * 3));
     *color = (Color) {
-        (interpolatedNDC.x + 1) / 2 * 255,
-        (interpolatedNDC.y + 1) / 2 * 255,
-        (interpolatedNDC.z + 1) / 2 * 255,
+        round(colorVec.x * 255),
+        round(colorVec.y * 255),
+        round(colorVec.z * 255),
         255
     };
 }
@@ -33,33 +36,25 @@ void fragmentShader(void* pInterpolated, Color* color)
 int main(int argc, char** argv)
 {
     constructContext(&context);
-
-    Vertex data[15] = {
-        {.position = {-0.25, -0.25,  0.0}},
-        {.position = { 0.  ,  0.25,  0.0}},
-        {.position = { 0.25, -0.25,  0.0}},
-
-        {.position = {-0.75,  0.10,  0.0}},
-        {.position = {-0.75,  0.90,  0.0}},
-        {.position = {-0.40,  0.10,  0.0}},
-
-        {.position = { 0.40,  0.25,  0.0}},
-        {.position = { 0.50,  0.60,  0.0}},
-        {.position = { 0.80,  0.25,  0.0}},
-
-        {.position = {-0.50, -0.75,  0.0}},
-        {.position = {-0.75, -0.25,  0.0}},
-        {.position = {-0.25, -0.75,  0.0}},
-
-        {.position = { 0.10, -0.80,  0.0}},
-        {.position = { 0.50, -0.10,  0.0}},
-        {.position = { 0.90, -0.10,  0.0}}
+    
+    Vertex data[3] = {
+        {.position = {-0.75, -0.75,  0.0}, .color = {1., 0., 0.}},
+        {.position = { 0.  ,  0.75,  0.0}, .color = {0., 1., 0.}},
+        {.position = { 0.75, -0.75,  0.0}, .color = {0., 0., 1.}}
     };
-    VertexAttribute attributes[1] = {{
-        .nItems = 3,
-        .type = TYPE_DOUBLE,
-        .offsetBytes = 0
-    }};
+    VertexAttribute attributes[2] = {
+        {
+            .nItems = 3,
+            .type = TYPE_DOUBLE,
+            .offsetBytes = 0
+        },
+        {
+            .nItems = 3,
+            .type = TYPE_DOUBLE,
+            .offsetBytes = sizeof(double) * 3
+        }
+    };
+
     VertexBuffer* vb = newVertexBuffer(
         sizeof(Vertex), sizeof(data), data, 1, attributes
     );
@@ -67,8 +62,8 @@ int main(int argc, char** argv)
     ShaderProgram shaderProgram = {
         .vertexShader = {
             .shader = vertexShader,
-            .nBytesPerVertex = sizeof(double) * 3,
-            .nAttributes = 1,
+            .nBytesPerVertex = sizeof(double) * 6,
+            .nAttributes = 2,
             .attributes = attributes,
             .indexOfPositionAttribute = 0
         },
@@ -88,8 +83,7 @@ int main(int argc, char** argv)
         begin = clock();
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 15, &shaderProgram);
-        // drawIndexBuffer();
+        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
         pollEvents();
         rendererSwapBuffer(context.renderer);
@@ -101,9 +95,6 @@ int main(int argc, char** argv)
             "Frametime: %lf s; FPS: %lf; Framecount: %zu\n", 
             frametimeSec, 1 / frametimeSec, frameCount
         );
-
-        // if (frameCount == 5000)
-        //     break;
     }
 
     freeVertexBuffer(vb);
