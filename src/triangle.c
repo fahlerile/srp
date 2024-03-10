@@ -388,17 +388,6 @@ static void triangleLoopOverTileAndFill(
 
             Color color;
             double depth;
-#ifndef NDEBUG
-            if (context.debug.colorRasterizerTiles)
-            {
-                if (check)
-                    color = (Color) {255, 0, 0, 255};
-                else
-                    color = (Color) {0, 255, 0, 255};
-                depth = 1;
-            }
-            else
-#endif
             {
                 // TODO avoid VLA (custom allocator?)
                 uint8_t pInterpolated[sp->geometryShader.nBytesPerOutputVertex];
@@ -410,7 +399,20 @@ static void triangleLoopOverTileAndFill(
                         sp->geometryShader.indexOfOutputPositionAttribute
                     ].offsetBytes
                 ))[2];
-                sp->fragmentShader.shader(sp, pInterpolated, &color);
+
+#ifndef NDEBUG
+                if (context.debug.colorRasterizerTiles)
+                {
+                    if (check)
+                        color = (Color) {255, 0, 0, 255};
+                    else
+                        color = (Color) {0, 255, 0, 255};
+                }
+                else
+#endif
+                {
+                    sp->fragmentShader.shader(sp, pInterpolated, &color);
+                }
             }
 
             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, depth, color);
