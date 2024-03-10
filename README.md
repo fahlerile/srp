@@ -26,12 +26,18 @@ cd bin
     - Pass `ShaderProgram*` to shaders to avoid repetition
 - [x] Test vertex, geometry and fragment shaders
 - [x] Implement Z-buffer
+- [ ] Investigate #8
 - [ ] Optimize the rasterizer
     - Ideas:
+        - Assembly-level optimizations
         - Play around with `tileDimensions` computation (`calculateTileDimensionsAndNTilesInBoundingBox`)
         - Draw multiple primitives at the same tile (z-buffer issue)
         - Draw multiple tiles at the same time
-        - Assembly-level optimizations
+- [ ] Write implementation-level documentation
+- [ ] Add `indexBuffer`
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
-- [ ] Test geometry shader for new primitives
+- [ ] Extensively test shader with new primitives and using `indexBuffer`
+- [ ] Add convenience macros/functions to avoid giving the user an ability to ~~shoot themselves in the foot~~ blow their whole leg off
+- [ ] Prettify the API, write the use-level documentation
+- [ ] Write some examples
 
