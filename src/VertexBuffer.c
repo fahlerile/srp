@@ -41,29 +41,29 @@ void drawVertexBuffer(
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
     
-    void* triangleVsOutput = xmalloc(sp->vertexShader.nBytesPerVertex * 3);
+    void* triangleVsOutput = xmalloc(sp->vertexShader.nBytesPerOutputVertex * 3);
     void* gsOutput;
     if (sp->geometryShader.shader == NULL)
     {
-        sp->geometryShader.nBytesPerVertex = \
-            sp->vertexShader.nBytesPerVertex;
-        sp->geometryShader.nAttributes = \
-            sp->vertexShader.nAttributes;
+        sp->geometryShader.nBytesPerOutputVertex = \
+            sp->vertexShader.nBytesPerOutputVertex;
+        sp->geometryShader.nOutputAttributes = \
+            sp->vertexShader.nOutputAttributes;
         // points to the same buffer!
-        sp->geometryShader.attributes = \
-            sp->vertexShader.attributes;
-        sp->geometryShader.indexOfPositionAttribute = \
-            sp->vertexShader.indexOfPositionAttribute;
+        sp->geometryShader.outputAttributes = \
+            sp->vertexShader.outputAttributes;
+        sp->geometryShader.indexOfOutputPositionAttribute = \
+            sp->vertexShader.indexOfOutputPositionAttribute;
         // this assumes that primitive == triangle
-        sp->geometryShader.nVertices = 3;
+        sp->geometryShader.nOutputVertices = 3;
         sp->geometryShader.inputPrimitive = primitive;
         sp->geometryShader.outputPrimitive = primitive;
         gsOutput = triangleVsOutput;
     }
     else
         gsOutput = xmalloc(
-            sp->geometryShader.nBytesPerVertex * \
-            sp->geometryShader.nVertices
+            sp->geometryShader.nBytesPerOutputVertex * \
+            sp->geometryShader.nOutputVertices
         );
 
 #ifndef NDEBUG
@@ -83,7 +83,7 @@ void drawVertexBuffer(
         {
             void* pVertex = (uint8_t*) this->data + (this->nBytesPerVertex * (i+j));
             sp->vertexShader.shader(
-                sp, pVertex, (char*) triangleVsOutput + sp->vertexShader.nBytesPerVertex * j
+                sp, pVertex, (char*) triangleVsOutput + sp->vertexShader.nBytesPerOutputVertex * j
             );
         }
 
@@ -106,11 +106,11 @@ static void drawRawVertexBuffer(void* gsOutput, ShaderProgram* sp, Primitive pri
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
-    size_t n = sp->geometryShader.nVertices;
+    size_t n = sp->geometryShader.nOutputVertices;
     for (size_t i = 0; i < n; i += 3)
     {
         drawTriangle(
-            (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerVertex), sp
+            (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerOutputVertex), sp
         );
     }
 }

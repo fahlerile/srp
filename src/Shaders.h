@@ -6,22 +6,22 @@
 typedef struct
 {
     void (*shader)(void* sp, void* pVertex, void* pOutput);
-    size_t nBytesPerVertex;
-    size_t nAttributes;
-    VertexAttribute* attributes;
-    size_t indexOfPositionAttribute;
+    size_t nBytesPerOutputVertex;
+    size_t nOutputAttributes;
+    VertexAttribute* outputAttributes;
+    size_t indexOfOutputPositionAttribute;
 } VertexShaderType;
 
 typedef struct
 {
     void (*shader)(void* sp, void* pInput, void* pOutput);
-    size_t nBytesPerVertex;
-    size_t nAttributes;
-    VertexAttribute* attributes;
-    size_t indexOfPositionAttribute;
+    size_t nBytesPerOutputVertex;
+    size_t nOutputAttributes;
+    VertexAttribute* outputAttributes;
+    size_t indexOfOutputPositionAttribute;
 
     // Geometry shader specific
-    size_t nVertices;
+    size_t nOutputVertices;
     Primitive inputPrimitive;
     Primitive outputPrimitive;
 } GeometryShaderType;

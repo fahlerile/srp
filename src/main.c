@@ -19,14 +19,14 @@ typedef struct
 
 void vertexShader(void* sp, void* pVertex, void* pOutput)
 {
-    memcpy(pOutput, pVertex, ((ShaderProgram*) sp)->vertexShader.nBytesPerVertex);
+    memcpy(pOutput, pVertex, ((ShaderProgram*) sp)->vertexShader.nBytesPerOutputVertex);
 }
 
 void fragmentShader(void* sp, void* pInterpolated, Color* color)
 {
     Vector3d colorVec = *(Vector3d*) (
         (uint8_t*) pInterpolated + \
-        ((ShaderProgram*) sp)->geometryShader.attributes[1].offsetBytes
+        ((ShaderProgram*) sp)->geometryShader.outputAttributes[1].offsetBytes
     );
     *color = (Color) {
         round(colorVec.x * 255),
@@ -65,10 +65,10 @@ int main(int argc, char** argv)
     ShaderProgram shaderProgram = {
         .vertexShader = {
             .shader = vertexShader,
-            .nBytesPerVertex = sizeof(double) * 6,
-            .nAttributes = 2,
-            .attributes = attributes,
-            .indexOfPositionAttribute = 0
+            .nBytesPerOutputVertex = sizeof(double) * 6,
+            .nOutputAttributes = 2,
+            .outputAttributes = attributes,
+            .indexOfOutputPositionAttribute = 0
         },
         .geometryShader = {
             .shader = NULL,

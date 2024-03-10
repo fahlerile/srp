@@ -17,8 +17,8 @@ static void drawTrianglePreparation(
     void* gsOutput, ShaderProgram* sp, triangleData* data
 )
 {
-    VertexAttribute positionAttribute = sp->geometryShader.attributes[
-        sp->geometryShader.indexOfPositionAttribute
+    VertexAttribute positionAttribute = sp->geometryShader.outputAttributes[
+        sp->geometryShader.indexOfOutputPositionAttribute
     ];
 
     // TODO add this assert to docs
@@ -29,7 +29,7 @@ static void drawTrianglePreparation(
     Vector3d NDCPositions[3];
     for (uint8_t i = 0; i < 3; i++)
     {
-        void* pVertex = (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerVertex);
+        void* pVertex = (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerOutputVertex);
         NDCPositions[i] = \
             *(Vector3d*) ((uint8_t*) pVertex + positionOffsetBytes);
     }
@@ -399,7 +399,7 @@ static void triangleLoopOverTileAndFill(
 #endif
             {
                 // TODO avoid VLA (custom allocator?)
-                uint8_t interpolated[sp->geometryShader.nBytesPerVertex];
+                uint8_t interpolated[sp->geometryShader.nBytesPerOutputVertex];
                 triangleInterpolateGsOutput(
                     gsOutput, data->barycentricCoordinatesCopy, sp, interpolated
                 );
@@ -435,10 +435,10 @@ static void triangleInterpolateGsOutput(
     void* interpolated
 )
 {
-    for (size_t attrI = 0; attrI < sp->geometryShader.nAttributes; attrI++)
+    for (size_t attrI = 0; attrI < sp->geometryShader.nOutputAttributes; attrI++)
     {
-        size_t attrOffset = sp->geometryShader.attributes[attrI].offsetBytes;
-        Type elemType = sp->geometryShader.attributes[attrI].type;
+        size_t attrOffset = sp->geometryShader.outputAttributes[attrI].offsetBytes;
+        Type elemType = sp->geometryShader.outputAttributes[attrI].type;
         size_t elemSize;
 
         switch (elemType)
@@ -451,7 +451,7 @@ static void triangleInterpolateGsOutput(
                 break;
         }
 
-        for (size_t elemI = 0; elemI < sp->geometryShader.attributes[attrI].nItems; elemI++)
+        for (size_t elemI = 0; elemI < sp->geometryShader.outputAttributes[attrI].nItems; elemI++)
         {
             size_t elemOffset = attrOffset + (elemI * elemSize);
             void* pInterpolatedElem = (uint8_t*) interpolated + elemOffset;
@@ -462,7 +462,7 @@ static void triangleInterpolateGsOutput(
                 double interpolatedElem = 0;
                 for (size_t vertexI = 0; vertexI < 3; vertexI++)
                 {
-                    size_t vertexOffset = vertexI * sp->geometryShader.nBytesPerVertex;
+                    size_t vertexOffset = vertexI * sp->geometryShader.nBytesPerOutputVertex;
                     double elem = *(double*) ((uint8_t*) gsOutput + vertexOffset + elemOffset);
                     interpolatedElem += elem * barycentricCoordinates[vertexI];
                 }
