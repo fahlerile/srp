@@ -399,11 +399,11 @@ static void triangleLoopOverTileAndFill(
 #endif
             {
                 // TODO avoid VLA (custom allocator?)
-                uint8_t interpolated[sp->geometryShader.nBytesPerOutputVertex];
+                uint8_t pInterpolated[sp->geometryShader.nBytesPerOutputVertex];
                 triangleInterpolateGsOutput(
-                    gsOutput, data->barycentricCoordinatesCopy, sp, interpolated
+                    gsOutput, data->barycentricCoordinatesCopy, sp, pInterpolated
                 );
-                sp->fragmentShader.shader(sp, interpolated, &color);
+                sp->fragmentShader.shader(sp, pInterpolated, &color);
             }
 
             rendererDrawPixel(context.renderer, (Vector2i) {x, y}, color);
