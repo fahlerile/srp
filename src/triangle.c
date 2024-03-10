@@ -17,22 +17,9 @@ static void drawTrianglePreparation(
     void* gsOutput, ShaderProgram* sp, triangleData* data
 )
 {
-    VertexAttribute positionAttribute;
-    size_t nBytesPerVertex;
-    if (sp->geometryShader.shader == NULL)
-    {
-        positionAttribute = sp->vertexShader.attributes[
-            sp->vertexShader.indexOfPositionAttribute
-        ];
-        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
-    }
-    else
-    {
-        positionAttribute = sp->geometryShader.attributes[
-            sp->geometryShader.indexOfPositionAttribute
-        ];
-        nBytesPerVertex = sp->geometryShader.nBytesPerVertex;
-    }
+    VertexAttribute positionAttribute = sp->geometryShader.attributes[
+        sp->geometryShader.indexOfPositionAttribute
+    ];
 
     // TODO add this assert to docs
     assert(positionAttribute.nItems == 3);
@@ -42,7 +29,7 @@ static void drawTrianglePreparation(
     Vector3d NDCPositions[3];
     for (uint8_t i = 0; i < 3; i++)
     {
-        void* pVertex = (uint8_t*) gsOutput + (i * nBytesPerVertex);
+        void* pVertex = (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerVertex);
         NDCPositions[i] = \
             *(Vector3d*) ((uint8_t*) pVertex + positionOffsetBytes);
     }
@@ -412,13 +399,7 @@ static void triangleLoopOverTileAndFill(
 #endif
             {
                 // TODO avoid VLA (custom allocator?)
-                size_t n;
-                if (sp->geometryShader.shader != NULL)
-                    n = sp->geometryShader.nBytesPerVertex;
-                else
-                    n = sp->vertexShader.nBytesPerVertex;
-                uint8_t interpolated[n];
-
+                uint8_t interpolated[sp->geometryShader.nBytesPerVertex];
                 triangleInterpolateGsOutput(
                     gsOutput, data->barycentricCoordinatesCopy, sp, interpolated
                 );
@@ -454,25 +435,10 @@ static void triangleInterpolateGsOutput(
     void* interpolated
 )
 {
-    size_t nAttributes, nBytesPerVertex;
-    VertexAttribute* attributes;
-    if (sp->geometryShader.shader == NULL)
+    for (size_t attrI = 0; attrI < sp->geometryShader.nAttributes; attrI++)
     {
-        nAttributes = sp->vertexShader.nAttributes;
-        attributes = sp->vertexShader.attributes;
-        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
-    }
-    else
-    {
-        nAttributes = sp->geometryShader.nAttributes;
-        attributes = sp->geometryShader.attributes;
-        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
-    }
-
-    for (size_t attrI = 0; attrI < nAttributes; attrI++)
-    {
-        size_t attrOffset = attributes[attrI].offsetBytes;
-        Type elemType = attributes[attrI].type;
+        size_t attrOffset = sp->geometryShader.attributes[attrI].offsetBytes;
+        Type elemType = sp->geometryShader.attributes[attrI].type;
         size_t elemSize;
 
         switch (elemType)
@@ -485,7 +451,7 @@ static void triangleInterpolateGsOutput(
                 break;
         }
 
-        for (size_t elemI = 0; elemI < attributes[attrI].nItems; elemI++)
+        for (size_t elemI = 0; elemI < sp->geometryShader.attributes[attrI].nItems; elemI++)
         {
             size_t elemOffset = attrOffset + (elemI * elemSize);
             void* pInterpolatedElem = (uint8_t*) interpolated + elemOffset;
@@ -496,7 +462,7 @@ static void triangleInterpolateGsOutput(
                 double interpolatedElem = 0;
                 for (size_t vertexI = 0; vertexI < 3; vertexI++)
                 {
-                    size_t vertexOffset = vertexI * nBytesPerVertex;
+                    size_t vertexOffset = vertexI * sp->geometryShader.nBytesPerVertex;
                     double elem = *(double*) ((uint8_t*) gsOutput + vertexOffset + elemOffset);
                     interpolatedElem += elem * barycentricCoordinates[vertexI];
                 }
