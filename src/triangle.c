@@ -18,21 +18,34 @@ static void drawTrianglePreparation(
 )
 {
     VertexAttribute positionAttribute;
+    size_t nBytesPerVertex;
     if (sp->geometryShader.shader == NULL)
+    {
         positionAttribute = sp->vertexShader.attributes[
             sp->vertexShader.indexOfPositionAttribute
         ];
+        nBytesPerVertex = sp->vertexShader.nBytesPerVertex;
+    }
     else
+    {
         positionAttribute = sp->geometryShader.attributes[
             sp->geometryShader.indexOfPositionAttribute
         ];
+        nBytesPerVertex = sp->geometryShader.nBytesPerVertex;
+    }
 
     // TODO add this assert to docs
     assert(positionAttribute.nItems == 3);
     assert(positionAttribute.type == TYPE_DOUBLE);
 
     size_t positionOffsetBytes = positionAttribute.offsetBytes;
-    Vector3d* NDCPositions = (Vector3d*) ((uint8_t*) gsOutput + positionOffsetBytes);
+    Vector3d NDCPositions[3];
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        void* pVertex = (uint8_t*) gsOutput + (i * nBytesPerVertex);
+        NDCPositions[i] = \
+            *(Vector3d*) ((uint8_t*) pVertex + positionOffsetBytes);
+    }
 
     Vector3d SSPositions[3], edgeVectors[3];
     Vector2d maxBP;
