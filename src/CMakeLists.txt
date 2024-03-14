@@ -11,7 +11,7 @@ set(
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
 target_include_directories(${EXECUTABLE_NAME} PUBLIC .)
 target_compile_options(${EXECUTABLE_NAME} PRIVATE
-    -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native
+    -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native -O3
 )
 
 if (ENABLE_ASAN)
