@@ -21,6 +21,10 @@ typedef struct
     size_t indexOfOutputPositionAttribute;
 
     // Geometry shader specific
+    // If both `inputPrimitive` and `outputPrimitive` are `PRIMITIVE_ANY` 
+    // (so geometryShader was default-initialized) then `nOutputVertices`
+    // is not valid and should be set accordingly to primitive type that 
+    // is being processed
     size_t nOutputVertices;
     Primitive inputPrimitive;
     Primitive outputPrimitive;
@@ -37,4 +41,6 @@ typedef struct
     GeometryShaderType geometryShader;
     FragmentShaderType fragmentShader;
 } ShaderProgram;
+
+void shaderProgramSetDefaultGeometryShader(ShaderProgram* sp);
 

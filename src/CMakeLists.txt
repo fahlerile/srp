@@ -5,6 +5,7 @@ set(
     Context.c
     Renderer.c
     VertexBuffer.c
+    Shaders.c
     triangle.c
 )
 

@@ -152,6 +152,7 @@ int main(int argc, char** argv)
             .shader = fragmentShader
         }
     };
+    shaderProgramSetDefaultGeometryShader(&shaderProgram);
 
     size_t frameCount = 0;
     clock_t begin, end;
