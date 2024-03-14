@@ -395,7 +395,7 @@ static void triangleLoopOverTileAndFill(
                     gsOutput, data->barycentricCoordinatesCopy, sp, pInterpolated
                 );
                 depth = ((double*) (
-                    pInterpolated + sp->geometryShader.outputAttributes[
+                    (uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
                         sp->geometryShader.indexOfOutputPositionAttribute
                     ].offsetBytes
                 ))[2];
@@ -439,47 +439,55 @@ static bool triangleIsEdgeFlatTopOrLeft(Vector3d edgeVector)
     return ((edgeVector.x > 0) && (edgeVector.y == 0)) || (edgeVector.y < 0);
 }
 
+// @brief Interpolates geometry shader output in triangle
+// Invalidates the whole buffer pointed to by `gsOutput`
+// Interpolated data is stored in the first vertex of `gsOutput`
 static void triangleInterpolateGsOutput(
-    void* gsOutput, double* barycentricCoordinates, ShaderProgram* sp,
-    void* interpolated
+    const void* gsOutput, const double barycentricCoordinates[3],
+    const ShaderProgram* sp, void* pInterpolatedBuffer
 )
 {
-    for (size_t attrI = 0; attrI < sp->geometryShader.nOutputAttributes; attrI++)
+    // gsOutput =
+    // (                           V0                            )  (       V1      ) (       V2      )
+    // (          A0V0          )      (           AnV0          )  (A0V1, ..., AnV1) (A0V2, ..., AnV2)
+    // V0A0E0, V0A0E1, ... V0A0En, ... V0AnE0, V0AnE1, ..., V0AnEn, ...
+
+    // points to the beginning of attribute
+    const void* pAttrVoid = gsOutput;
+    // points to attribute in output buffer
+    void* pInterpolatedAttrVoid = pInterpolatedBuffer;
+    const GeometryShaderType* gs = &sp->geometryShader;
+
+    for (size_t attrI = 0; attrI < gs->nOutputAttributes; attrI++)
     {
-        size_t attrOffset = sp->geometryShader.outputAttributes[attrI].offsetBytes;
-        Type elemType = sp->geometryShader.outputAttributes[attrI].type;
-        size_t elemSize;
-
-        switch (elemType)
+        VertexAttribute* attr = &gs->outputAttributes[attrI];
+        size_t elemSize = 0;
+        switch (attr->type)
         {
-            case TYPE_DOUBLE:
-                elemSize = sizeof(double);
-                break;
-            default:
-                LOGE("Unknown type (%i) in triangleInterpolateGsOutput", elemType);
-                break;
-        }
-
-        for (size_t elemI = 0; elemI < sp->geometryShader.outputAttributes[attrI].nItems; elemI++)
+        case TYPE_DOUBLE:
         {
-            size_t elemOffset = attrOffset + (elemI * elemSize);
-            void* pInterpolatedElem = (uint8_t*) interpolated + elemOffset;
-            switch (elemType)
+            elemSize = sizeof(double);
+            double* pInterpolatedAttr = (double*) pInterpolatedAttrVoid;
+            double* AV0 = (double*) pAttrVoid;
+            double* AV1 = (double*) ((uint8_t*) AV0 + gs->nBytesPerOutputVertex);
+            double* AV2 = (double*) ((uint8_t*) AV1 + gs->nBytesPerOutputVertex);
+            for (size_t elemI = 0; elemI < attr->nItems; elemI++)
             {
-            case TYPE_DOUBLE:
-            {
-                double interpolatedElem = 0;
-                for (size_t vertexI = 0; vertexI < 3; vertexI++)
-                {
-                    size_t vertexOffset = vertexI * sp->geometryShader.nBytesPerOutputVertex;
-                    double elem = *(double*) ((uint8_t*) gsOutput + vertexOffset + elemOffset);
-                    interpolatedElem += elem * barycentricCoordinates[vertexI];
-                }
-                memcpy(pInterpolatedElem, &interpolatedElem, elemSize);
-                break;
+                pInterpolatedAttr[elemI] = \
+                    AV0[elemI] * barycentricCoordinates[0] + \
+                    AV1[elemI] * barycentricCoordinates[1] + \
+                    AV2[elemI] * barycentricCoordinates[2];
             }
-            }
+            break;
         }
+        default:
+            LOGE("Unknown type (%i) in %s", attr->type, __func__);
+            memset(pInterpolatedBuffer, 0, gs->nBytesPerOutputVertex);
+            return;
+        }
+        size_t attrSize = elemSize * attr->nItems;
+        pAttrVoid = (uint8_t*) pAttrVoid + attrSize;
+        pInterpolatedAttrVoid = (uint8_t*) pInterpolatedAttrVoid + attrSize;
     }
 }
 

@@ -67,7 +67,7 @@ static void triangleLoopOverTileAndFill(
 );
 
 static void triangleInterpolateGsOutput(
-    void* gsOutput, double* barycentricCoordinates, ShaderProgram* sp,
-    void* interpolated
+    const void* gsOutput, const double barycentricCoordinates[3],
+    const ShaderProgram* sp, void* pInterpolatedBuffer
 );
 
