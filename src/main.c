@@ -1,11 +1,14 @@
 #define SDL_MAIN_HANDLED
-#include <time.h>
+#include <assert.h>
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "Shaders.h"
 #include "Context.h"
 #include "Type.h"
+#include "Color/Color.h"
+#include "Vector/Vector.h"
 #include "log.h"
+#include "timer.h"
 
 Context context;
 
@@ -155,11 +158,9 @@ int main(int argc, char** argv)
     shaderProgramSetDefaultGeometryShader(&shaderProgram);
 
     size_t frameCount = 0;
-    clock_t begin, end;
-    double frametimeSec;
     while (context.running)
     {
-        begin = clock();
+        TIMER_START(frametime);
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
         shaderProgram.fragmentShader.shader = fragmentShader;
@@ -171,11 +172,11 @@ int main(int argc, char** argv)
         rendererSwapBuffer(context.renderer);
 
         frameCount++;
-        end = clock();
-        frametimeSec = (double) (end - begin) / CLOCKS_PER_SEC;
+        TIMER_STOP(frametime);
         LOGI(
-            "Frametime: %lf s; FPS: %lf; Framecount: %zu\n", 
-            frametimeSec, 1 / frametimeSec, frameCount
+            "Frametime: %li us; FPS: %lf; Framecount: %zu\n", 
+            TIMER_REPORT_US(frametime, long), 1. / TIMER_REPORT_S(frametime, double),
+            frameCount
         );
     }
 
