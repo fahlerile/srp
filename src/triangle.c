@@ -6,7 +6,7 @@
 #include "triangle.h"
 #include "log.h"
 
-void drawTriangle(void* gsOutput, ShaderProgram* sp)
+void drawTriangle(const void* restrict gsOutput, const ShaderProgram* restrict sp)
 {
     triangleData data;
     drawTrianglePreparation(gsOutput, sp, &data);
@@ -14,7 +14,8 @@ void drawTriangle(void* gsOutput, ShaderProgram* sp)
 }
 
 static void drawTrianglePreparation(
-    void* gsOutput, ShaderProgram* sp, triangleData* data
+    const void* restrict gsOutput, const ShaderProgram* restrict sp,
+    triangleData* restrict data
 )
 {
     VertexAttribute positionAttribute = sp->geometryShader.outputAttributes[
@@ -61,11 +62,12 @@ static void drawTrianglePreparation(
 
     for (uint8_t i = 0; i < 3; i++)
         data->isEdgeNotFlatTopOrLeft[i] = \
-            !triangleIsEdgeFlatTopOrLeft(edgeVectors[i]);
+            !triangleIsEdgeFlatTopOrLeft(&edgeVectors[i]);
 }
 
 static void drawTriangleRasterization(
-    void* gsOutput, triangleData* data, ShaderProgram* sp
+    const void* restrict gsOutput, triangleData* restrict data,
+    const ShaderProgram* restrict sp
 )
 {
     double barycentricCoordinatesAtBeginningOfTheRow[3];
@@ -97,7 +99,7 @@ static void drawTriangleRasterization(
 
             if (fullyAccepted || !fullyRejected)
                 triangleLoopOverTileAndFill(
-                    check, startPoint, endPoint, data, sp, gsOutput
+                    check, &startPoint, &endPoint, data, sp, gsOutput
                 );
 
             for (uint8_t i = 0; i < 3; i++)
@@ -117,7 +119,8 @@ static void drawTriangleRasterization(
 }
 
 static void NDCToScreenSpaceArray(
-    Vector3d* NDCPositions, Vector3d* SSPositions, size_t n
+    const Vector3d* restrict NDCPositions, Vector3d* restrict SSPositions,
+    const size_t n
 )
 {
     for (size_t i = 0; i < n; i++)
@@ -125,8 +128,8 @@ static void NDCToScreenSpaceArray(
 }
 
 static void getBoundingBoxArray(
-    Vector3d* SSPositions, Vector2d* min, Vector2d* max,
-    Vector2i* BBDimensions, size_t n
+    const Vector3d* restrict SSPositions, Vector2d* restrict min,
+    Vector2d* restrict max, Vector2i* restrict BBDimensions, const size_t n
 )
 {
     double xmin = SSPositions[0].x, xmax = SSPositions[0].x;
@@ -156,7 +159,8 @@ static void getBoundingBoxArray(
 }
 
 static void calculateEdgeVectors(
-    Vector3d* SSPositions, Vector3d* edgeVectors, size_t n
+    const Vector3d* restrict SSPositions, Vector3d* restrict edgeVectors,
+    const size_t n
 )
 {
     for (size_t i = 0; i < n; i++)
@@ -168,8 +172,8 @@ static void calculateEdgeVectors(
 }
 
 static void calculatePositiveOnPlusYAndSlopeSignsArray(
-    Vector3d* SSPositions, Vector3d* edgeVectors,
-    bool* posOnPlusY, bool* slopeSigns, size_t n
+    const Vector3d* restrict SSPositions, const Vector3d* restrict edgeVectors,
+    bool* restrict posOnPlusY, bool* restrict slopeSigns, const size_t n
 )
 {
     for (uint8_t iEdge = 0; iEdge < n; iEdge++)
@@ -207,18 +211,20 @@ static void calculatePositiveOnPlusYAndSlopeSignsArray(
     }
 }
 
-static double signedAreaParallelogram(Vector3d a, Vector3d b)
+static double signedAreaParallelogram(
+    const Vector3d* restrict a, const Vector3d* restrict b
+)
 {
-    return a.y * b.x - a.x * b.y;
+    return a->y * b->x - a->x * b->y;
 }
 
 static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
-    Vector3d* SSPositions, Vector3d* edgeVectors, Vector2d point, 
-    double* barycentricCoordinates, double* barycentricDeltaX, 
-    double* barycentricDeltaY
+    const Vector3d* restrict SSPositions, const Vector3d* restrict edgeVectors,
+    const Vector2d point, double* restrict barycentricCoordinates,
+    double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
 )
 {
-    double areaX2 = fabs(signedAreaParallelogram(edgeVectors[0], edgeVectors[2]));
+    double areaX2 = fabs(signedAreaParallelogram(&edgeVectors[0], &edgeVectors[2]));
 
     Vector3d AP = {
         point.x - SSPositions[0].x,
@@ -236,9 +242,9 @@ static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
         0
     };
 
-    barycentricCoordinates[0] = signedAreaParallelogram(BP, edgeVectors[1]) / areaX2;
-    barycentricCoordinates[1] = signedAreaParallelogram(CP, edgeVectors[2]) / areaX2;
-    barycentricCoordinates[2] = signedAreaParallelogram(AP, edgeVectors[0]) / areaX2;
+    barycentricCoordinates[0] = signedAreaParallelogram(&BP, &edgeVectors[1]) / areaX2;
+    barycentricCoordinates[1] = signedAreaParallelogram(&CP, &edgeVectors[2]) / areaX2;
+    barycentricCoordinates[2] = signedAreaParallelogram(&AP, &edgeVectors[0]) / areaX2;
 
     barycentricDeltaX[0] = -edgeVectors[1].y / areaX2;
     barycentricDeltaX[1] = -edgeVectors[2].y / areaX2;
@@ -250,7 +256,8 @@ static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
 }
 
 static void calculateTileDimensionsAndNTilesInBoundingBox(
-    Vector2i BBDimensions, Vector2i* tileDimensions, Vector2i* nTiles
+    const Vector2i BBDimensions, Vector2i* restrict tileDimensions,
+    Vector2i* restrict nTiles
 )
 {
     // linear regression (boundingBoxDimension -> tileDimension)
@@ -267,8 +274,9 @@ static void calculateTileDimensionsAndNTilesInBoundingBox(
 }
 
 static void calculateBarycentricTileDeltas(
-    Vector2i tileDimensions, double* barycentricDeltaX, double* barycentricDeltaY,
-    double* barycentricTileDeltaX, double* barycentricTileDeltaY
+    const Vector2i tileDimensions, const double* restrict barycentricDeltaX,
+    const double* restrict barycentricDeltaY, double* restrict barycentricTileDeltaX,
+    double* restrict barycentricTileDeltaY
 )
 {
     barycentricTileDeltaX[0] = barycentricDeltaX[0] * tileDimensions.x;
@@ -280,8 +288,14 @@ static void calculateBarycentricTileDeltas(
     barycentricTileDeltaY[2] = barycentricDeltaY[2] * tileDimensions.y;
 }
 
+static bool triangleIsEdgeFlatTopOrLeft(const Vector3d* restrict edgeVector)
+{
+    return ((edgeVector->x > 0) && (edgeVector->y == 0)) || (edgeVector->y < 0);
+}
+
 static void triangleRejectionAcceptionTests(
-    triangleData* data, bool* rejected, bool* accepted
+    const triangleData* restrict data, bool* restrict rejected,
+    bool* restrict accepted
 )
 {
     for (uint8_t iEdge = 0; iEdge < 3; iEdge++)
@@ -351,8 +365,9 @@ static void triangleRejectionAcceptionTests(
 }
 
 static void triangleLoopOverTileAndFill(
-    bool check, Vector2d startPoint, Vector2d endPoint, triangleData* data,
-    ShaderProgram* sp, void* gsOutput
+    const bool check, const Vector2d* restrict startPoint,
+    const Vector2d* restrict endPoint, triangleData* restrict data,
+    const ShaderProgram* restrict sp, const void* restrict gsOutput
 )
 {
     double barycentricCoordinatesAtBeginningOfTheRow[3];
@@ -367,9 +382,9 @@ static void triangleLoopOverTileAndFill(
         sizeof(double) * 3
     );
 
-    for (size_t y = startPoint.y; y < endPoint.y; y += 1)
+    for (size_t y = startPoint->y; y < endPoint->y; y += 1)
     {
-        for (size_t x = startPoint.x; x < endPoint.x; x += 1)
+        for (size_t x = startPoint->x; x < endPoint->x; x += 1)
         {
             if (check)
             {
@@ -434,17 +449,12 @@ nextPixel:
     }
 }
 
-static bool triangleIsEdgeFlatTopOrLeft(Vector3d edgeVector)
-{
-    return ((edgeVector.x > 0) && (edgeVector.y == 0)) || (edgeVector.y < 0);
-}
-
 // @brief Interpolates geometry shader output in triangle
 // Invalidates the whole buffer pointed to by `gsOutput`
 // Interpolated data is stored in the first vertex of `gsOutput`
 static void triangleInterpolateGsOutput(
     const void* gsOutput, const double barycentricCoordinates[3],
-    const ShaderProgram* sp, void* pInterpolatedBuffer
+    const ShaderProgram* restrict sp, void* pInterpolatedBuffer
 )
 {
     // gsOutput =
