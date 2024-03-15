@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    void (*shader)(void* sp, void* pVertex, void* pOutput);
+    void (*shader)(const void* sp, const void* pVertex, void* pOutput);
     size_t nBytesPerOutputVertex;
     size_t nOutputAttributes;
     VertexAttribute* outputAttributes;
@@ -14,7 +14,7 @@ typedef struct
 
 typedef struct
 {
-    void (*shader)(void* sp, void* pInput, void* pOutput);
+    void (*shader)(const void* sp, const void* pInput, void* pOutput);
     size_t nBytesPerOutputVertex;
     size_t nOutputAttributes;
     VertexAttribute* outputAttributes;
@@ -32,7 +32,7 @@ typedef struct
 
 typedef struct
 {
-    void (*shader)(void* sp, void* pInterpolated, Color* color);
+    void (*shader)(const void* sp, const void* pInterpolated, Color* color);
 } FragmentShaderType;
 
 typedef struct

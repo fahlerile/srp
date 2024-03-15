@@ -20,13 +20,13 @@ typedef struct
 } Vertex;
 #pragma pack(pop)
 
-void vertexShader(void* shaderProgram, void* pVertex, void* pOutput)
+void vertexShader(const void* shaderProgram, const void* pVertex, void* pOutput)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     memcpy(pOutput, pVertex, sp->vertexShader.nBytesPerOutputVertex);
 }
 
-void geometryShader(void* shaderProgram, void* pInput, void* pOutput)
+void geometryShader(const void* shaderProgram, const void* pInput, void* pOutput)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
 
@@ -73,7 +73,7 @@ void geometryShader(void* shaderProgram, void* pInput, void* pOutput)
     }
 }
 
-void fragmentShader(void* shaderProgram, void* pInterpolated, Color* color)
+void fragmentShader(const void* shaderProgram, const void* pInterpolated, Color* color)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     Vector3d colorVec = *(Vector3d*) (
@@ -88,7 +88,7 @@ void fragmentShader(void* shaderProgram, void* pInterpolated, Color* color)
     };
 }
 
-void fragmentShaderZ(void* shaderProgram, void* pInterpolated, Color* color)
+void fragmentShaderZ(const void* shaderProgram, const void* pInterpolated, Color* color)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     double* position = (double*) ((uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
