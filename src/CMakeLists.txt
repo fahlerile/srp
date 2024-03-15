@@ -18,6 +18,10 @@ target_compile_options(${EXECUTABLE_NAME} PRIVATE
 if (ENABLE_ASAN)
     target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=address)
 endif()
+if (ENABLE_UBSAN)
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=undefined)
+    target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=undefined)
+endif()
 
 if (ENABLE_GPROF)
     target_compile_options(${EXECUTABLE_NAME} PRIVATE -pg)
