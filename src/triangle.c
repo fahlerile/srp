@@ -1,12 +1,14 @@
 #include <assert.h>
 #include <math.h>
 #include <string.h>
+#include <wchar.h>
 #include "Context.h"
 #include "NDC.h"
 #include "triangle.h"
+#include "Shaders.h"
 #include "log.h"
 
-void drawTriangle(const void* restrict gsOutput, const ShaderProgram* restrict sp)
+void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp)
 {
     triangleData data;
     drawTrianglePreparation(gsOutput, sp, &data);
@@ -14,7 +16,7 @@ void drawTriangle(const void* restrict gsOutput, const ShaderProgram* restrict s
 }
 
 static void drawTrianglePreparation(
-    const void* restrict gsOutput, const ShaderProgram* restrict sp,
+    const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp,
     triangleData* restrict data
 )
 {
@@ -66,7 +68,7 @@ static void drawTrianglePreparation(
 }
 
 static void drawTriangleRasterization(
-    const void* restrict gsOutput, triangleData* restrict data,
+    const GSOutput* restrict gsOutput, triangleData* restrict data,
     const ShaderProgram* restrict sp
 )
 {
@@ -405,7 +407,8 @@ static void triangleLoopOverTileAndFill(
             double depth;
             {
                 // TODO avoid VLA (custom allocator?)
-                uint8_t pInterpolated[sp->geometryShader.nBytesPerOutputVertex];
+                uint8_t interpolatedBuffer[sp->geometryShader.nBytesPerOutputVertex];
+                Interpolated* pInterpolated = (Interpolated*) interpolatedBuffer;
                 triangleInterpolateGsOutput(
                     gsOutput, data->barycentricCoordinatesCopy, sp, pInterpolated
                 );
@@ -454,7 +457,7 @@ nextPixel:
 // Interpolated data is stored in the first vertex of `gsOutput`
 static void triangleInterpolateGsOutput(
     const void* gsOutput, const double barycentricCoordinates[3],
-    const ShaderProgram* restrict sp, void* pInterpolatedBuffer
+    const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer
 )
 {
     // gsOutput =
@@ -466,7 +469,7 @@ static void triangleInterpolateGsOutput(
     const void* pAttrVoid = gsOutput;
     // points to attribute in output buffer
     void* pInterpolatedAttrVoid = pInterpolatedBuffer;
-    const GeometryShaderType* gs = &sp->geometryShader;
+    const GeometryShader* gs = &sp->geometryShader;
 
     for (size_t attrI = 0; attrI < gs->nOutputAttributes; attrI++)
     {

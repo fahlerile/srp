@@ -2,7 +2,7 @@
 
 void shaderProgramSetDefaultGeometryShader(ShaderProgram* sp)
 {
-    GeometryShaderType* gs = &sp->geometryShader;
+    GeometryShader* gs = &sp->geometryShader;
     gs->shader = NULL;
     gs->nBytesPerOutputVertex = sp->vertexShader.nBytesPerOutputVertex;
     gs->nOutputAttributes = sp->vertexShader.nOutputAttributes;

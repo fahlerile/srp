@@ -21,14 +21,14 @@ typedef struct
     Vector2d minBP;
 } triangleData;
 
-void drawTriangle(const void* restrict gsOutput, const ShaderProgram* restrict sp);
+void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp);
 
 static void drawTrianglePreparation(
-    const void* restrict gsOutput, const ShaderProgram* restrict sp,
+    const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp,
     triangleData* restrict data
 );
 static void drawTriangleRasterization(
-    const void* restrict gsOutput, triangleData* restrict data,
+    const GSOutput* restrict gsOutput, triangleData* restrict data,
     const ShaderProgram* restrict sp
 );
 
@@ -79,6 +79,6 @@ static void triangleLoopOverTileAndFill(
 
 static void triangleInterpolateGsOutput(
     const void* gsOutput, const double barycentricCoordinates[3],
-    const ShaderProgram* restrict sp, void* pInterpolatedBuffer
+    const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer
 );
 

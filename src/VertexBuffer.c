@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
+#include "Shaders.h"
 #include "memoryUtils/memoryUtils.h"
 #include "VertexBuffer.h"
 #include "log.h"
@@ -42,8 +43,8 @@ void drawVertexBuffer(
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
-    VertexShaderType* vs = &sp->vertexShader;
-    GeometryShaderType* gs = &sp->geometryShader;
+    VertexShader* vs = &sp->vertexShader;
+    GeometryShader* gs = &sp->geometryShader;
 
     void* triangleVsOutput = xmalloc(vs->nBytesPerOutputVertex * 3);
     void* gsOutput;
@@ -73,8 +74,10 @@ void drawVertexBuffer(
     {
         for (size_t j = 0; j < 3; j++)
         {
-            void* pVertex = (uint8_t*) this->data + this->nBytesPerVertex * (i+j);
-            void* pVsOutput = (uint8_t*) triangleVsOutput + vs->nBytesPerOutputVertex * j;
+            Vertex* pVertex = (Vertex*) ((uint8_t*) this->data + this->nBytesPerVertex * (i+j));
+            VSOutput* pVsOutput = (VSOutput*) (
+                (uint8_t*) triangleVsOutput + vs->nBytesPerOutputVertex * j
+            );
             vs->shader(sp, pVertex, pVsOutput);
         }
 
@@ -87,7 +90,8 @@ void drawVertexBuffer(
         drawRawVertexBuffer(gsOutput, sp, newPrimitive);
     }
 
-    if (triangleVsOutput != gsOutput)
+    // That means a distinct buffer for GS was allocated
+    if ((void*) triangleVsOutput != (void*) gsOutput)
         xfree(gsOutput);
     xfree(triangleVsOutput);
 }
@@ -95,16 +99,17 @@ void drawVertexBuffer(
 // @brief Draw vertex array without calling vertex and geometry shaders
 // Needed because geometry shader can output multiple primitives to draw
 // Intended to use inside `drawVertexBuffer` after calling these shaders
-static void drawRawVertexBuffer(void* gsOutput, ShaderProgram* sp, Primitive primitive)
+static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive primitive)
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
-    GeometryShaderType* gs = &sp->geometryShader;
+    GeometryShader* gs = &sp->geometryShader;
     size_t n = (gs->nOutputVertices == 0) ? 3 : gs->nOutputVertices;
     for (size_t i = 0; i < n; i += 3)
     {
-        void* gsOutputTriangle = \
-            (uint8_t*) gsOutput + (i * gs->nBytesPerOutputVertex);
+        GSOutput* gsOutputTriangle = (GSOutput*) (
+            (uint8_t*) gsOutput + (i * gs->nBytesPerOutputVertex)
+        );
         drawTriangle(gsOutputTriangle, sp);
     }
 }

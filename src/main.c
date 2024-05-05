@@ -1,3 +1,4 @@
+#include <wchar.h>
 #define SDL_MAIN_HANDLED
 #include <assert.h>
 #include "Renderer.h"
@@ -13,20 +14,20 @@
 Context context;
 
 #pragma pack(push, 1)
-typedef struct
+struct Vertex
 {
     double position[3];
     double color[3];
-} Vertex;
+};
 #pragma pack(pop)
 
-void vertexShader(const void* shaderProgram, const void* pVertex, void* pOutput)
+void vertexShader(const ShaderProgram* shaderProgram, const Vertex* pVertex, VSOutput* pOutput)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     memcpy(pOutput, pVertex, sp->vertexShader.nBytesPerOutputVertex);
 }
 
-void geometryShader(const void* shaderProgram, const void* pInput, void* pOutput)
+void geometryShader(const ShaderProgram* shaderProgram, const VSOutput* pInput, GSOutput* pOutput)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
 
@@ -73,7 +74,7 @@ void geometryShader(const void* shaderProgram, const void* pInput, void* pOutput
     }
 }
 
-void fragmentShader(const void* shaderProgram, const void* pInterpolated, Color* color)
+void fragmentShader(const ShaderProgram* shaderProgram, const Interpolated* pInterpolated, Color* color)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     Vector3d colorVec = *(Vector3d*) (
@@ -88,7 +89,7 @@ void fragmentShader(const void* shaderProgram, const void* pInterpolated, Color*
     };
 }
 
-void fragmentShaderZ(const void* shaderProgram, const void* pInterpolated, Color* color)
+void fragmentShaderZ(const ShaderProgram* shaderProgram, const Interpolated* pInterpolated, Color* color)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     double* position = (double*) ((uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
@@ -129,7 +130,7 @@ int main(int argc, char** argv)
     };
 
     VertexBuffer* vb = newVertexBuffer(
-        sizeof(Vertex), sizeof(data), data, 1, attributes
+        sizeof(Vertex), sizeof(data), data, 2, attributes
     );
 
     ShaderProgram shaderProgram = {
