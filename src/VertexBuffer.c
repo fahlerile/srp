@@ -20,7 +20,8 @@ VertexBuffer* newVertexBuffer(
     this->data = xmalloc(nBytesData);
     memcpy(this->data, data, nBytesData);
     this->nAttributes = nAttributes;
-    this->attributes = attributes;
+    this->attributes = xmalloc(nAttributes * sizeof(VertexAttribute));
+    memcpy(this->attributes, attributes, nAttributes * sizeof(VertexAttribute));
 
     return this;
 }
