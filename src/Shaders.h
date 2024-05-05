@@ -1,40 +1,52 @@
 #pragma once
-#include "VertexAttribute.h"
+#include "Vertex.h"
 #include "Primitive.h"
 #include "Color/Color.h"
 
+typedef struct VSOutput VSOutput;
+typedef struct GSOutput GSOutput;
+typedef struct Interpolated Interpolated;
+
+typedef struct ShaderProgram ShaderProgram;
+
 typedef struct
 {
-    void (*shader)(void* sp, void* pVertex, void* pOutput);
+    void (*shader)(const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput);
     size_t nBytesPerOutputVertex;
     size_t nOutputAttributes;
     VertexAttribute* outputAttributes;
     size_t indexOfOutputPositionAttribute;
-} VertexShaderType;
+} VertexShader;
 
 typedef struct
 {
-    void (*shader)(void* sp, void* pInput, void* pOutput);
+    void (*shader)(const ShaderProgram* sp, const VSOutput* pInput, GSOutput* pOutput);
     size_t nBytesPerOutputVertex;
     size_t nOutputAttributes;
     VertexAttribute* outputAttributes;
     size_t indexOfOutputPositionAttribute;
 
     // Geometry shader specific
+    // If both `inputPrimitive` and `outputPrimitive` are `PRIMITIVE_ANY` 
+    // (so geometryShader was default-initialized) then `nOutputVertices`
+    // is not valid and should be set accordingly to primitive type that 
+    // is being processed
     size_t nOutputVertices;
     Primitive inputPrimitive;
     Primitive outputPrimitive;
-} GeometryShaderType;
+} GeometryShader;
 
 typedef struct
 {
-    void (*shader)(void* sp, void* pInterpolated, Color* color);
-} FragmentShaderType;
+    void (*shader)(const ShaderProgram* sp, const Interpolated* pInterpolated, Color* color);
+} FragmentShader;
 
-typedef struct
+struct ShaderProgram
 {
-    VertexShaderType vertexShader;
-    GeometryShaderType geometryShader;
-    FragmentShaderType fragmentShader;
-} ShaderProgram;
+    VertexShader vertexShader;
+    GeometryShader geometryShader;
+    FragmentShader fragmentShader;
+};
+
+void shaderProgramSetDefaultGeometryShader(ShaderProgram* sp);
 

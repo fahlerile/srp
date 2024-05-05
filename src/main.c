@@ -1,29 +1,33 @@
+#include <wchar.h>
 #define SDL_MAIN_HANDLED
-#include <time.h>
+#include <assert.h>
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "Shaders.h"
 #include "Context.h"
 #include "Type.h"
+#include "Color/Color.h"
+#include "Vector/Vector.h"
 #include "log.h"
+#include "timer.h"
 
 Context context;
 
 #pragma pack(push, 1)
-typedef struct
+struct Vertex
 {
     double position[3];
     double color[3];
-} Vertex;
+};
 #pragma pack(pop)
 
-void vertexShader(void* shaderProgram, void* pVertex, void* pOutput)
+void vertexShader(const ShaderProgram* shaderProgram, const Vertex* pVertex, VSOutput* pOutput)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     memcpy(pOutput, pVertex, sp->vertexShader.nBytesPerOutputVertex);
 }
 
-void geometryShader(void* shaderProgram, void* pInput, void* pOutput)
+void geometryShader(const ShaderProgram* shaderProgram, const VSOutput* pInput, GSOutput* pOutput)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
 
@@ -70,7 +74,7 @@ void geometryShader(void* shaderProgram, void* pInput, void* pOutput)
     }
 }
 
-void fragmentShader(void* shaderProgram, void* pInterpolated, Color* color)
+void fragmentShader(const ShaderProgram* shaderProgram, const Interpolated* pInterpolated, Color* color)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     Vector3d colorVec = *(Vector3d*) (
@@ -85,7 +89,7 @@ void fragmentShader(void* shaderProgram, void* pInterpolated, Color* color)
     };
 }
 
-void fragmentShaderZ(void* shaderProgram, void* pInterpolated, Color* color)
+void fragmentShaderZ(const ShaderProgram* shaderProgram, const Interpolated* pInterpolated, Color* color)
 {
     ShaderProgram* sp = (ShaderProgram*) shaderProgram;
     double* position = (double*) ((uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
@@ -126,7 +130,7 @@ int main(int argc, char** argv)
     };
 
     VertexBuffer* vb = newVertexBuffer(
-        sizeof(Vertex), sizeof(data), data, 1, attributes
+        sizeof(Vertex), sizeof(data), data, 2, attributes
     );
 
     ShaderProgram shaderProgram = {
@@ -152,13 +156,12 @@ int main(int argc, char** argv)
             .shader = fragmentShader
         }
     };
+    shaderProgramSetDefaultGeometryShader(&shaderProgram);
 
     size_t frameCount = 0;
-    clock_t begin, end;
-    double frametimeSec;
     while (context.running)
     {
-        begin = clock();
+        TIMER_START(frametime);
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
         shaderProgram.fragmentShader.shader = fragmentShader;
@@ -170,11 +173,11 @@ int main(int argc, char** argv)
         rendererSwapBuffer(context.renderer);
 
         frameCount++;
-        end = clock();
-        frametimeSec = (double) (end - begin) / CLOCKS_PER_SEC;
+        TIMER_STOP(frametime);
         LOGI(
-            "Frametime: %lf s; FPS: %lf; Framecount: %zu\n", 
-            frametimeSec, 1 / frametimeSec, frameCount
+            "Frametime: %li us; FPS: %lf; Framecount: %zu\n", 
+            TIMER_REPORT_US(frametime, long), 1. / TIMER_REPORT_S(frametime, double),
+            frameCount
         );
     }
 

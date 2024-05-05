@@ -22,6 +22,9 @@
     #define M_PI 3.14159265358979323846
 #endif
 
+#define MIN(a, b) ( (a) < (b) ? (a) : (b) )
+#define MAX(a, b) ( (a) > (b) ? (a) : (b) )
+
 #define RADIANS(x) ((M_PI / 180) * (x))
 #define ROUGHLY_EQUAL(a, b) \
     (fabs((a) - (b)) < TOLERANCE)

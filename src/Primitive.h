@@ -11,6 +11,8 @@ typedef enum
     PRIMITIVE_TRIANGLE_FAN,
     PRIMITIVE_QUADS,
     PRIMITIVE_QUAD_STRIP,
-    PRIMITIVE_POLYGON
+    PRIMITIVE_POLYGON,
+
+    PRIMITIVE_ANY  // not for user
 } Primitive;
 

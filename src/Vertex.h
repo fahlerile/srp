@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include "Type.h"
 
+typedef struct Vertex Vertex;
+
 typedef struct
 {
     size_t nItems;
