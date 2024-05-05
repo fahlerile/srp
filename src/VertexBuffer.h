@@ -8,7 +8,7 @@ typedef struct
     size_t nBytesPerVertex;
     size_t nBytesData;
     size_t nVertices;
-    void* data;
+    Vertex* data;
     size_t nAttributes;
     VertexAttribute* attributes;
 } VertexBuffer;
@@ -23,5 +23,5 @@ void drawVertexBuffer(
     VertexBuffer* this, Primitive drawMode, size_t startIndex, size_t count, 
     ShaderProgram* shaderProgram
 );
-static void drawRawVertexBuffer(void* gsOutput, ShaderProgram* sp, Primitive primitive);
+static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive primitive);
 

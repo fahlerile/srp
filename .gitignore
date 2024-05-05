@@ -1,8 +1,3 @@
-.vscode/
 .cache/
-.ccls-cache/
-release/
-debug/
-debug_asan/
-debug_gprof/
+build/
 compile_commands.json
