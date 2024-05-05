@@ -19,17 +19,17 @@ cd bin
 ```
 
 ## TODO
-- [ ] Optimize the rasterizer
-    - Ideas:
-        - Assembly-level optimizations
-        - Play around with `tileDimensions` computation (`calculateTileDimensionsAndNTilesInBoundingBox`)
-        - Draw multiple primitives at the same tile (z-buffer issue)
-        - Draw multiple tiles at the same time
-- [ ] Write implementation-level documentation
-- [ ] Add `indexBuffer`
+- [ ] Add `IndexBuffer`
+- [ ] Add `Uniforms`
+- [ ] Add texture mapping with perspective correction
+- [ ] Think about making an API more user-friendly
+- [ ] Add `Mesh`/`Model` structure
+- [ ] Play around with rendering models
+- [ ] Draw primitives in parallel (OpenMP)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
-- [ ] Extensively test shader with new primitives and using `indexBuffer`
-- [ ] Add convenience macros/functions to avoid giving the user an ability to ~~shoot themselves in the foot~~ blow their whole leg off
-- [ ] Prettify the API, write the use-level documentation
+- [ ] Write implementation-level documentation
+- [ ] Prettify the API, write the user-level documentation
 - [ ] Write some examples
+
+- [ ] Read LearnOpenGL to learn about light, reflections, shadows and all that fancy stuff and think how can I implement that
 
