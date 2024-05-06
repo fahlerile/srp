@@ -117,8 +117,8 @@ int main(int argc, char** argv)
         {.position = {1  ,  0, -1}, .color = {1., 1., 1.}}
     };
     uint64_t indices[6] = {
-        0, 1, 4,
-        2, 3, 5
+        0, 4, 1,
+        2, 5, 3
     };
     VertexAttribute attributes[2] = {
         {

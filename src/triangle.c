@@ -110,7 +110,7 @@ static double signedAreaParallelogram(
     const Vector3d* restrict a, const Vector3d* restrict b
 )
 {
-    return a->y * b->x - a->x * b->y;
+    return a->x * b->y - a->y * b->x;
 }
 
 static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
@@ -141,13 +141,13 @@ static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
     barycentricCoordinates[1] = signedAreaParallelogram(&CP, &edgeVectors[2]) / areaX2;
     barycentricCoordinates[2] = signedAreaParallelogram(&AP, &edgeVectors[0]) / areaX2;
 
-    barycentricDeltaX[0] = -edgeVectors[1].y / areaX2;
-    barycentricDeltaX[1] = -edgeVectors[2].y / areaX2;
-    barycentricDeltaX[2] = -edgeVectors[0].y / areaX2;
+    barycentricDeltaX[0] = edgeVectors[1].y / areaX2;
+    barycentricDeltaX[1] = edgeVectors[2].y / areaX2;
+    barycentricDeltaX[2] = edgeVectors[0].y / areaX2;
 
-    barycentricDeltaY[0] = edgeVectors[1].x / areaX2;
-    barycentricDeltaY[1] = edgeVectors[2].x / areaX2;
-    barycentricDeltaY[2] = edgeVectors[0].x / areaX2;
+    barycentricDeltaY[0] = -edgeVectors[1].x / areaX2;
+    barycentricDeltaY[1] = -edgeVectors[2].x / areaX2;
+    barycentricDeltaY[2] = -edgeVectors[0].x / areaX2;
 }
 
 static bool triangleIsEdgeFlatTopOrLeft(const Vector3d* restrict edgeVector)
