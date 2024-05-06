@@ -26,8 +26,10 @@
 #define MAX(a, b) ( (a) > (b) ? (a) : (b) )
 
 #define RADIANS(x) ((M_PI / 180) * (x))
-#define ROUGHLY_EQUAL(a, b) \
-    (fabs((a) - (b)) < TOLERANCE)
+#define ROUGHLY_EQUAL(a, b) (fabs((a) - (b)) < TOLERANCE)
+
+#define INDEX_VOID_PTR(ptr, i, bytesPerElem) \
+    ((uint8_t*) (ptr) + (i) * (bytesPerElem))
 
 #define SWAP(a, b) \
     do \

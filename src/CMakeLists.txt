@@ -4,7 +4,7 @@ set(
     main.c
     Context.c
     Renderer.c
-    VertexBuffer.c
+    buffer.c
     Shaders.c
     triangle.c
 )
