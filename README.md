@@ -20,6 +20,7 @@ cd bin
 
 ## TODO
 - [x] Add `IndexBuffer`
+- [ ] Fix unreasonable `size_t` usage in `drawIndexBuffer`
 - [ ] Change vertices' winding order to counter-clockwise to be consistent with OpenGL (right now `drawTriangle` only draws clockwise triangles, not the counter-clockwise ones)
 - [ ] Implement back-face culling
 - [ ] Add `Uniforms`
