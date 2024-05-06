@@ -3,9 +3,7 @@
 #include <string.h>
 #include "Shaders.h"
 #include "memoryUtils/memoryUtils.h"
-#include "VertexBuffer.h"
-#include "log.h"
-#include "Context.h"
+#include "buffer.h"
 #include "triangle.h"
 
 VertexBuffer* newVertexBuffer(
@@ -33,12 +31,47 @@ void freeVertexBuffer(VertexBuffer* this)
     xfree(this);
 }
 
-// @brief Draw a vertex buffer with specified primitive mode
-// If sp->geometryShader.shader is NULL (so if geometry shader is not set),
-// then geometry shader is set to a default one
-void drawVertexBuffer(
-    VertexBuffer* this, Primitive primitive, size_t startIndex, size_t count, 
-    ShaderProgram* sp
+// @brief Draw vertex array without calling vertex and geometry shaders
+// Needed because geometry shader can output multiple primitives to draw
+// Intended to use inside `drawIndexBuffer` after calling these shaders
+static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive primitive)
+{
+    assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
+
+    GeometryShader* gs = &sp->geometryShader;
+    size_t n = (gs->nOutputVertices == 0) ? 3 : gs->nOutputVertices;
+    for (size_t i = 0; i < n; i += 3)
+    {
+        GSOutput* gsOutputTriangle = (GSOutput*) (
+            (uint8_t*) gsOutput + (i * gs->nBytesPerOutputVertex)
+        );
+        drawTriangle(gsOutputTriangle, sp);
+    }
+}
+
+IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data)
+{
+    IndexBuffer* this = xmalloc(sizeof(IndexBuffer));
+
+    this->indicesType = indicesType;
+    this->nBytesPerIndex = SIZEOF_TYPE(indicesType);
+    this->nIndices = nBytesData / this->nBytesPerIndex;
+    this->data = xmalloc(nBytesData);
+    memcpy(this->data, data, nBytesData);
+
+    return this;
+}
+
+void freeIndexBuffer(IndexBuffer* this)
+{
+    xfree(this->data);
+    xfree(this);
+}
+
+// @brief Draw an index buffer with specified primitive mode
+void drawIndexBuffer(
+    IndexBuffer* this, VertexBuffer* vb, Primitive primitive, 
+    size_t startIndex, size_t count, ShaderProgram* sp
 )
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
@@ -68,13 +101,16 @@ void drawVertexBuffer(
 #endif
 
     size_t endIndex = startIndex + count;
-    assert(endIndex <= this->nVertices);
+    assert(endIndex <= this->nIndices);
 
     for (size_t i = startIndex; i < endIndex; i += 3)
     {
         for (size_t j = 0; j < 3; j++)
         {
-            Vertex* pVertex = (Vertex*) ((uint8_t*) this->data + this->nBytesPerVertex * (i+j));
+            // TODO not necessarily size_t!
+            size_t vertexIndex = *(size_t*) ((uint8_t*) this->data + this->nBytesPerIndex * (i+j));
+
+            Vertex* pVertex = (Vertex*) ((uint8_t*) vb->data + vb->nBytesPerVertex * vertexIndex);
             VSOutput* pVsOutput = (VSOutput*) (
                 (uint8_t*) triangleVsOutput + vs->nBytesPerOutputVertex * j
             );
@@ -94,23 +130,5 @@ void drawVertexBuffer(
     if ((void*) triangleVsOutput != (void*) gsOutput)
         xfree(gsOutput);
     xfree(triangleVsOutput);
-}
-
-// @brief Draw vertex array without calling vertex and geometry shaders
-// Needed because geometry shader can output multiple primitives to draw
-// Intended to use inside `drawVertexBuffer` after calling these shaders
-static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive primitive)
-{
-    assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
-
-    GeometryShader* gs = &sp->geometryShader;
-    size_t n = (gs->nOutputVertices == 0) ? 3 : gs->nOutputVertices;
-    for (size_t i = 0; i < n; i += 3)
-    {
-        GSOutput* gsOutputTriangle = (GSOutput*) (
-            (uint8_t*) gsOutput + (i * gs->nBytesPerOutputVertex)
-        );
-        drawTriangle(gsOutputTriangle, sp);
-    }
 }
 

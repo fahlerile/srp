@@ -1,13 +1,12 @@
-#include <wchar.h>
+#include "triangle.h"
 #define SDL_MAIN_HANDLED
 #include <assert.h>
 #include "Renderer.h"
-#include "VertexBuffer.h"
 #include "Shaders.h"
 #include "Context.h"
 #include "Type.h"
 #include "Color/Color.h"
-#include "Vector/Vector.h"
+#include "buffer.h"
 #include "log.h"
 #include "timer.h"
 
@@ -116,6 +115,10 @@ int main(int argc, char** argv)
         {.position = {0  ,  0,  1}, .color = {1., 1., 1.}},
         {.position = {1  ,  0, -1}, .color = {1., 1., 1.}}
     };
+    size_t indices[6] = {
+        0, 1, 4,
+        2, 3, 5
+    };
     VertexAttribute attributes[2] = {
         {
             .nItems = 3,
@@ -129,9 +132,8 @@ int main(int argc, char** argv)
         }
     };
 
-    VertexBuffer* vb = newVertexBuffer(
-        sizeof(Vertex), sizeof(data), data, 2, attributes
-    );
+    VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
+    IndexBuffer* ib = newIndexBuffer(TYPE_SIZE_T, sizeof(indices), indices);
 
     ShaderProgram shaderProgram = {
         .vertexShader = {
@@ -164,10 +166,7 @@ int main(int argc, char** argv)
         TIMER_START(frametime);
 
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-        shaderProgram.fragmentShader.shader = fragmentShader;
-        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
-        shaderProgram.fragmentShader.shader = fragmentShaderZ;
-        drawVertexBuffer(vb, PRIMITIVE_TRIANGLES, 3, 3, &shaderProgram);
+        drawIndexBuffer(ib, vb, PRIMITIVE_TRIANGLES, 0, 6, &shaderProgram);
 
         pollEvents();
         rendererSwapBuffer(context.renderer);
@@ -182,6 +181,7 @@ int main(int argc, char** argv)
     }
 
     freeVertexBuffer(vb);
+    freeIndexBuffer(ib);
     return 0;
 }
 
