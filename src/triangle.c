@@ -12,21 +12,20 @@
 
 void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp)
 {
-    VertexAttribute positionAttribute = sp->geometryShader.outputAttributes[
-        sp->geometryShader.indexOfOutputPositionAttribute
+    const GeometryShader* gs = &sp->geometryShader;
+    VertexAttribute positionAttribute = gs->outputAttributes[
+        gs->indexOfOutputPositionAttribute
     ];
 
     // TODO add this assert to docs
     assert(positionAttribute.nItems == 3);
     assert(positionAttribute.type == TYPE_DOUBLE);
 
-    size_t positionOffsetBytes = positionAttribute.offsetBytes;
     Vector3d NDCPositions[3];
     for (uint8_t i = 0; i < 3; i++)
     {
-        void* pVertex = (uint8_t*) gsOutput + (i * sp->geometryShader.nBytesPerOutputVertex);
-        NDCPositions[i] = \
-            *(Vector3d*) ((uint8_t*) pVertex + positionOffsetBytes);
+        Vertex* pVertex = (Vertex*) INDEX_VOID_PTR(gsOutput, i, gs->nBytesPerOutputVertex);
+        NDCPositions[i] = *(Vector3d*) VOID_PTR_ADD(pVertex, positionAttribute.offsetBytes);
     }
 
     // Do not traverse triangles with clockwise vertices
@@ -55,7 +54,6 @@ void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restri
 
     double barycentricCoordinates[3];
     double barycentricDeltaX[3], barycentricDeltaY[3];
-
     calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
         SSPositions, edgeVectors, minBoundingPoint, barycentricCoordinates,
         barycentricDeltaX, barycentricDeltaY

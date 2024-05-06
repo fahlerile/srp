@@ -49,9 +49,8 @@ static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive
     size_t n = (gs->nOutputVertices == 0) ? 3 : gs->nOutputVertices;
     for (size_t i = 0; i < n; i += 3)
     {
-        GSOutput* gsOutputTriangle = (GSOutput*) (
-            (uint8_t*) gsOutput + (i * gs->nBytesPerOutputVertex)
-        );
+        GSOutput* gsOutputTriangle = (GSOutput*) \
+            INDEX_VOID_PTR(gsOutput, i, gs->nBytesPerOutputVertex);
         drawTriangle(gsOutputTriangle, sp);
     }
 }
