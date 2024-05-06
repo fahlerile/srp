@@ -1,7 +1,9 @@
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
 #include "Type.h"
 #include "Shaders.h"
+#include "Vertex.h"
 
 // Stores vertex data
 // Similar to VBO in OpenGL
@@ -31,6 +33,7 @@ VertexBuffer* newVertexBuffer(
 );
 void freeVertexBuffer(VertexBuffer* this);
 
+static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index);
 static void drawRawVertexBuffer(
     GSOutput* gsOutput, ShaderProgram* sp, Primitive primitive
 );
@@ -38,6 +41,7 @@ static void drawRawVertexBuffer(
 IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data);
 void freeIndexBuffer(IndexBuffer* this);
 
+static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index);
 void drawIndexBuffer(
     IndexBuffer* this, VertexBuffer* vb, Primitive primitive, 
     size_t startIndex, size_t count, ShaderProgram* sp

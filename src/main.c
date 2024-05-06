@@ -1,4 +1,5 @@
 #include "triangle.h"
+#include <stdint.h>
 #define SDL_MAIN_HANDLED
 #include <assert.h>
 #include "Renderer.h"
@@ -115,7 +116,7 @@ int main(int argc, char** argv)
         {.position = {0  ,  0,  1}, .color = {1., 1., 1.}},
         {.position = {1  ,  0, -1}, .color = {1., 1., 1.}}
     };
-    size_t indices[6] = {
+    uint64_t indices[6] = {
         0, 1, 4,
         2, 3, 5
     };
@@ -133,7 +134,7 @@ int main(int argc, char** argv)
     };
 
     VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
-    IndexBuffer* ib = newIndexBuffer(TYPE_SIZE_T, sizeof(indices), indices);
+    IndexBuffer* ib = newIndexBuffer(TYPE_UINT64, sizeof(indices), indices);
 
     ShaderProgram shaderProgram = {
         .vertexShader = {
