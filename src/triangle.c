@@ -29,6 +29,13 @@ void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restri
             *(Vector3d*) ((uint8_t*) pVertex + positionOffsetBytes);
     }
 
+    // Do not traverse triangles with clockwise vertices
+    Vector3d e0 = Vector3dSubtract(NDCPositions[1], NDCPositions[0]);
+    Vector3d e1 = Vector3dSubtract(NDCPositions[2], NDCPositions[1]);
+    double normal = signedAreaParallelogram(&e0, &e1);
+    if (normal < 0)
+        return;
+
     Vector3d SSPositions[3], edgeVectors[3];
     for (size_t i = 0; i < 3; i++)
         SSPositions[i] = NDCToScreenSpace(context.renderer, NDCPositions[i]);
