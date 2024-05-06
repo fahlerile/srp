@@ -73,6 +73,7 @@ void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restri
         {
             for (uint8_t i = 0; i < 3; i++)
             {
+                // TODO are rasterization rules working? ROUGHLY_EQUAL here?
                 if (barycentricCoordinates[i] == 0 && isEdgeNotFlatTopOrLeft[i])
                     goto nextPixel;
             }
