@@ -22,6 +22,11 @@ struct Vertex
 };
 #pragma pack(pop)
 
+struct Uniforms
+{
+    Matrix4 rotation;
+};
+
 void vertexShader
     (const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput);
 void geometryShader
@@ -36,17 +41,16 @@ int main(int argc, char** argv)
     constructContext(&context);
 
     Vertex data[6] = {
-        {.position = {-0.75, -0.75, 0}, .color = {1., 0., 0.}},
-        {.position = { 0   ,  0.75, 0}, .color = {0., 1., 0.}},
-        {.position = { 0.75, -0.75, 0}, .color = {0., 0., 1.}},
+        {.position = {-0.5, -0.5, 0}, .color = {1., 0., 0.}},
+        {.position = { 0   , 0.5, 0}, .color = {0., 1., 0.}},
+        {.position = { 0.5, -0.5, 0}, .color = {0., 0., 1.}},
 
         {.position = {0.5, -1, -0.9}, .color = {1., 1., 1.}},
         {.position = {0  ,  0,  0  }, .color = {1., 1., 1.}},
         {.position = {1  ,  0, -0.9}, .color = {1., 1., 1.}}
     };
-    uint64_t indices[6] = {
-        0, 4, 1,
-        2, 5, 3
+    uint64_t indices[3] = {
+        0, 2, 1,
     };
     VertexAttribute attributes[2] = {
         {
@@ -65,7 +69,9 @@ int main(int argc, char** argv)
         newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
     IndexBuffer* ib = newIndexBuffer(TYPE_UINT64, sizeof(indices), indices);
 
+    Uniforms uniforms;
     ShaderProgram shaderProgram = {
+        .uniforms = &uniforms,
         .vertexShader = {
             .shader = vertexShader,
             .nBytesPerOutputVertex = sizeof(Vertex),
@@ -95,8 +101,12 @@ int main(int argc, char** argv)
     {
         TIMER_START(frametime);
 
+        shaderProgram.uniforms->rotation = Matrix4ConstructRotate(
+            (Vector3d) {RADIANS(0.0), RADIANS(0.0), RADIANS(frameCount)}
+        );
+
         rendererClearBuffer(context.renderer, (Color) {0, 0, 0, 255});
-        drawIndexBuffer(ib, vb, PRIMITIVE_TRIANGLES, 0, 6, &shaderProgram);
+        drawIndexBuffer(ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
         pollEvents();
         rendererSwapBuffer(context.renderer);
@@ -119,7 +129,22 @@ int main(int argc, char** argv)
 void vertexShader
     (const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput)
 {
-    *(Vertex*) pOutput = *pVertex;
+    Vector4d position = {
+        pVertex->position[0],
+        pVertex->position[1],
+        pVertex->position[2],
+        1
+    };
+    Vector4d transformedPosition = Matrix4MultiplyVector4d(
+        &sp->uniforms->rotation, position
+    );
+    memcpy(
+        &((Vertex*) pOutput)->position, &transformedPosition,
+        3 * sizeof(double)
+    );
+    memcpy(
+        &((Vertex*) pOutput)->color, pVertex->color, 3 * sizeof(double)
+    );
 }
 
 void geometryShader

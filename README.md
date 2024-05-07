@@ -23,7 +23,7 @@ cd bin
     - [x] Fix unreasonable `size_t` usage in `drawIndexBuffer`
 - [x] Change vertices' winding order to counter-clockwise to be consistent with OpenGL (right now `drawTriangle` only draws clockwise triangles, not the counter-clockwise ones)
 - [x] Implement back-face culling in screen space (do not draw triangles with CW winding)
-- [ ] Add `Uniforms` with named parameters
+- [x] Add `Uniforms` with named parameters
 - [ ] Add texture mapping with perspective correction
 - [ ] Think about making an API more user-friendly
 - [ ] Add `Mesh`/`Model` structure

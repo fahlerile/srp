@@ -7,6 +7,8 @@ typedef struct VSOutput VSOutput;
 typedef struct GSOutput GSOutput;
 typedef struct Interpolated Interpolated;
 
+typedef struct Uniforms Uniforms;
+
 typedef struct ShaderProgram ShaderProgram;
 
 typedef struct
@@ -43,6 +45,8 @@ typedef struct
 
 struct ShaderProgram
 {
+    Uniforms* uniforms;
+
     VertexShader vertexShader;
     GeometryShader geometryShader;
     FragmentShader fragmentShader;
