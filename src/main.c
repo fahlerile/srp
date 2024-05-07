@@ -10,6 +10,7 @@
 #include "buffer.h"
 #include "log.h"
 #include "timer.h"
+#include "utils.h"
 
 Context context;
 
@@ -21,100 +22,27 @@ struct Vertex
 };
 #pragma pack(pop)
 
-void vertexShader(const ShaderProgram* shaderProgram, const Vertex* pVertex, VSOutput* pOutput)
-{
-    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
-    memcpy(pOutput, pVertex, sp->vertexShader.nBytesPerOutputVertex);
-}
-
-void geometryShader(const ShaderProgram* shaderProgram, const VSOutput* pInput, GSOutput* pOutput)
-{
-    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
-
-    VertexAttribute inputPosition = sp->vertexShader.outputAttributes[
-        sp->vertexShader.indexOfOutputPositionAttribute
-    ];
-
-    assert(
-        sp->vertexShader.nBytesPerOutputVertex == \
-        sp->geometryShader.nBytesPerOutputVertex
-    );
-    assert(inputPosition.nItems == 3 && inputPosition.type == TYPE_DOUBLE);
-
-    size_t nBytesPerVertex = sp->vertexShader.nBytesPerOutputVertex;
-    
-    for (uint8_t i = 0; i < 3; i++)
-    {
-        size_t inputVertexOffset = i * nBytesPerVertex;
-        void* pInputVertex = (uint8_t*) pInput + inputVertexOffset;
-
-        void* pOutputVertex[2] = {
-            (uint8_t*) pOutput + i * nBytesPerVertex,
-            (uint8_t*) pOutput + (i+3) * nBytesPerVertex
-        };
-
-        double* oldPosition = (double*) ((uint8_t*) pInputVertex + inputPosition.offsetBytes);
-        double newPosition[3] = {
-            oldPosition[0] + 0.5,
-            oldPosition[1],
-            oldPosition[2]
-        };
-
-        memcpy(pOutputVertex[0], pInputVertex, nBytesPerVertex);
-        memcpy(
-            (uint8_t*) pOutputVertex[1] + inputPosition.offsetBytes,
-            newPosition,
-            inputPosition.nItems * sizeof(double)
-        );
-        memcpy(
-            (uint8_t*) pOutputVertex[1] + sp->geometryShader.outputAttributes[1].offsetBytes,
-            (uint8_t*) pInputVertex + sp->vertexShader.outputAttributes[1].offsetBytes,
-            sp->vertexShader.outputAttributes[1].nItems * sizeof(double)
-        );
-    }
-}
-
-void fragmentShader(const ShaderProgram* shaderProgram, const Interpolated* pInterpolated, Color* color)
-{
-    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
-    Vector3d colorVec = *(Vector3d*) (
-        (uint8_t*) pInterpolated + \
-        sp->geometryShader.outputAttributes[1].offsetBytes
-    );
-    *color = (Color) {
-        round(colorVec.x * 255),
-        round(colorVec.y * 255),
-        round(colorVec.z * 255),
-        255
-    };
-}
-
-void fragmentShaderZ(const ShaderProgram* shaderProgram, const Interpolated* pInterpolated, Color* color)
-{
-    ShaderProgram* sp = (ShaderProgram*) shaderProgram;
-    double* position = (double*) ((uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
-        sp->geometryShader.indexOfOutputPositionAttribute
-    ].offsetBytes);
-    *color = (Color) {
-        (position[2] + 1) / 2 * 255,
-        (position[2] + 1) / 2 * 255,
-        (position[2] + 1) / 2 * 255,
-        255
-    };
-}
+void vertexShader
+    (const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput);
+void geometryShader
+    (const ShaderProgram* sp, const VSOutput* pInput, GSOutput* pOutput);
+void fragmentShader
+    (const ShaderProgram* sp, const Interpolated* pFragment, Color* color);
+void fragmentShaderZ
+    (const ShaderProgram* sp, const Interpolated* pFragment, Color* color);
 
 int main(int argc, char** argv)
 {
     constructContext(&context);
-    
+
     Vertex data[6] = {
         {.position = {-0.75, -0.75, 0}, .color = {1., 0., 0.}},
         {.position = { 0   ,  0.75, 0}, .color = {0., 1., 0.}},
         {.position = { 0.75, -0.75, 0}, .color = {0., 0., 1.}},
 
-        {.position = {0.5, -1, -1}, .color = {1., 1., 1.}},
-        {.position = {0  ,  0,  1}, .color = {1., 1., 1.}},
-        {.position = {1  ,  0, -1}, .color = {1., 1., 1.}}
+        {.position = {0.5, -1, -0.9}, .color = {1., 1., 1.}},
+        {.position = {0  ,  0,  0  }, .color = {1., 1., 1.}},
+        {.position = {1  ,  0, -0.9}, .color = {1., 1., 1.}}
     };
     uint64_t indices[6] = {
         0, 4, 1,
@@ -133,13 +61,14 @@ int main(int argc, char** argv)
         }
     };
 
-    VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
+    VertexBuffer* vb = \
+        newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
     IndexBuffer* ib = newIndexBuffer(TYPE_UINT64, sizeof(indices), indices);
 
     ShaderProgram shaderProgram = {
         .vertexShader = {
             .shader = vertexShader,
-            .nBytesPerOutputVertex = sizeof(double) * 6,
+            .nBytesPerOutputVertex = sizeof(Vertex),
             .nOutputAttributes = 2,
             .outputAttributes = attributes,
             .indexOfOutputPositionAttribute = 0
@@ -147,7 +76,7 @@ int main(int argc, char** argv)
         .geometryShader = {
             .shader = NULL
             // .shader = geometryShader,
-            // .nBytesPerOutputVertex = sizeof(double) * 6,
+            // .nBytesPerOutputVertex = sizeof(Vertex),
             // .nOutputAttributes = 2,
             // .outputAttributes = attributes,
             // .indexOfOutputPositionAttribute = 0,
@@ -176,7 +105,8 @@ int main(int argc, char** argv)
         TIMER_STOP(frametime);
         LOGI(
             "Frametime: %li us; FPS: %lf; Framecount: %zu\n", 
-            TIMER_REPORT_US(frametime, long), 1. / TIMER_REPORT_S(frametime, double),
+            TIMER_REPORT_US(frametime, long),
+            1. / TIMER_REPORT_S(frametime, double),
             frameCount
         );
     }
@@ -184,5 +114,81 @@ int main(int argc, char** argv)
     freeVertexBuffer(vb);
     freeIndexBuffer(ib);
     return 0;
+}
+
+void vertexShader
+    (const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput)
+{
+    *(Vertex*) pOutput = *pVertex;
+}
+
+void geometryShader
+    (const ShaderProgram* sp, const VSOutput* pInput, GSOutput* pOutput)
+{
+    VertexAttribute inputPositionAttribute = sp->vertexShader.outputAttributes[
+        sp->vertexShader.indexOfOutputPositionAttribute
+    ];
+
+    assert(
+        sp->vertexShader.nBytesPerOutputVertex == \
+        sp->geometryShader.nBytesPerOutputVertex
+    );
+    assert(inputPositionAttribute.nItems == 3);
+    assert(inputPositionAttribute.type == TYPE_DOUBLE);
+
+    size_t nBytesPerInputVertex = sp->vertexShader.nBytesPerOutputVertex;
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        size_t inputVertexOffset = i * nBytesPerInputVertex;
+        VSOutput* pInputVertex = (VSOutput*) VOID_PTR_ADD(pInput, inputVertexOffset);
+
+        GSOutput* pOutputVertex[2] = {
+            (GSOutput*) INDEX_VOID_PTR(pOutput, i, nBytesPerInputVertex),
+            (GSOutput*) INDEX_VOID_PTR(pOutput, i+3, nBytesPerInputVertex)
+        };
+
+        double* inputPosition = (double*) VOID_PTR_ADD(pInputVertex, inputPositionAttribute.offsetBytes);
+        double newPosition[3] = {
+            inputPosition[0] - 0.1,
+            inputPosition[1] + 0.1,
+            inputPosition[2] - 0.1
+        };
+
+        memcpy(pOutputVertex[0], pInputVertex, nBytesPerInputVertex);
+        memcpy(
+            VOID_PTR_ADD(pOutputVertex[1], inputPositionAttribute.offsetBytes),
+            newPosition,
+            3 * sizeof(double)
+        );
+        memcpy(
+            VOID_PTR_ADD(pOutputVertex[1], sp->geometryShader.outputAttributes[1].offsetBytes),
+            VOID_PTR_ADD(pInputVertex, sp->vertexShader.outputAttributes[1].offsetBytes),
+            sp->vertexShader.outputAttributes[1].nItems * sizeof(double)
+        );
+    }
+}
+
+void fragmentShader
+    (const ShaderProgram* sp, const Interpolated* pFragment, Color* color)
+{
+    double* colorVec = ((Vertex*) pFragment)->color;
+    *color = (Color) {
+        round(colorVec[0] * 255),
+        round(colorVec[1] * 255),
+        round(colorVec[2] * 255),
+        255
+    };
+}
+
+void fragmentShaderZ
+    (const ShaderProgram* sp, const Interpolated* pFragment, Color* color)
+{
+    double* position = ((Vertex*) pFragment)->position;
+    *color = (Color) {
+        (position[2] + 1) / 2 * 255,
+        (position[2] + 1) / 2 * 255,
+        (position[2] + 1) / 2 * 255,
+        255
+    };
 }
 
