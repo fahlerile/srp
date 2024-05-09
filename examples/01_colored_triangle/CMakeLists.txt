@@ -1,0 +1,17 @@
+get_filename_component(NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+
+add_executable(${NAME} main.c)
+target_link_libraries(
+	${NAME}
+	rasterizer
+	SDL2 SDL2main
+	window
+)
+target_include_directories(
+	${NAME}
+	PRIVATE
+	${CMAKE_SOURCE_DIR}/lib/c-codebase  # TODO fix this!
+	${CMAKE_SOURCE_DIR}/src
+	${CMAKE_CURRENT_LIST_DIR}/../utility
+)
+
