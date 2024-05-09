@@ -30,6 +30,7 @@ VertexBuffer* newVertexBuffer(
 void freeVertexBuffer(VertexBuffer* this)
 {
     xfree(this->data);
+    xfree(this->attributes);
     xfree(this);
 }
 
