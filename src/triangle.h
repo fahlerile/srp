@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include "Vector/Vector.h"
-#include "Shaders.h"
+#include "shaders.h"
 
 typedef struct
 {

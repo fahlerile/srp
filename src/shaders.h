@@ -40,7 +40,9 @@ typedef struct
 
 typedef struct
 {
-    void (*shader)(const ShaderProgram* sp, const Interpolated* pInterpolated, Color* color);
+    void (*shader)(
+        const ShaderProgram* sp, const Interpolated* pInterpolated, Color* pColor
+    );
 } FragmentShader;
 
 struct ShaderProgram

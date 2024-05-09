@@ -3,7 +3,7 @@
 #define SDL_MAIN_HANDLED
 #include <assert.h>
 #include "Renderer.h"
-#include "Shaders.h"
+#include "shaders.h"
 #include "Context.h"
 #include "Type.h"
 #include "Color/Color.h"

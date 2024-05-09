@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "Type.h"
-#include "Shaders.h"
+#include "shaders.h"
 #include "Vertex.h"
 
 // Stores vertex data

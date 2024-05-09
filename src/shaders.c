@@ -1,4 +1,4 @@
-#include "Shaders.h"
+#include "shaders.h"
 
 void shaderProgramSetDefaultGeometryShader(ShaderProgram* sp)
 {

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#include "Shaders.h"
+#include "shaders.h"
 #include "Type.h"
 #include "memoryUtils/memoryUtils.h"
 #include "buffer.h"

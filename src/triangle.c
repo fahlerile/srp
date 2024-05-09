@@ -4,10 +4,10 @@
 #include "Context.h"
 #include "NDC.h"
 #include "triangle.h"
-#include "Shaders.h"
 #include "Vector/Vector2.h"
 #include "Vector/Vector3.h"
 #include "log.h"
+#include "shaders.h"
 #include "utils.h"
 
 void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp)
