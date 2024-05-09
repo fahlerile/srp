@@ -1,17 +1,14 @@
 #include <assert.h>
-#include <math.h>
-#include <string.h>
-#include "Context.h"
-#include "NDC.h"
+#include "Vector/Vector.h"
 #include "triangle.h"
-#include "Vector/Vector2.h"
-#include "Vector/Vector3.h"
-#include "log.h"
 #include "shaders.h"
 #include "voidptr.h"
 #include "utils.h"
 
-void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp)
+void drawTriangle(
+    Framebuffer* fb, const GSOutput* restrict gsOutput, 
+    const ShaderProgram* restrict sp
+)
 {
     const GeometryShader* gs = &sp->geometryShader;
     VertexAttribute positionAttribute = gs->outputAttributes[
@@ -38,7 +35,8 @@ void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restri
 
     Vector3d SSPositions[3], edgeVectors[3];
     for (size_t i = 0; i < 3; i++)
-        SSPositions[i] = NDCToScreenSpace(context.renderer, NDCPositions[i]);
+        SSPositions[i] = \
+            framebufferNDCToScreenSpace(fb, &NDCPositions[i]);
     for (size_t i = 0; i < 3; i++)
         edgeVectors[i] = Vector3dSubtract(
             SSPositions[(i+1) % 3], SSPositions[i]
@@ -97,8 +95,7 @@ void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restri
 
                 Color color;
                 sp->fragmentShader.shader(sp, pInterpolated, &color);
-
-                rendererDrawPixel(context.renderer, (Vector2i) {x, y}, depth, color);
+                framebufferDrawPixel(fb, x, y, depth, &color);
             }
 
 nextPixel:

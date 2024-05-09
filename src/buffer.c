@@ -41,7 +41,10 @@ static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index)
 // @brief Draw vertex array without calling vertex and geometry shaders
 // Needed because geometry shader can output multiple primitives to draw
 // Intended to use inside `drawIndexBuffer` after calling these shaders
-static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive primitive)
+static void drawRawVertexBuffer(
+    Framebuffer* fb, GSOutput* gsOutput, ShaderProgram* sp, 
+    Primitive primitive
+)
 {
     assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
@@ -51,7 +54,7 @@ static void drawRawVertexBuffer(GSOutput* gsOutput, ShaderProgram* sp, Primitive
     {
         GSOutput* gsOutputTriangle = (GSOutput*) \
             INDEX_VOID_PTR(gsOutput, i, gs->nBytesPerOutputVertex);
-        drawTriangle(gsOutputTriangle, sp);
+        drawTriangle(fb, gsOutputTriangle, sp);
     }
 }
 
@@ -101,7 +104,7 @@ static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index)
 
 // @brief Draw an index buffer with specified primitive mode
 void drawIndexBuffer(
-    IndexBuffer* this, VertexBuffer* vb, Primitive primitive, 
+    Framebuffer* fb, IndexBuffer* this, VertexBuffer* vb, Primitive primitive, 
     size_t startIndex, size_t count, ShaderProgram* sp
 )
 {
@@ -151,7 +154,7 @@ void drawIndexBuffer(
         if (gs->shader != NULL)
             gs->shader(sp, triangleVsOutput, gsOutput);
 
-        drawRawVertexBuffer(gsOutput, sp, newPrimitive);
+        drawRawVertexBuffer(fb, gsOutput, sp, newPrimitive);
     }
 
     // That means a distinct buffer for GS was allocated

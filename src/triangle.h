@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>
+#include "Framebuffer.h"
 #include "Vector/Vector.h"
 #include "shaders.h"
 
@@ -12,7 +13,10 @@ typedef struct
     Vector2d minBP, maxBP;
 } triangleData;
 
-void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp);
+void drawTriangle(
+    Framebuffer* fb, const GSOutput* restrict gsOutput, 
+    const ShaderProgram* restrict sp
+);
 
 static double signedAreaParallelogram(
     const Vector3d* restrict a, const Vector3d* restrict b

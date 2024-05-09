@@ -1,9 +1,9 @@
 set(
     SOURCES
-    Renderer.c
     buffer.c
     shaders.c
     triangle.c
+    Framebuffer.c
 )
 
 add_library(rasterizer STATIC ${SOURCES})
