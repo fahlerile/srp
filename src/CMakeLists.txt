@@ -1,18 +1,23 @@
 set(
     SOURCES
-
-    main.c
-    Context.c
     Renderer.c
     buffer.c
     shaders.c
     triangle.c
 )
 
-add_executable(${EXECUTABLE_NAME} ${SOURCES})
-target_include_directories(${EXECUTABLE_NAME} PUBLIC .)
-target_compile_options(${EXECUTABLE_NAME} PRIVATE
-    -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native -O3
+add_library(rasterizer STATIC ${SOURCES})
+target_link_libraries(
+    rasterizer
+    PRIVATE
+    SDL2
+    memoryUtils
+    Vector
+)
+target_include_directories(
+    rasterizer
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/lib/c-codebase
 )
 
 if (ENABLE_ASAN)

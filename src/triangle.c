@@ -8,6 +8,7 @@
 #include "Vector/Vector3.h"
 #include "log.h"
 #include "shaders.h"
+#include "voidptr.h"
 #include "utils.h"
 
 void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp)

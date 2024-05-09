@@ -6,7 +6,7 @@
 #include "memoryUtils/memoryUtils.h"
 #include "buffer.h"
 #include "triangle.h"
-#include "utils.h"
+#include "voidptr.h"
 
 VertexBuffer* newVertexBuffer(
     size_t nBytesPerVertex, size_t nBytesData, void* data, 
