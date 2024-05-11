@@ -5,24 +5,24 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 add_compile_options(
-    -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native -O3
+	-Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native -O3
 )
 
 if (ENABLE_ASAN)
-    add_compile_options(-fsanitize=address)
-    link_libraries(asan)
+	add_compile_options(-fsanitize=address)
+	link_libraries(asan)
 endif()
 if (ENABLE_LSAN)
-    add_compile_options(-fsanitize=leak)
-    link_libraries(asan)
+	add_compile_options(-fsanitize=leak)
+	link_libraries(asan)
 endif()
 if (ENABLE_UBSAN)
-    add_compile_options(-fsanitize=undefined)
-    link_libraries(ubsan)
+	add_compile_options(-fsanitize=undefined)
+	link_libraries(ubsan)
 endif()
 if (ENABLE_GPROF)
-    add_compile_options(-pg)
-    add_link_options(-pg)
+	add_compile_options(-pg)
+	add_link_options(-pg)
 endif()
 
 add_subdirectory(src)

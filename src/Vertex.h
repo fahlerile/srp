@@ -6,8 +6,8 @@ typedef struct Vertex Vertex;
 
 typedef struct
 {
-    size_t nItems;
-    Type type;
-    size_t offsetBytes;
+	size_t nItems;
+	Type type;
+	size_t offsetBytes;
 } VertexAttribute;
 

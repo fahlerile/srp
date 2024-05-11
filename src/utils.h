@@ -16,7 +16,7 @@
 #include "log.h"
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+	#define M_PI 3.14159265358979323846
 #endif
 #define TOLERANCE 10e-6
 
@@ -27,11 +27,11 @@
 #define ROUGHLY_EQUAL(a, b) (fabs((a) - (b)) < TOLERANCE)
 
 #define SWAP(a, b) \
-    do \
-    { \
-        unsigned char temp[(sizeof(a) == sizeof(b)) ? (int) sizeof(a) : -1]; \
-        memcpy(temp, &a, sizeof(a)); \
-        memcpy(&a, &b, sizeof(a)); \
-        memcpy(&b, temp, sizeof(a)); \
-    } while (false)
+	do \
+	{ \
+		unsigned char temp[(sizeof(a) == sizeof(b)) ? (int) sizeof(a) : -1]; \
+		memcpy(temp, &a, sizeof(a)); \
+		memcpy(&a, &b, sizeof(a)); \
+		memcpy(&b, temp, sizeof(a)); \
+	} while (false)
 

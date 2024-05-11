@@ -13,9 +13,9 @@ struct Vertex
 };
 
 void vertexShader
-    (const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput);
+	(const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput);
 void fragmentShader
-    (const ShaderProgram* sp, const Interpolated* pFragment, Color* pColor);
+	(const ShaderProgram* sp, const Interpolated* pFragment, Color* pColor);
 
 int main()
 {
@@ -96,13 +96,13 @@ int main()
 
 
 void vertexShader
-    (const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput)
+	(const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput)
 {
 	*(Vertex*) pOutput = *pVertex;
 }
 
 void fragmentShader
-    (const ShaderProgram* sp, const Interpolated* pFragment, Color* pColor)
+	(const ShaderProgram* sp, const Interpolated* pFragment, Color* pColor)
 {
 	double* colorVec = ((Vertex*) pFragment)->color;
 	*pColor = (Color) {
