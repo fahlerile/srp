@@ -2,10 +2,6 @@
 #include "Window.h"
 #include "timer.h"
 
-#ifdef HELLO
-	#warning hello
-#endif
-
 struct Vertex
 {
 	double position[3];
