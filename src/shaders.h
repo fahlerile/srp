@@ -44,7 +44,7 @@ typedef struct
 typedef struct
 {
 	void (*shader)(
-		const ShaderProgram* sp, const Interpolated* pInterpolated, Color* pColor
+		const ShaderProgram* sp, const Interpolated* pInterpolated, double* color
 	);
 } FragmentShader;
 

@@ -13,7 +13,7 @@ void vertexShader(
 	size_t vertexIndex
 );
 void fragmentShader
-	(const ShaderProgram* sp, const Interpolated* pFragment, Color* pColor);
+	(const ShaderProgram* sp, const Interpolated* pFragment, double* color);
 
 int main()
 {
@@ -102,14 +102,13 @@ void vertexShader(
 }
 
 void fragmentShader
-	(const ShaderProgram* sp, const Interpolated* pFragment, Color* pColor)
+	(const ShaderProgram* sp, const Interpolated* pFragment, double* color)
 {
-	double* colorVec = ((Vertex*) pFragment)->color;
-	*pColor = (Color) {
-		colorVec[0] * 255,
-		colorVec[1] * 255,
-		colorVec[2] * 255,
-		255
-	};
+	memcpy(
+		color,
+		((Vertex*) pFragment)->color,
+		3 * sizeof(double)
+	);
+	color[3] = 1.;
 }
 

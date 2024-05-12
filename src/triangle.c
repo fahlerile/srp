@@ -93,8 +93,14 @@ void drawTriangle(
 					].offsetBytes
 				))[2];
 
-				Color color;
-				sp->fragmentShader.shader(sp, pInterpolated, &color);
+				double colorVec[4];
+				sp->fragmentShader.shader(sp, pInterpolated, colorVec);
+				Color color = {
+					CLAMP(0, 255, colorVec[0] * 255),
+					CLAMP(0, 255, colorVec[1] * 255),
+					CLAMP(0, 255, colorVec[2] * 255),
+					CLAMP(0, 255, colorVec[3] * 255)
+				};
 				framebufferDrawPixel(fb, x, y, depth, &color);
 			}
 

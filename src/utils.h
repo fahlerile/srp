@@ -23,6 +23,15 @@
 #define MIN(a, b) ( (a) < (b) ? (a) : (b) )
 #define MAX(a, b) ( (a) > (b) ? (a) : (b) )
 
+#define CLAMP_MIN(min, val) ( ((val) < (min)) ? (min) : (val) )
+#define CLAMP_MAX(max, val) ( ((val) > (max)) ? (max) : (val) )
+#define CLAMP(min, max, val) \
+	(\
+		((val) < (min)) ? (min) : (\
+			((val) > (max)) ? (max) : (val)\
+		)\
+	)
+
 #define RADIANS(x) ((M_PI / 180) * (x))
 #define ROUGHLY_EQUAL(a, b) (fabs((a) - (b)) < TOLERANCE)
 
