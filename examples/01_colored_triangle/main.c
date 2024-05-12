@@ -1,6 +1,7 @@
 #include "rasterizer.h"
 #include "Window.h"
 #include "timer.h"
+#include "utils.h"
 
 struct Vertex
 {
@@ -19,10 +20,17 @@ int main()
 {
 	Framebuffer* fb = newFramebuffer(512, 512);
 
+	const double R = 0.8;
 	Vertex data[3] = {
-		{.position = {-0.75, -0.75, 0.}, .color = {1., 0., 0.}},
-		{.position = { 0.75, -0.75, 0.}, .color = {0., 1., 0.}},
-		{.position = { 0.  ,  0.75, 0.}, .color = {0., 0., 1.}}
+		{.position = {0., R, 0.}, .color = {1., 0., 0.}},
+		{
+			.position = {-cos(RADIANS(30)) * R, -sin(RADIANS(30)) * R, 0.},
+			.color = {0., 0., 1.}
+		},
+		{
+			.position = { cos(RADIANS(30)) * R, -sin(RADIANS(30)) * R, 0.},
+			.color = {0., 1., 0.}
+		}
 	};
 	uint8_t indices[3] = {
 		0, 1, 2
