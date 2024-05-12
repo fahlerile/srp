@@ -13,7 +13,10 @@ typedef struct ShaderProgram ShaderProgram;
 
 typedef struct
 {
-	void (*shader)(const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput);
+	void (*shader)(
+		const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput,
+		size_t vertexIndex
+	);
 	size_t nBytesPerOutputVertex;
 	size_t nOutputAttributes;
 	VertexAttribute* outputAttributes;

@@ -146,7 +146,7 @@ void drawIndexBuffer(
 			Vertex* pVertex = indexVertexBuffer(vb, vertexIndex);
 			VSOutput* pVsOutput = (VSOutput*) \
 				INDEX_VOID_PTR(triangleVsOutput, j, vs->nBytesPerOutputVertex);
-			vs->shader(sp, pVertex, pVsOutput);
+			vs->shader(sp, pVertex, pVsOutput, i+j);
 		}
 
 		Primitive newPrimitive = \
