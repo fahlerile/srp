@@ -50,8 +50,14 @@ Vector3d framebufferNDCToScreenSpace(Framebuffer* this, Vector3d* NDC)
 
 void framebufferClear(Framebuffer *this)
 {
-	memset(this->color, '\0', this->size);
-	memset(this->depth, '\0', this->size);
+	for (size_t y = 0; y < this->height; y++)
+	{
+		for (size_t x = 0; x < this->width; x++)
+		{
+			*framebufferGetPixelPointer(this, x, y) = 0x000000FF;
+			*framebufferGetDepthPointer(this, x, y) = -1;
+		}
+	}
 }
 
 uint32_t* framebufferGetPixelPointer(Framebuffer* this, size_t x, size_t y)
