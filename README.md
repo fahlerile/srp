@@ -24,15 +24,19 @@ cd bin
 - [x] Change vertices' winding order to counter-clockwise to be consistent with OpenGL (right now `drawTriangle` only draws clockwise triangles, not the counter-clockwise ones)
 - [x] Implement back-face culling in screen space (do not draw triangles with CW winding)
 - [x] Add `Uniforms` with named parameters
+- [x] Write some examples
+
+- [ ] Review the rendering pipeline (https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview)
+- [ ] Do not use `lib/c-codebase` types for API function signatures
+- [ ] Prettify the API, write the documentation
+
 - [ ] Add texture mapping with perspective correction
-- [ ] Think about making an API more user-friendly
+
 - [ ] Add `Mesh`/`Model` structure
 - [ ] Play around with rendering models
+
 - [ ] Draw primitives in parallel (OpenMP)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
-- [ ] Write implementation-level documentation
-- [ ] Prettify the API, write the user-level documentation
-- [ ] Write some examples
 
 - [ ] Read LearnOpenGL to learn about light, reflections, shadows and all that fancy stuff and think how can I implement that
 
