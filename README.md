@@ -19,24 +19,26 @@ cd bin
 ```
 
 ## TODO
-- [x] Add `IndexBuffer`
-	- [x] Fix unreasonable `size_t` usage in `drawIndexBuffer`
-- [x] Change vertices' winding order to counter-clockwise to be consistent with OpenGL (right now `drawTriangle` only draws clockwise triangles, not the counter-clockwise ones)
-- [x] Implement back-face culling in screen space (do not draw triangles with CW winding)
-- [x] Add `Uniforms` with named parameters
+### Documentation/examples
 - [x] Write some examples
+- [ ] Add comments to the examples
+- [ ] Prettify the API (think about convenience macros/functions)
+- [ ] Write the documentation about the main pipeline and individual functions
 
+### Features
 - [ ] Review the rendering pipeline (https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview)
-- [x] Do not use `lib/c-codebase` types for API function signatures
-- [ ] Prettify the API, write the documentation
-
+	- See if I am missing some important step
+	- See if I can make the pipeline more customizable
 - [ ] Add texture mapping with perspective correction
-
 - [ ] Add `Mesh`/`Model` structure
 - [ ] Play around with rendering models
-
-- [ ] Draw primitives in parallel (OpenMP)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
-
 - [ ] Read LearnOpenGL to learn about light, reflections, shadows and all that fancy stuff and think how can I implement that
+
+### Optimization
+- [ ] Draw primitives in parallel (OpenMP)
+
+### Portability
+- [x] Do not use `lib/c-codebase` types for API function signatures for portability and avoiding useless dependency
+- [ ] Fix header hell
 
