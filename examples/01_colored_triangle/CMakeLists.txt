@@ -10,7 +10,7 @@ target_link_libraries(
 target_include_directories(
 	${NAME}
 	PRIVATE
-	${CMAKE_SOURCE_DIR}/lib/c-codebase	# TODO fix this!
+	${CMAKE_SOURCE_DIR}/lib/c-codebase
 	${CMAKE_SOURCE_DIR}/src
 	${CMAKE_CURRENT_LIST_DIR}/../utility
 )

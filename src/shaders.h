@@ -1,7 +1,6 @@
 #pragma once
 #include "Vertex.h"
 #include "Primitive.h"
-#include "Color/Color.h"
 
 typedef struct VSOutput VSOutput;
 typedef struct GSOutput GSOutput;

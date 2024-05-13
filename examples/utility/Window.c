@@ -1,5 +1,6 @@
 #include "Framebuffer.h"
 #include "memoryUtils/memoryUtils.h"
+#include "Color/Color.h"
 #include "Window.h"
 
 Window* newWindow(size_t width, size_t height, char* title, bool fullscreen)

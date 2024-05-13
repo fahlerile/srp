@@ -4,6 +4,7 @@ set(
 	shaders.c
 	triangle.c
 	Framebuffer.c
+	Type.c
 )
 
 add_library(rasterizer STATIC ${SOURCES})

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "Color/Color.h"
 #include "Vector/Vector.h"
 #include "triangle.h"
 #include "shaders.h"
@@ -35,12 +36,11 @@ void drawTriangle(
 
 	Vector3d SSPositions[3], edgeVectors[3];
 	for (size_t i = 0; i < 3; i++)
-		SSPositions[i] = \
-			framebufferNDCToScreenSpace(fb, &NDCPositions[i]);
-	for (size_t i = 0; i < 3; i++)
-		edgeVectors[i] = Vector3dSubtract(
-			SSPositions[(i+1) % 3], SSPositions[i]
+		framebufferNDCToScreenSpace(
+			fb, (double*) &NDCPositions[i], (double*) &SSPositions[i]
 		);
+	for (size_t i = 0; i < 3; i++)
+		edgeVectors[i] = Vector3dSubtract(SSPositions[(i+1) % 3], SSPositions[i]);
 
 	Vector2d minBoundingPoint = {
 		MIN(SSPositions[0].x, MIN(SSPositions[1].x, SSPositions[2].x)),
@@ -101,7 +101,7 @@ void drawTriangle(
 					CLAMP(0, 255, colorVec[2] * 255),
 					CLAMP(0, 255, colorVec[3] * 255)
 				};
-				framebufferDrawPixel(fb, x, y, depth, &color);
+				framebufferDrawPixel(fb, x, y, depth, ColorToUint32RGBA(&color));
 			}
 
 nextPixel:

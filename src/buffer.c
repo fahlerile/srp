@@ -3,6 +3,7 @@
 #include <string.h>
 #include "shaders.h"
 #include "Type.h"
+#include "log.h"
 #include "memoryUtils/memoryUtils.h"
 #include "buffer.h"
 #include "triangle.h"

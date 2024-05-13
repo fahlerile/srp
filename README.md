@@ -27,7 +27,7 @@ cd bin
 - [x] Write some examples
 
 - [ ] Review the rendering pipeline (https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview)
-- [ ] Do not use `lib/c-codebase` types for API function signatures
+- [x] Do not use `lib/c-codebase` types for API function signatures
 - [ ] Prettify the API, write the documentation
 
 - [ ] Add texture mapping with perspective correction

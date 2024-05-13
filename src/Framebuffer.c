@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 #include "Framebuffer.h"
@@ -25,7 +26,7 @@ void freeFramebuffer(Framebuffer* this)
 }
 
 void framebufferDrawPixel(
-	Framebuffer* this, size_t x, size_t y, double depth, Color* pColor
+	Framebuffer* this, size_t x, size_t y, double depth, uint32_t color
 )
 {
 	assert(1 >= depth);
@@ -35,17 +36,15 @@ void framebufferDrawPixel(
 	if (depth < *pDepth)
 		return;
 
-	*framebufferGetPixelPointer(this, x, y) = ColorToUint32RGBA(pColor);
+	*framebufferGetPixelPointer(this, x, y) = color;
 	*pDepth = depth;
 }
 
-Vector3d framebufferNDCToScreenSpace(Framebuffer* this, Vector3d* NDC)
+void framebufferNDCToScreenSpace(Framebuffer* this, double* NDC, double* SS)
 {
-	return (Vector3d) {
-		 (((double) this->width	 - 1) / 2) * (NDC->x + 1),
-		-(((double) this->height - 1) / 2) * (NDC->y - 1),
-		NDC->z
-	};
+	SS[0] =  (((double) this->width  - 1) / 2) * (NDC[0] + 1);
+	SS[1] = -(((double) this->height - 1) / 2) * (NDC[1] - 1),
+	SS[2] = NDC[2];
 }
 
 void framebufferClear(Framebuffer *this)
