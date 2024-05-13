@@ -1,7 +1,8 @@
 #include "rasterizer.h"
 #include "Window.h"
 #include "timer.h"
-#include "utils.h"
+#include "math_utils.h"
+#include "log.h"
 
 struct Vertex
 {
@@ -24,11 +25,11 @@ int main()
 	Vertex data[3] = {
 		{.position = {0., R, 0.}, .color = {1., 0., 0.}},
 		{
-			.position = {-cos(RADIANS(30)) * R, -sin(RADIANS(30)) * R, 0.},
+			.position = {-cos(RAD(30)) * R, -sin(RAD(30)) * R, 0.},
 			.color = {0., 0., 1.}
 		},
 		{
-			.position = { cos(RADIANS(30)) * R, -sin(RADIANS(30)) * R, 0.},
+			.position = { cos(RAD(30)) * R, -sin(RAD(30)) * R, 0.},
 			.color = {0., 1., 0.}
 		}
 	};

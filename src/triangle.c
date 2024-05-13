@@ -1,10 +1,12 @@
 #include <assert.h>
+#include <string.h>
 #include "Color/Color.h"
 #include "Vector/Vector.h"
 #include "triangle.h"
 #include "shaders.h"
 #include "voidptr.h"
-#include "utils.h"
+#include "math_utils.h"
+#include "log.h"
 
 void drawTriangle(
 	Framebuffer* fb, const GSOutput* restrict gsOutput, 
