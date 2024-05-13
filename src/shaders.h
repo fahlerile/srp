@@ -2,12 +2,16 @@
 #include "Vertex.h"
 #include "Primitive.h"
 
+// Incomplete "filler" type
 typedef struct VSOutput VSOutput;
 typedef struct GSOutput GSOutput;
 typedef struct Interpolated Interpolated;
 
+// Assumed to be defined by the user
+// TODO: what if there are multiple wanted uniforms?
 typedef struct Uniforms Uniforms;
 
+// Circular dependency
 typedef struct ShaderProgram ShaderProgram;
 
 typedef struct
