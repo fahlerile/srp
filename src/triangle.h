@@ -1,7 +1,6 @@
 #pragma once
-#include <stdbool.h>
-#include "Framebuffer.h"
 #include "Vector/Vector.h"
+#include "Framebuffer.h"
 #include "shaders.h"
 
 typedef struct

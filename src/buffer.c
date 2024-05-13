@@ -1,13 +1,9 @@
-#include <assert.h>
-#include <stdint.h>
 #include <string.h>
-#include "shaders.h"
-#include "Type.h"
-#include "log.h"
-#include "memoryUtils/memoryUtils.h"
 #include "buffer.h"
+#include "memoryUtils/memoryUtils.h"
 #include "triangle.h"
 #include "voidptr.h"
+#include "log.h"
 
 VertexBuffer* newVertexBuffer(
 	size_t nBytesPerVertex, size_t nBytesData, void* data, 

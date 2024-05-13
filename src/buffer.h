@@ -1,10 +1,7 @@
 #pragma once
-#include <stddef.h>
-#include <stdint.h>
 #include "Framebuffer.h"
-#include "Type.h"
-#include "shaders.h"
 #include "Vertex.h"
+#include "shaders.h"
 
 // Stores vertex data
 // Similar to VBO in OpenGL

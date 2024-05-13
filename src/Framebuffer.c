@@ -1,8 +1,6 @@
 #include <assert.h>
 #include <stdint.h>
-#include <string.h>
 #include "Framebuffer.h"
-#include "Color/Color.h"
 #include "memoryUtils/memoryUtils.h"
 
 Framebuffer* newFramebuffer(size_t width, size_t height)
@@ -12,7 +10,7 @@ Framebuffer* newFramebuffer(size_t width, size_t height)
 	this->width = width;
 	this->height = height;
 	this->size = width * height;
-	this->color = xmalloc(sizeof(Color) * this->size);
+	this->color = xmalloc(sizeof(uint32_t) * this->size);
 	this->depth = xmalloc(sizeof(double) * this->size);
 
 	return this;

@@ -1,11 +1,7 @@
-#include <assert.h>
 #include <string.h>
-#include "Color/Color.h"
-#include "Vector/Vector.h"
 #include "triangle.h"
-#include "shaders.h"
-#include "voidptr.h"
 #include "math_utils.h"
+#include "voidptr.h"
 #include "log.h"
 
 void drawTriangle(

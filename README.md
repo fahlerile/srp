@@ -40,5 +40,5 @@ cd bin
 
 ### Portability
 - [x] Do not use `lib/c-codebase` types for API function signatures for portability and avoiding useless dependency
-- [ ] Fix header hell
+- [x] Fix header hell
 
