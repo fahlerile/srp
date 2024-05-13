@@ -29,6 +29,7 @@ cd bin
 - [ ] Review the rendering pipeline (https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview)
 	- See if I am missing some important step
 	- See if I can make the pipeline more customizable
+- [ ] Consider the case of multiple `Vertex` types, and changes between them during the rendering pipeline (see \`TODO\` comments)
 - [ ] Add texture mapping with perspective correction
 - [ ] Add `Mesh`/`Model` structure
 - [ ] Play around with rendering models
