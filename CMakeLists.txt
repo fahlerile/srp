@@ -4,9 +4,13 @@ project(rasterizer)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-add_compile_options(
-	-Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native -O3
-)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -std=c2x -march=native")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 if (ENABLE_ASAN)
 	add_compile_options(-fsanitize=address)
