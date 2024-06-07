@@ -13,8 +13,8 @@ typedef struct
 } triangleData;
 
 void drawTriangle(
-	Framebuffer* fb, const VSOutput* restrict vertices, 
-	const ShaderProgram* restrict sp
+	Framebuffer* fb, const VSOutput vertices[3], const ShaderProgram* restrict sp,
+	size_t primitiveID
 );
 
 static double signedAreaParallelogram(
@@ -27,8 +27,9 @@ static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
 );
 static bool triangleIsEdgeFlatTopOrLeft(const Vector3d* restrict edgeVector);
 
-static void triangleInterpolateGsOutput(
-	const void* gsOutput, const double barycentricCoordinates[3],
-	const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer
+static void triangleInterpolatePositionAndVertexVariables(
+	const VSOutput vertices[3], const double barycentricCoordinates[3],
+	const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer,
+	Vector4d* interpolatedPosition
 );
 

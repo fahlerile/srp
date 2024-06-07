@@ -5,10 +5,7 @@
 #include "voidptr.h"
 #include "log.h"
 
-VertexBuffer* newVertexBuffer(
-	size_t nBytesPerVertex, size_t nBytesData, void* data, 
-	size_t nAttributes, VertexAttribute* attributes
-)
+VertexBuffer* newVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data)
 {
 	VertexBuffer* this = xmalloc(sizeof(VertexBuffer));
 
@@ -17,9 +14,6 @@ VertexBuffer* newVertexBuffer(
 	this->nVertices = nBytesData / nBytesPerVertex;
 	this->data = xmalloc(nBytesData);
 	memcpy(this->data, data, nBytesData);
-	this->nAttributes = nAttributes;
-	this->attributes = xmalloc(nAttributes * sizeof(VertexAttribute));
-	memcpy(this->attributes, attributes, nAttributes * sizeof(VertexAttribute));
 
 	return this;
 }
@@ -27,7 +21,6 @@ VertexBuffer* newVertexBuffer(
 void freeVertexBuffer(VertexBuffer* this)
 {
 	xfree(this->data);
-	xfree(this->attributes);
 	xfree(this);
 }
 
@@ -88,24 +81,40 @@ void drawIndexBuffer(
 {
 	assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
-	VSOutput* triangleVsOutput = xmalloc(sp->vs.nBytesPerOutputVertex * 3);
+	VSOutputVariable* triangleVSOutputVariables = \
+		xmalloc(sp->vs.nBytesPerOutputVariables * 3);
 
 	size_t endIndex = startIndex + count;
 	assert(endIndex <= this->nIndices);
 
+	size_t primitiveID = 0;
 	for (size_t i = startIndex; i < endIndex; i += 3)
 	{
+		VSInput vsIn[3];
+		VSOutput vsOut[3];
 		for (size_t j = 0; j < 3; j++)
 		{
 			uint64_t vertexIndex = indexIndexBuffer(this, i + j);
-			Vertex* pVertex = indexVertexBuffer(vb, vertexIndex);
-			VSOutput* pVsOutput = (VSOutput*) \
-				INDEX_VOID_PTR(triangleVsOutput, j, sp->vs.nBytesPerOutputVertex);
-			sp->vs.shader(sp, pVertex, pVsOutput, i+j);
+			Vertex* pInVertex = indexVertexBuffer(vb, vertexIndex);
+			VSOutputVariable* pVSOutputVariables = (VSOutputVariable*) \
+				INDEX_VOID_PTR(triangleVSOutputVariables, j, sp->vs.nBytesPerOutputVariables);
+
+			vsIn[j] = (VSInput) {
+				.vertexID = i+j,
+				.pVertex = pInVertex,
+				.uniforms = sp->uniforms
+			};
+			vsOut[j] = (VSOutput) {
+				.position = {0},
+				.pOutputVariables = pVSOutputVariables
+			};
+
+			sp->vs.shader(&vsIn[j], &vsOut[j]);
 		}
-		drawTriangle(fb, triangleVsOutput, sp);
+		drawTriangle(fb, vsOut, sp, primitiveID);
+		primitiveID++;
 	}
 
-	xfree(triangleVsOutput);
+	xfree(triangleVSOutputVariables);
 }
 

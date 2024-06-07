@@ -10,12 +10,8 @@ struct Vertex
 	double color[3];
 };
 
-void vertexShader(
-	const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput,
-	size_t vertexIndex
-);
-void fragmentShader
-	(const ShaderProgram* sp, const Interpolated* pFragment, double* color);
+void vertexShader(VSInput* in, VSOutput* out);
+void fragmentShader(FSInput* in, FSOutput* out);
 
 int main()
 {
@@ -37,31 +33,24 @@ int main()
 		0, 1, 2
 	};
 
-	VertexAttribute attributes[2] = {
+	VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
+
+	VertexVariable VSOutputVariables[1] = {
 		{
 			.nItems = 3,
 			.type = TYPE_DOUBLE,
-			.offsetBytes = offsetof(Vertex, position)
-		},
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = offsetof(Vertex, color)
+			.offsetBytes = 0
 		}
 	};
-
-	VertexBuffer* vb = \
-		newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
-	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
 	ShaderProgram shaderProgram = {
 		.uniforms = NULL,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVertex = sizeof(Vertex),
-			.nOutputAttributes = 2,
-			.outputAttributes = attributes,
-			.indexOfOutputPositionAttribute = 0
+			.nBytesPerOutputVariables = sizeof(double) * 3,
+			.nOutputVariables = 1,
+			.outputVariables = VSOutputVariables,
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -100,22 +89,23 @@ int main()
 }
 
 
-void vertexShader(
-	const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput,
-	size_t vertexIndex
-)
+void vertexShader(VSInput* in, VSOutput* out)
 {
-	*(Vertex*) pOutput = *pVertex;
+	double* pos = in->pVertex->position;
+	out->position = (Vector4d) {
+		pos[0], pos[1], pos[2], 1.0
+	};
+
+	double* colorOut = (double*) out->pOutputVariables;
+	colorOut[0] = in->pVertex->color[0];
+	colorOut[1] = in->pVertex->color[1];
+	colorOut[2] = in->pVertex->color[2];
 }
 
-void fragmentShader
-	(const ShaderProgram* sp, const Interpolated* pFragment, double* color)
+void fragmentShader(FSInput* in, FSOutput* out)
 {
-	memcpy(
-		color,
-		((Vertex*) pFragment)->color,
-		3 * sizeof(double)
-	);
-	color[3] = 1.;
+	double* colorIn = (double*) in->interpolated;
+	memcpy(&out->color, colorIn, 3 * sizeof(double));
+	out->color.w = 1.;
 }
 

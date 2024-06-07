@@ -1,7 +1,7 @@
 #pragma once
+#include "Vector/Vector.h"
 #include "Vertex.h"
 
-typedef struct VSOutput VSOutput;
 typedef struct Interpolated Interpolated;
 
 // Assumed to be defined by the user
@@ -11,24 +11,52 @@ typedef struct Uniforms Uniforms;
 // Circular dependency
 typedef struct ShaderProgram ShaderProgram;
 
+
 typedef struct
 {
-	void (*shader)(
-		const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput,
-		size_t vertexIndex
-	);
-	size_t nBytesPerOutputVertex;
-	size_t nOutputAttributes;
-	VertexAttribute* outputAttributes;
-	size_t indexOfOutputPositionAttribute;
-} VertexShader;
+	size_t vertexID;
+	Vertex* pVertex;
+	Uniforms* uniforms;
+} VSInput;
+
+typedef struct VSOutputVariable VSOutputVariable;
+
+typedef struct
+{
+	Vector4d position;
+	VSOutputVariable* pOutputVariables;
+} VSOutput;
 
 typedef struct
 {
 	void (*shader)(
-		const ShaderProgram* sp, const Interpolated* pInterpolated, double* color
+		VSInput* in, VSOutput* out
 	);
+	size_t nBytesPerOutputVariables;
+	size_t nOutputVariables;
+	VertexVariable* outputVariables;
+} VertexShader;
+
+
+typedef struct
+{
+	Vector4d fragCoord;
+	bool frontFacing;
+	size_t primitiveID;
+	Interpolated* interpolated;
+} FSInput;
+
+typedef struct
+{
+	Vector4d color;
+	double fragDepth;
+} FSOutput;
+
+typedef struct
+{
+	void (*shader)(FSInput* in, FSOutput* out);
 } FragmentShader;
+
 
 struct ShaderProgram
 {

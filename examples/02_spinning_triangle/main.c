@@ -17,12 +17,8 @@ struct Uniforms
 	Matrix4 rotation;
 };
 
-void vertexShader(
-	const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput,
-	size_t vertexIndex
-);
-void fragmentShader
-	(const ShaderProgram* sp, const Interpolated* pFragment, double* pColor);
+void vertexShader(VSInput* in, VSOutput* out);
+void fragmentShader(FSInput* in, FSOutput* out);
 
 int main()
 {
@@ -44,21 +40,16 @@ int main()
 		0, 1, 2
 	};
 
-	VertexAttribute attributes[2] = {
+	VertexVariable VSOutputVariables[1] = {
 		{
 			.nItems = 3,
 			.type = TYPE_DOUBLE,
-			.offsetBytes = offsetof(Vertex, position)
-		},
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = offsetof(Vertex, color)
+			.offsetBytes = 0
 		}
 	};
 
 	VertexBuffer* vb = \
-		newVertexBuffer(sizeof(Vertex), sizeof(data), data, 2, attributes);
+		newVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
 	Uniforms uniforms = {0};
@@ -66,10 +57,9 @@ int main()
 		.uniforms = &uniforms,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVertex = sizeof(Vertex),
-			.nOutputAttributes = 2,
-			.outputAttributes = attributes,
-			.indexOfOutputPositionAttribute = 0
+			.nBytesPerOutputVariables = sizeof(Vertex),
+			.nOutputVariables = 1,
+			.outputVariables = VSOutputVariables,
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -110,37 +100,24 @@ int main()
 }
 
 
-void vertexShader(
-	const ShaderProgram* sp, const Vertex* pVertex, VSOutput* pOutput,
-	size_t vertexIndex
-)
+void vertexShader(VSInput* in, VSOutput* out)
 {
-	Vector4d position = Matrix4MultiplyVector4d(
-		&sp->uniforms->rotation,
-		*(Vector4d*) pVertex->position
-	);
-	memcpy(
-		((Vertex*) pOutput)->position,
-		&position,
-		sizeof(pVertex->position)
-	);
+	double* pos = in->pVertex->position;
+	out->position = (Vector4d) {
+		pos[0], pos[1], pos[2], 1.0
+	};
+	out->position = Matrix4MultiplyVector4d(&in->uniforms->rotation, out->position);
 
-	((Vertex*) pOutput)->color[0] = \
-		pVertex->color[0] + sin(sp->uniforms->frameCount * 2.5e-3) * 0.3;
-	((Vertex*) pOutput)->color[1] = \
-		pVertex->color[1] + sin(sp->uniforms->frameCount * 0.5e-3) * 0.1;
-	((Vertex*) pOutput)->color[2] = \
-		pVertex->color[2] + sin(sp->uniforms->frameCount * 5e-3) * 0.5;
+	double* colorOut = (double*) out->pOutputVariables;
+	colorOut[0] = in->pVertex->color[0] + sin(in->uniforms->frameCount * 2.5e-3) * 0.3;
+	colorOut[1] = in->pVertex->color[1] + sin(in->uniforms->frameCount * 0.5e-3) * 0.1;
+	colorOut[2] = in->pVertex->color[2] + sin(in->uniforms->frameCount * 5e-3) * 0.5;
 }
 
-void fragmentShader
-	(const ShaderProgram* sp, const Interpolated* pFragment, double* pColor)
+void fragmentShader(FSInput* in, FSOutput* out)
 {
-	memcpy(
-		pColor,
-		((Vertex*) pFragment)->color,
-		3 * sizeof(double)
-	);
-	pColor[3] = 1.;
+	double* colorIn = (double*) in->interpolated;
+	memcpy(&out->color, colorIn, 3 * sizeof(double));
+	out->color.w = 1.;
 }
 

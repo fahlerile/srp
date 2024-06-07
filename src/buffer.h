@@ -12,8 +12,6 @@ typedef struct
 	size_t nBytesData;
 	size_t nVertices;
 	Vertex* data;
-	size_t nAttributes;
-	VertexAttribute* attributes;
 } VertexBuffer;
 
 // Stores indices to vertices stored in `VertexBuffer`
@@ -26,10 +24,7 @@ typedef struct
 	void* data;
 } IndexBuffer;
 
-VertexBuffer* newVertexBuffer(
-	size_t nBytesPerVertex, size_t nBytesData, void* data, 
-	size_t nAttributes, VertexAttribute* attributes
-);
+VertexBuffer* newVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data);
 void freeVertexBuffer(VertexBuffer* this);
 static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index);
 

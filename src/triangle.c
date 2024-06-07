@@ -1,28 +1,21 @@
+#include <stdint.h>
 #include <string.h>
 #include "triangle.h"
+#include "Vector/Vector4.h"
+#include "Vertex.h"
 #include "math_utils.h"
-#include "voidptr.h"
+#include "shaders.h"
 #include "log.h"
+#include "voidptr.h"
 
 void drawTriangle(
-	Framebuffer* fb, const VSOutput* restrict vertices, 
-	const ShaderProgram* restrict sp
+	Framebuffer* fb, const VSOutput vertices[3], const ShaderProgram* restrict sp,
+	size_t primitiveID
 )
 {
-	VertexAttribute positionAttribute = sp->vs.outputAttributes[
-		sp->vs.indexOfOutputPositionAttribute
-	];
-
-	// TODO add this assert to docs
-	assert(positionAttribute.nItems == 3);
-	assert(positionAttribute.type == TYPE_DOUBLE);
-
 	Vector3d NDCPositions[3];
 	for (uint8_t i = 0; i < 3; i++)
-	{
-		Vertex* pVertex = (Vertex*) INDEX_VOID_PTR(vertices, i, sp->vs.nBytesPerOutputVertex);
-		NDCPositions[i] = *(Vector3d*) VOID_PTR_ADD(pVertex, positionAttribute.offsetBytes);
-	}
+		NDCPositions[i] = Vector4dHomogenousDivide(vertices[i].position);
 
 	// Do not traverse triangles with clockwise vertices
 	Vector3d e0 = Vector3dSubtract(NDCPositions[1], NDCPositions[0]);
@@ -78,26 +71,35 @@ void drawTriangle(
 				barycentricCoordinates[1] >= 0 && \
 				barycentricCoordinates[2] >= 0)
 			{
-				// TODO avoid VLA (custom allocator?)
-				uint8_t interpolatedBuffer[sp->vs.nBytesPerOutputVertex];
+				// TODO: avoid VLA (custom allocator?)
+				uint8_t interpolatedBuffer[sp->vs.nBytesPerOutputVariables];
 				Interpolated* pInterpolated = (Interpolated*) interpolatedBuffer;
-				triangleInterpolateGsOutput(
-					vertices, barycentricCoordinates, sp, pInterpolated
+				Vector4d interpolatedPosition = {0};
+				triangleInterpolatePositionAndVertexVariables(
+					vertices, barycentricCoordinates, sp, pInterpolated,
+					&interpolatedPosition
 				);
-				double depth = ((double*) (
-					(uint8_t*) pInterpolated + sp->vs.outputAttributes[
-						sp->vs.indexOfOutputPositionAttribute
-					].offsetBytes
-				))[2];
 
-				double colorVec[4];
-				sp->fs.shader(sp, pInterpolated, colorVec);
-				Color color = {
-					CLAMP(0, 255, colorVec[0] * 255),
-					CLAMP(0, 255, colorVec[1] * 255),
-					CLAMP(0, 255, colorVec[2] * 255),
-					CLAMP(0, 255, colorVec[3] * 255)
+				// TODO: fix rasterizer to accept both cw and ccw vertices
+				// and add correct `frontFacing` here!
+				FSInput fsIn = {
+					.fragCoord = interpolatedPosition,
+					.frontFacing = true,
+					.primitiveID = primitiveID,
+					.interpolated = pInterpolated
 				};
+				FSOutput fsOut = {0};
+
+				sp->fs.shader(&fsIn, &fsOut);
+
+				Color color = {
+					CLAMP(0, 255, fsOut.color.x * 255),
+					CLAMP(0, 255, fsOut.color.y * 255),
+					CLAMP(0, 255, fsOut.color.z * 255),
+					CLAMP(0, 255, fsOut.color.w * 255)
+				};
+				double depth = (fsOut.fragDepth == 0) ? fsIn.fragCoord.z : fsOut.fragDepth;
+
 				framebufferDrawPixel(fb, x, y, depth, ColorToUint32RGBA(&color));
 			}
 
@@ -162,28 +164,35 @@ static bool triangleIsEdgeFlatTopOrLeft(const Vector3d* restrict edgeVector)
 	return ((edgeVector->x > 0) && (edgeVector->y == 0)) || (edgeVector->y < 0);
 }
 
-// @brief Interpolates geometry shader output in triangle
-// Invalidates the whole buffer pointed to by `gsOutput`
-// Interpolated data is stored in the first vertex of `gsOutput`
-static void triangleInterpolateGsOutput(
-	const void* gsOutput, const double barycentricCoordinates[3],
-	const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer
+// @brief Interpolates variables in triangle
+static void triangleInterpolatePositionAndVertexVariables(
+	const VSOutput vertices[3], const double barycentricCoordinates[3],
+	const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer,
+	Vector4d* pInterpolatedPosition
 )
 {
-	// gsOutput =
+	// *vertices.pOutputVariables =
 	// (						   V0							 )	(		V1		) (		  V2	  )
-	// (		  A0V0			)	   (		   AnV0			 )	(A0V1, ..., AnV1) (A0V2, ..., AnV2)
+	// (		  V0A0			) ...  (		   V0An			 )	(V1A0, ..., V1An) (V2A0, ..., V2An)
 	// V0A0E0, V0A0E1, ... V0A0En, ... V0AnE0, V0AnE1, ..., V0AnEn, ...
 	// [V]ertex, [A]ttribute, [E]lement
 
-	// points to the beginning of attribute
-	const void* pAttrVoid = gsOutput;
 	// points to attribute in output buffer
 	void* pInterpolatedAttrVoid = pInterpolatedBuffer;
 
-	for (size_t attrI = 0; attrI < sp->vs.nOutputAttributes; attrI++)
+	// interpolate position
+	for (uint8_t i = 0; i < 4; i++)
 	{
-		VertexAttribute* attr = &sp->vs.outputAttributes[attrI];
+		((double*) pInterpolatedPosition)[i] = \
+			((double*) &vertices[0].position)[i] * barycentricCoordinates[0] + \
+			((double*) &vertices[1].position)[i] * barycentricCoordinates[1] + \
+			((double*) &vertices[2].position)[i] * barycentricCoordinates[2];
+	}
+
+	// interpolate variables (attributes)
+	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
+	{
+		VertexVariable* attr = &sp->vs.outputVariables[attrI];
 		size_t elemSize = 0;
 		switch (attr->type)
 		{
@@ -191,9 +200,15 @@ static void triangleInterpolateGsOutput(
 		{
 			elemSize = sizeof(double);
 			double* pInterpolatedAttr = (double*) pInterpolatedAttrVoid;
-			double* AV0 = (double*) pAttrVoid;
-			double* AV1 = (double*) ((uint8_t*) AV0 + sp->vs.nBytesPerOutputVertex);
-			double* AV2 = (double*) ((uint8_t*) AV1 + sp->vs.nBytesPerOutputVertex);
+
+			// pointers to the current attribute of 0th, 1st and 2nd vertices
+			double* AV0 = (double*) \
+				INDEX_VOID_PTR(vertices[0].pOutputVariables, attr->offsetBytes, 1);
+			double* AV1 = (double*) \
+				INDEX_VOID_PTR(vertices[1].pOutputVariables, attr->offsetBytes, 1);
+			double* AV2 = (double*) \
+				INDEX_VOID_PTR(vertices[2].pOutputVariables, attr->offsetBytes, 1);
+
 			for (size_t elemI = 0; elemI < attr->nItems; elemI++)
 			{
 				pInterpolatedAttr[elemI] = \
@@ -205,11 +220,10 @@ static void triangleInterpolateGsOutput(
 		}
 		default:
 			LOGE("Unknown type (%i) in %s", attr->type, __func__);
-			memset(pInterpolatedBuffer, 0, sp->vs.nBytesPerOutputVertex);
+			memset(pInterpolatedBuffer, 0, sp->vs.nBytesPerOutputVariables);
 			return;
 		}
 		size_t attrSize = elemSize * attr->nItems;
-		pAttrVoid = (uint8_t*) pAttrVoid + attrSize;
 		pInterpolatedAttrVoid = (uint8_t*) pInterpolatedAttrVoid + attrSize;
 	}
 }
