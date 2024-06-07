@@ -36,26 +36,6 @@ static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index)
 	return (Vertex*) ((uint8_t*) this->data + this->nBytesPerVertex * index);
 }
 
-// @brief Draw vertex array without calling vertex and geometry shaders
-// Needed because geometry shader can output multiple primitives to draw
-// Intended to use inside `drawIndexBuffer` after calling these shaders
-static void drawRawVertexBuffer(
-	Framebuffer* fb, GSOutput* gsOutput, ShaderProgram* sp, 
-	Primitive primitive
-)
-{
-	assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
-
-	GeometryShader* gs = &sp->geometryShader;
-	size_t n = (gs->nOutputVertices == 0) ? 3 : gs->nOutputVertices;
-	for (size_t i = 0; i < n; i += 3)
-	{
-		GSOutput* gsOutputTriangle = (GSOutput*) \
-			INDEX_VOID_PTR(gsOutput, i, gs->nBytesPerOutputVertex);
-		drawTriangle(fb, gsOutputTriangle, sp);
-	}
-}
-
 IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data)
 {
 	IndexBuffer* this = xmalloc(sizeof(IndexBuffer));
@@ -108,29 +88,7 @@ void drawIndexBuffer(
 {
 	assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
-	VertexShader* vs = &sp->vertexShader;
-	GeometryShader* gs = &sp->geometryShader;
-
-	VSOutput* triangleVsOutput = xmalloc(vs->nBytesPerOutputVertex * 3);
-	GSOutput* gsOutput;
-	if (gs->shader == NULL)
-		gsOutput = (GSOutput*) triangleVsOutput;
-	else
-		gsOutput = xmalloc(
-			gs->nBytesPerOutputVertex * \
-			gs->nOutputVertices
-		);
-
-#ifndef NDEBUG
-	assert(
-		gs->inputPrimitive == PRIMITIVE_ANY ||
-		(
-			primitive == gs->inputPrimitive && \
-			"Input primitive type for geometry shader and primitive type \
-			passed mismatch"
-		)
-	);
-#endif
+	VSOutput* triangleVsOutput = xmalloc(sp->vs.nBytesPerOutputVertex * 3);
 
 	size_t endIndex = startIndex + count;
 	assert(endIndex <= this->nIndices);
@@ -142,22 +100,12 @@ void drawIndexBuffer(
 			uint64_t vertexIndex = indexIndexBuffer(this, i + j);
 			Vertex* pVertex = indexVertexBuffer(vb, vertexIndex);
 			VSOutput* pVsOutput = (VSOutput*) \
-				INDEX_VOID_PTR(triangleVsOutput, j, vs->nBytesPerOutputVertex);
-			vs->shader(sp, pVertex, pVsOutput, i+j);
+				INDEX_VOID_PTR(triangleVsOutput, j, sp->vs.nBytesPerOutputVertex);
+			sp->vs.shader(sp, pVertex, pVsOutput, i+j);
 		}
-
-		Primitive newPrimitive = \
-			(gs->outputPrimitive == PRIMITIVE_ANY) ? \
-			primitive : gs->outputPrimitive;
-		if (gs->shader != NULL)
-			gs->shader(sp, triangleVsOutput, gsOutput);
-
-		drawRawVertexBuffer(fb, gsOutput, sp, newPrimitive);
+		drawTriangle(fb, triangleVsOutput, sp);
 	}
 
-	// That means a distinct buffer for GS was allocated
-	if ((void*) triangleVsOutput != (void*) gsOutput)
-		xfree(gsOutput);
 	xfree(triangleVsOutput);
 }
 

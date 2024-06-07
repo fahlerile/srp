@@ -1,7 +1,6 @@
 set(
 	SOURCES
 	buffer.c
-	shaders.c
 	triangle.c
 	Framebuffer.c
 	Type.c

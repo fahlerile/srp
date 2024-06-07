@@ -5,13 +5,12 @@
 #include "log.h"
 
 void drawTriangle(
-	Framebuffer* fb, const GSOutput* restrict gsOutput, 
+	Framebuffer* fb, const VSOutput* restrict vertices, 
 	const ShaderProgram* restrict sp
 )
 {
-	const GeometryShader* gs = &sp->geometryShader;
-	VertexAttribute positionAttribute = gs->outputAttributes[
-		gs->indexOfOutputPositionAttribute
+	VertexAttribute positionAttribute = sp->vs.outputAttributes[
+		sp->vs.indexOfOutputPositionAttribute
 	];
 
 	// TODO add this assert to docs
@@ -21,7 +20,7 @@ void drawTriangle(
 	Vector3d NDCPositions[3];
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		Vertex* pVertex = (Vertex*) INDEX_VOID_PTR(gsOutput, i, gs->nBytesPerOutputVertex);
+		Vertex* pVertex = (Vertex*) INDEX_VOID_PTR(vertices, i, sp->vs.nBytesPerOutputVertex);
 		NDCPositions[i] = *(Vector3d*) VOID_PTR_ADD(pVertex, positionAttribute.offsetBytes);
 	}
 
@@ -80,19 +79,19 @@ void drawTriangle(
 				barycentricCoordinates[2] >= 0)
 			{
 				// TODO avoid VLA (custom allocator?)
-				uint8_t interpolatedBuffer[sp->geometryShader.nBytesPerOutputVertex];
+				uint8_t interpolatedBuffer[sp->vs.nBytesPerOutputVertex];
 				Interpolated* pInterpolated = (Interpolated*) interpolatedBuffer;
 				triangleInterpolateGsOutput(
-					gsOutput, barycentricCoordinates, sp, pInterpolated
+					vertices, barycentricCoordinates, sp, pInterpolated
 				);
 				double depth = ((double*) (
-					(uint8_t*) pInterpolated + sp->geometryShader.outputAttributes[
-						sp->geometryShader.indexOfOutputPositionAttribute
+					(uint8_t*) pInterpolated + sp->vs.outputAttributes[
+						sp->vs.indexOfOutputPositionAttribute
 					].offsetBytes
 				))[2];
 
 				double colorVec[4];
-				sp->fragmentShader.shader(sp, pInterpolated, colorVec);
+				sp->fs.shader(sp, pInterpolated, colorVec);
 				Color color = {
 					CLAMP(0, 255, colorVec[0] * 255),
 					CLAMP(0, 255, colorVec[1] * 255),
@@ -177,15 +176,14 @@ static void triangleInterpolateGsOutput(
 	// V0A0E0, V0A0E1, ... V0A0En, ... V0AnE0, V0AnE1, ..., V0AnEn, ...
 	// [V]ertex, [A]ttribute, [E]lement
 
-	const GeometryShader* gs = &sp->geometryShader;
 	// points to the beginning of attribute
 	const void* pAttrVoid = gsOutput;
 	// points to attribute in output buffer
 	void* pInterpolatedAttrVoid = pInterpolatedBuffer;
 
-	for (size_t attrI = 0; attrI < gs->nOutputAttributes; attrI++)
+	for (size_t attrI = 0; attrI < sp->vs.nOutputAttributes; attrI++)
 	{
-		VertexAttribute* attr = &gs->outputAttributes[attrI];
+		VertexAttribute* attr = &sp->vs.outputAttributes[attrI];
 		size_t elemSize = 0;
 		switch (attr->type)
 		{
@@ -194,8 +192,8 @@ static void triangleInterpolateGsOutput(
 			elemSize = sizeof(double);
 			double* pInterpolatedAttr = (double*) pInterpolatedAttrVoid;
 			double* AV0 = (double*) pAttrVoid;
-			double* AV1 = (double*) ((uint8_t*) AV0 + gs->nBytesPerOutputVertex);
-			double* AV2 = (double*) ((uint8_t*) AV1 + gs->nBytesPerOutputVertex);
+			double* AV1 = (double*) ((uint8_t*) AV0 + sp->vs.nBytesPerOutputVertex);
+			double* AV2 = (double*) ((uint8_t*) AV1 + sp->vs.nBytesPerOutputVertex);
 			for (size_t elemI = 0; elemI < attr->nItems; elemI++)
 			{
 				pInterpolatedAttr[elemI] = \
@@ -207,7 +205,7 @@ static void triangleInterpolateGsOutput(
 		}
 		default:
 			LOGE("Unknown type (%i) in %s", attr->type, __func__);
-			memset(pInterpolatedBuffer, 0, gs->nBytesPerOutputVertex);
+			memset(pInterpolatedBuffer, 0, sp->vs.nBytesPerOutputVertex);
 			return;
 		}
 		size_t attrSize = elemSize * attr->nItems;

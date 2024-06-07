@@ -56,19 +56,17 @@ int main()
 
 	ShaderProgram shaderProgram = {
 		.uniforms = NULL,
-		.vertexShader = {
+		.vs = {
 			.shader = vertexShader,
 			.nBytesPerOutputVertex = sizeof(Vertex),
 			.nOutputAttributes = 2,
 			.outputAttributes = attributes,
 			.indexOfOutputPositionAttribute = 0
 		},
-		.geometryShader = {0},
-		.fragmentShader = {
+		.fs = {
 			.shader = fragmentShader
 		}
 	};
-	shaderProgramSetDefaultGeometryShader(&shaderProgram);
 
 	Window* window = newWindow(512, 512, "Rasterizer", false);
 

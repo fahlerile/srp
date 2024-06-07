@@ -13,7 +13,7 @@ typedef struct
 } triangleData;
 
 void drawTriangle(
-	Framebuffer* fb, const GSOutput* restrict gsOutput, 
+	Framebuffer* fb, const VSOutput* restrict vertices, 
 	const ShaderProgram* restrict sp
 );
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Framebuffer.h"
+#include "Primitive.h"
 #include "Vertex.h"
 #include "shaders.h"
 
@@ -30,16 +31,10 @@ VertexBuffer* newVertexBuffer(
 	size_t nAttributes, VertexAttribute* attributes
 );
 void freeVertexBuffer(VertexBuffer* this);
-
 static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index);
-static void drawRawVertexBuffer(
-	Framebuffer* fb, GSOutput* gsOutput, ShaderProgram* sp, 
-	Primitive primitive
-);
 
 IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data);
 void freeIndexBuffer(IndexBuffer* this);
-
 static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index);
 void drawIndexBuffer(
 	Framebuffer* fb, IndexBuffer* this, VertexBuffer* vb, Primitive primitive, 

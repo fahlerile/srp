@@ -26,15 +26,9 @@ cd bin
 - [ ] Write the documentation about the main pipeline and individual functions
 
 ### Features
-- [ ] Review the rendering pipeline (https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview)
-	- See if I am missing some important step
-	- See if I can make the pipeline more customizable
 - [ ] Consider the case of multiple `Vertex` types, and changes between them during the rendering pipeline (see \`TODO\` comments)
 - [ ] Add texture mapping with perspective correction
-- [ ] Add `Mesh`/`Model` structure
-- [ ] Play around with rendering models
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
-- [ ] Read LearnOpenGL to learn about light, reflections, shadows and all that fancy stuff and think how can I implement that
 
 ### Optimization
 - [ ] Draw primitives in parallel (OpenMP)
@@ -42,4 +36,6 @@ cd bin
 ### Portability
 - [x] Do not use `lib/c-codebase` types for API function signatures for portability and avoiding useless dependency
 - [x] Fix header hell
+- [ ] Split everything into public and private headers
+- [ ] Remove `lib/c-codebase` dependency
 

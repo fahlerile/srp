@@ -1,14 +1,11 @@
 #pragma once
 #include "Vertex.h"
-#include "Primitive.h"
 
-// Incomplete "filler" type
 typedef struct VSOutput VSOutput;
-typedef struct GSOutput GSOutput;
 typedef struct Interpolated Interpolated;
 
 // Assumed to be defined by the user
-// TODO: what if there are multiple wanted uniforms?
+// TODO: multiple uniform types?
 typedef struct Uniforms Uniforms;
 
 // Circular dependency
@@ -28,24 +25,6 @@ typedef struct
 
 typedef struct
 {
-	void (*shader)(const ShaderProgram* sp, const VSOutput* pInput, GSOutput* pOutput);
-	size_t nBytesPerOutputVertex;
-	size_t nOutputAttributes;
-	VertexAttribute* outputAttributes;
-	size_t indexOfOutputPositionAttribute;
-
-	// Geometry shader specific
-	// If both `inputPrimitive` and `outputPrimitive` are `PRIMITIVE_ANY` 
-	// (so geometryShader was default-initialized) then `nOutputVertices`
-	// is not valid and should be set accordingly to primitive type that 
-	// is being processed
-	size_t nOutputVertices;
-	Primitive inputPrimitive;
-	Primitive outputPrimitive;
-} GeometryShader;
-
-typedef struct
-{
 	void (*shader)(
 		const ShaderProgram* sp, const Interpolated* pInterpolated, double* color
 	);
@@ -55,10 +34,7 @@ struct ShaderProgram
 {
 	Uniforms* uniforms;
 
-	VertexShader vertexShader;
-	GeometryShader geometryShader;
-	FragmentShader fragmentShader;
+	VertexShader vs;
+	FragmentShader fs;
 };
-
-void shaderProgramSetDefaultGeometryShader(ShaderProgram* sp);
 
