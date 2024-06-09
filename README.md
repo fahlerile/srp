@@ -32,6 +32,12 @@ cd bin
 - [ ] Fix rasterization rules
 - [ ] Consider the case of multiple `Vertex` types, and changes between them during the rendering pipeline (see \`TODO\` comments)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
+- [ ] Add multisampling
+- [ ] Advanced texture techniques:
+    - [ ] (Bi)linear filtering
+    - [ ] Mipmapping
+    - [ ] Anisotropic filtering
+    - [ ] Transparent textures?
 
 ### Optimization
 - [ ] Draw primitives in parallel (OpenMP)
