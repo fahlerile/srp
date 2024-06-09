@@ -1,5 +1,7 @@
 #include <string.h>
 #include "buffer.h"
+#include "Vector/Vector3.h"
+#include "Vector/Vector4.h"
 #include "memoryUtils/memoryUtils.h"
 #include "triangle.h"
 #include "voidptr.h"
@@ -110,6 +112,9 @@ void drawIndexBuffer(
 			};
 
 			sp->vs.shader(&vsIn[j], &vsOut[j]);
+			vsOut[j].position = Vector3dToVector4dHomogenous(
+				Vector4dHomogenousDivide(vsOut[j].position)
+			);
 		}
 		drawTriangle(fb, vsOut, sp, primitiveID);
 		primitiveID++;
