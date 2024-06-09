@@ -27,7 +27,8 @@ cd bin
 
 ### Features
 - [x] Change shader signatures to use new input and output structures; add some builtin shader inputs from OpenGL
-- [ ] Add texture mapping with perspective correction
+- [ ] Add interpolation with perspective correction
+- [ ] Add texture mapping
 - [ ] Consider the case of multiple `Vertex` types, and changes between them during the rendering pipeline (see \`TODO\` comments)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
 
