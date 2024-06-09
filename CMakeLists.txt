@@ -29,6 +29,16 @@ if (ENABLE_GPROF)
 	add_link_options(-pg)
 endif()
 
+add_custom_target(copy_res_folder ALL)
+add_custom_command(
+	TARGET copy_res_folder
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${PROJECT_SOURCE_DIR}/res
+		${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res
+)
+
+include_directories(lib/c-codebase lib/)
+
 add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(examples)
