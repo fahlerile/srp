@@ -1,4 +1,4 @@
-#include "Vector/Vector3.h"
+#include "Texture.h"
 #include "rasterizer.h"
 #include "Matrix/Matrix.h"
 #include "Window.h"
@@ -9,7 +9,7 @@
 struct Vertex
 {
 	double position[3];
-	double color[3];
+	double uv[2];
 };
 
 struct Uniforms
@@ -18,6 +18,7 @@ struct Uniforms
 	Matrix4 model;
 	Matrix4 view;
 	Matrix4 projection;
+	Texture* texture;
 };
 
 void vertexShader(VSInput* in, VSOutput* out);
@@ -27,35 +28,56 @@ int main()
 {
 	Framebuffer* fb = newFramebuffer(512, 512);
 
-	Vertex data[8] = {
-		{.position = {-1., -1., -1.}, .color = {1., 0., 0.}},
-		{.position = {-1., -1.,  1.}, .color = {0., 1., 0.}},
-		{.position = { 1., -1.,  1.}, .color = {0., 0., 1.}},
-		{.position = { 1., -1., -1.}, .color = {1., 1., 0.}},
-		{.position = {-1.,  1., -1.}, .color = {0., 1., 1.}},
-		{.position = {-1.,  1.,  1.}, .color = {1., 0., 1.}},
-		{.position = { 1.,  1.,  1.}, .color = {1., 1., 1.}},
-		{.position = { 1.,  1., -1.}, .color = {0.8, 0.2, 0.5}},
-	};
-	uint8_t indices[36] = {
-		3, 6, 7,  3, 2, 6,  // +x
-		1, 4, 5,  1, 0, 4,  // -x
-		5, 7, 6,  5, 4, 7,  // +y
-		0, 2, 3,  0, 1, 2,  // -y
-		2, 5, 6,  2, 1, 5,  // +z
-		0, 7, 4,  0, 3, 7   // -z
-	};
+	Vertex data[] = {
+		{.position = {-1, -1, -1}, .uv = {0, 0}},
+		{.position = { 1, -1, -1}, .uv = {1, 0}},
+		{.position = { 1,  1, -1}, .uv = {1, 1}},
+		{.position = {-1,  1, -1}, .uv = {0, 1}},
 
-	VertexVariable VSOutputVariables[1] = {
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
+		{.position = {-1,  1, -1}, .uv = {0, 0}},
+		{.position = { 1,  1, -1}, .uv = {1, 0}},
+		{.position = { 1,  1,  1}, .uv = {1, 1}},
+		{.position = {-1,  1,  1}, .uv = {0, 1}},
+
+		{.position = { 1, -1,  1}, .uv = {0, 0}},
+		{.position = {-1, -1,  1}, .uv = {1, 0}},
+		{.position = {-1,  1,  1}, .uv = {1, 1}},
+		{.position = { 1,  1,  1}, .uv = {0, 1}},
+
+		{.position = { 1, -1,  1}, .uv = {0, 0}},
+		{.position = { 1, -1, -1}, .uv = {1, 0}},
+		{.position = { 1,  1, -1}, .uv = {1, 1}},
+		{.position = { 1,  1,  1}, .uv = {0, 1}},
+
+		{.position = {-1, -1, -1}, .uv = {0, 0}},
+		{.position = {-1, -1,  1}, .uv = {1, 0}},
+		{.position = {-1,  1,  1}, .uv = {1, 1}},
+		{.position = {-1,  1, -1}, .uv = {0, 1}},
+		
+		{.position = {-1, -1, -1}, .uv = {0, 0}},
+		{.position = { 1, -1, -1}, .uv = {1, 0}},
+		{.position = { 1, -1,  1}, .uv = {1, 1}},
+		{.position = {-1, -1,  1}, .uv = {0, 1}}
+	};
+	uint8_t indices[] = {
+		0, 1, 2,  0, 2, 3,
+		4, 5, 6,  4, 6, 7,
+		8, 9, 10,  8, 10, 11,
+		12, 15, 14,  12, 14, 13,
+		16, 18, 17,  16, 19, 18,
+		20, 23, 22,  20, 22, 21
 	};
 
 	VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
+
+	VertexVariable VSOutputVariables[1] = {
+		{
+			.nItems = 2,
+			.type = TYPE_DOUBLE,
+			.offsetBytes = 0
+		}
+	};
 
 	Uniforms uniforms = {
 		.model = Matrix4ConstructIdentity(),
@@ -64,8 +86,13 @@ int main()
 			(Vector3d) {1, 1, 1}
 		),
 		.projection = Matrix4ConstructPerspectiveProjection(-1, 1, -1, 1, 1, 50),
+		.texture = newTexture(
+			"./res/textures/stoneWall.png", TW_REPEAT, TW_REPEAT,
+			TF_NEAREST, TF_NEAREST
+		),
 		.frameCount = 0
 	};
+
 	ShaderProgram shaderProgram = {
 		.uniforms = &uniforms,
 		.vs = {
@@ -80,7 +107,6 @@ int main()
 	};
 
 	Window* window = newWindow(512, 512, "Rasterizer", false);
-
 	while (window->running)
 	{
 		TIMER_START(frametime);
@@ -106,6 +132,7 @@ int main()
 		);
 	}
 
+	freeTexture(uniforms.texture);
 	freeVertexBuffer(vb);
 	freeIndexBuffer(ib);
 	freeFramebuffer(fb);
@@ -125,16 +152,20 @@ void vertexShader(VSInput* in, VSOutput* out)
 	out->position = Matrix4MultiplyVector4d(&in->uniforms->view, out->position);
 	out->position = Matrix4MultiplyVector4d(&in->uniforms->projection, out->position);
 
-	double* colorOut = (double*) out->pOutputVariables;
-	colorOut[0] = in->pVertex->color[0];
-	colorOut[1] = in->pVertex->color[1];
-	colorOut[2] = in->pVertex->color[2];
+	double* uvOut = (double*) out->pOutputVariables;
+	uvOut[0] = in->pVertex->uv[0];
+	uvOut[1] = in->pVertex->uv[1];
 }
 
 void fragmentShader(FSInput* in, FSOutput* out)
 {
-	double* colorIn = (double*) in->interpolated;
-	memcpy(&out->color, colorIn, 3 * sizeof(double));
-	out->color.w = 1.;
+	double* uv = (double*) in->interpolated;
+	Color color = textureGetFilteredColor(in->uniforms->texture, uv[0], uv[1]);
+	out->color = (Vector4d) {
+		(double) color.r / 255,
+		(double) color.g / 255,
+		(double) color.b / 255,
+		(double) color.a / 255
+	};
 }
 
