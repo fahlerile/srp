@@ -14,9 +14,4 @@ target_link_libraries(
 	memoryUtils
 	Vector
 )
-target_include_directories(
-	rasterizer
-	PRIVATE
-	${CMAKE_SOURCE_DIR}/lib/c-codebase
-)
 

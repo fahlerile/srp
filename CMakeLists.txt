@@ -37,6 +37,8 @@ add_custom_command(
 		${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res
 )
 
+include_directories(lib/c-codebase lib/)
+
 add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(examples)
