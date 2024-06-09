@@ -14,9 +14,9 @@ typedef struct ShaderProgram ShaderProgram;
 
 typedef struct
 {
-	size_t vertexID;
-	Vertex* pVertex;
 	Uniforms* uniforms;
+	Vertex* pVertex;
+	size_t vertexID;
 } VSInput;
 
 typedef struct VSOutputVariable VSOutputVariable;
@@ -40,10 +40,11 @@ typedef struct
 
 typedef struct
 {
+	Uniforms* uniforms;
+	Interpolated* interpolated;
 	Vector4d fragCoord;
 	bool frontFacing;
 	size_t primitiveID;
-	Interpolated* interpolated;
 } FSInput;
 
 typedef struct
