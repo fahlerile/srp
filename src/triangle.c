@@ -83,10 +83,11 @@ void drawTriangle(
 				// TODO: fix rasterizer to accept both cw and ccw vertices
 				// and add correct `frontFacing` here!
 				FSInput fsIn = {
+					.uniforms = sp->uniforms,
+					.interpolated = pInterpolated,
 					.fragCoord = interpolatedPosition,
 					.frontFacing = true,
 					.primitiveID = primitiveID,
-					.interpolated = pInterpolated
 				};
 				FSOutput fsOut = {0};
 
