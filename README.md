@@ -29,6 +29,7 @@ You can also build the examples by providing the `-D BUILD_EXAMPLES=1` argument 
 - https://github.com/NotCamelCase/SoftLit
 - https://github.com/nikolausrauch/software-rasterizer
 - https://github.com/niepp/srpbr
+
 And a lot more... Here I mentioned only those projects on which I looked at as a reference while making this one. If you need more similar projects, see [this](https://github.com/topics/software-rendering) and [this](https://github.com/topics/software-rasterizer).
 
 ## References
@@ -43,6 +44,7 @@ And a lot more... Here I mentioned only those projects on which I looked at as a
 - Perspective-correct interpolation:
     - https://www.comp.nus.edu.sg/%7Elowkl/publications/lowk_persp_interp_techrep.pdf
     - https://www.youtube.com/watch?v=F5X6S35SW2s
+
 And many, many more, all of which I will not find anymore...
 
 ## TODO
