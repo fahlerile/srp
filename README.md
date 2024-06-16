@@ -20,17 +20,13 @@ cd bin
 
 ## TODO
 ### Documentation/examples
-- [x] Write some examples
-- [ ] Add comments to the examples
 - [ ] Prettify the API (think about convenience macros/functions)
+- [ ] Add comments to the examples
 - [ ] Write the documentation about the main pipeline and individual functions
 
 ### Features
-- [x] Change shader signatures to use new input and output structures; add some builtin shader inputs from OpenGL
-- [x] Add texture mapping
 - [ ] Add interpolation with perspective correction
 - [ ] Fix rasterization rules (see the gaps between triangles in `03_spinning_textured_cube` example)
-- [ ] Consider the case of multiple `Vertex` types, and changes between them during the rendering pipeline (see \`TODO\` comments)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
 - [ ] Add multisampling
 - [ ] Advanced texture techniques:
@@ -40,11 +36,8 @@ cd bin
     - [ ] Transparent textures?
 
 ### Optimization
+- [ ] Use a profiler to find bottlenecks in frequently-used functions
 - [ ] Draw primitives in parallel (OpenMP)
 
 ### Portability
-- [x] Do not use `lib/c-codebase` types for API function signatures for portability and avoiding useless dependency
-- [x] Fix header hell
-- [ ] Split everything into public and private headers
-- [ ] Remove `lib/c-codebase` dependency
 
