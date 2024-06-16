@@ -71,3 +71,16 @@ And many, many more, all of which I will not find anymore...
 ### Portability
 - [ ] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
 
+## What I learned
+This is a section specially for my portfolio, so feel free to skip it. Well, I learned:
+- Advanced (I think so) C programming techniques:
+    - Opaque types
+    - Use of header guards to incapsulate internal functions & types
+    - Many more...
+- Importance of having a plan, an end goal:
+    - This project started as something completely different from what it is now
+- Basic Git workflow
+- The importance of atomic (if it is possible) commits and meaningful commit names
+- Premature optimization and optimization without measuring *really* is the root of all evil
+- Importance of readable code and comments where they are needed
+
