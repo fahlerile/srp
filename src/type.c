@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include "message_callback.h"
-#include "Type.h"
+#include "type.h"
 
 size_t SIZEOF_TYPE(Type type)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "Type.h"
+#include "type.h"
 
 typedef struct SRPVertex SRPVertex;
 

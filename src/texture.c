@@ -9,7 +9,7 @@
 #include "math_utils.h"
 #include "stb_image.h"
 #include "utils.h"
-#include "Texture.h"
+#include "texture.h"
 
 #define N_CHANNELS_REQUESTED 3
 

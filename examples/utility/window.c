@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "window.h"
 #include "color.h"
 
 Window* newWindow(size_t width, size_t height, char* title, bool fullscreen)

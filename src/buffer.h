@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Framebuffer.h"
-#include "Primitive.h"
+#include "framebuffer.h"
+#include "primitive.h"
 #include "shaders.h"
 
 // Stores vertex data

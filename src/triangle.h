@@ -2,7 +2,7 @@
 
 #ifdef SRP_SOURCE
 
-#include "Framebuffer.h"
+#include "framebuffer.h"
 #include "shaders.h"
 #include "vec.h"
 

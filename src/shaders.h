@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
-#include "Vertex.h"
+#include "vertex.h"
 #include "vec.h"
 
 typedef struct SRPInterpolated SRPInterpolated;

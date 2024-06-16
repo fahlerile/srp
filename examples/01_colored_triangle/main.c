@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "rasterizer.h"
-#include "Window.h"
+#include "window.h"
 #include "timer.h"
 #include "rad.h"
 

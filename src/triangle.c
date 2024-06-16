@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "triangle.h"
-#include "Vertex.h"
+#include "vertex.h"
 #include "message_callback.h"
 #include "math_utils.h"
 #include "shaders.h"

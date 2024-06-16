@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include "Framebuffer.h"
+#include "framebuffer.h"
 #include "message_callback.h"
 #include "defines.h"
 
