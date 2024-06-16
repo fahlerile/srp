@@ -1,10 +1,12 @@
-#include <stdint.h>
-#include "Type.h"
-#include "log.h"
+#define SRP_SOURCE
 
-size_t SIZEOF_TYPE(Type a)
+#include <stdio.h>
+#include "message_callback.h"
+#include "type.h"
+
+size_t SIZEOF_TYPE(Type type)
 {
-	switch (a)
+	switch (type)
 	{
 		case TYPE_UINT8:
 			return sizeof(uint8_t);
@@ -19,8 +21,13 @@ size_t SIZEOF_TYPE(Type a)
 		case TYPE_DOUBLE:
 			return sizeof(double);
 		default:
-			LOGE("Unknown type (%i) in %s", a, __func__);
+		{
+			messageCallback(
+				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				"Unknown type (%i)", type
+			);
 			return 0;
+		}
 	}
 }
 

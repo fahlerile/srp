@@ -1,19 +1,16 @@
 set(
 	SOURCES
+	context.c
 	buffer.c
 	triangle.c
-	Framebuffer.c
-	Type.c
-	Texture.c
+	framebuffer.c
+	type.c
+	texture.c
 	stb_image.c
+	vec.c
+	mat.c
+	alloc.c
 )
 
 add_library(rasterizer STATIC ${SOURCES})
-target_link_libraries(
-	rasterizer
-	PRIVATE
-	SDL2
-	memoryUtils
-	Vector
-)
 

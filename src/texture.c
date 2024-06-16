@@ -1,28 +1,34 @@
+#define SRP_SOURCE
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "log.h"
+#include <stdio.h>
+#include "message_callback.h"
+#include "defines.h"
 #include "math_utils.h"
 #include "stb_image.h"
-#include "memoryUtils/memoryUtils.h"
-#include "Texture.h"
+#include "utils.h"
+#include "texture.h"
 
 #define N_CHANNELS_REQUESTED 3
 
-Texture* newTexture(
+static SRPColor textureGetColor(SRPTexture* this, size_t x, size_t y);
+
+SRPTexture* srpNewTexture(
 	const char* image,
-	TextureWrappingMode wrappingModeX, TextureWrappingMode wrappingModeY,
-	TextureFilteringMode filteringModeMagnifying,
-	TextureFilteringMode filteringModeMinifying
+	SRPTextureWrappingMode wrappingModeX, SRPTextureWrappingMode wrappingModeY,
+	SRPTextureFilteringMode filteringModeMagnifying,
+	SRPTextureFilteringMode filteringModeMinifying
 )
 {
-	Texture* this = xmalloc(sizeof(Texture));
+	SRPTexture* this = SRP_MALLOC(sizeof(SRPTexture));
 	this->data = stbi_load(image, &this->width, &this->height, NULL, N_CHANNELS_REQUESTED);
 	if (this->data == NULL)
 	{
-		LOGE(
-			"%s: failed to load image \"%s\"; %s\n",
-			__func__, image, stbi_failure_reason()
+		messageCallback(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Failed to load image `%s`: %s", image, stbi_failure_reason()
 		);
 		return NULL;
 	}
@@ -33,16 +39,16 @@ Texture* newTexture(
 	return this;
 }
 
-void freeTexture(Texture* this)
+void srpFreeTexture(SRPTexture* this)
 {
 	stbi_image_free(this->data);
-	xfree(this);
+	SRP_FREE(this);
 }
 
 // TODO: now using only filteringModeMagnifying
 // how to know if texture is magnified or minified?
-// TODO: too much conditionals?
-Color textureGetFilteredColor(Texture* this, double u, double v)
+// TODO: too many conditionals?
+SRPColor srpTextureGetFilteredColor(SRPTexture* this, double u, double v)
 {
 	if (u < 0 || u > 1)
 	{
@@ -80,11 +86,10 @@ Color textureGetFilteredColor(Texture* this, double u, double v)
 	}
 }
 
-static Color textureGetColor(Texture* this, size_t x, size_t y)
+static SRPColor textureGetColor(SRPTexture* this, size_t x, size_t y)
 {
-	uint8_t* start = \
-		(uint8_t*) this->data + (x + y * this->width) * N_CHANNELS_REQUESTED;
-	return (Color) {
+	uint8_t* start = INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
+	return (SRPColor) {
 		start[0],
 		start[1],
 		start[2],
