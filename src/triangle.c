@@ -6,6 +6,7 @@
 #include <string.h>
 #include "triangle.h"
 #include "Vertex.h"
+#include "message_callback.h"
 #include "math_utils.h"
 #include "shaders.h"
 #include "color.h"
@@ -244,9 +245,10 @@ static void triangleInterpolatePositionAndVertexVariables(
 			break;
 		}
 		default:
-			fprintf(stderr, "Unknown type (%i) in %s", attr->type, __func__);
-			memset(pInterpolatedBuffer, 0, sp->vs.nBytesPerOutputVariables);
-			return;
+			messageCallback(
+				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				"Unexpected type (%i)", attr->type
+			);
 		}
 		size_t attrSize = elemSize * attr->nItems;
 		pInterpolatedAttrVoid = (uint8_t*) pInterpolatedAttrVoid + attrSize;

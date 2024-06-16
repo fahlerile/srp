@@ -1,4 +1,7 @@
+#define SRP_SOURCE
+
 #include <stdio.h>
+#include "message_callback.h"
 #include "Type.h"
 
 size_t SIZEOF_TYPE(Type type)
@@ -18,8 +21,13 @@ size_t SIZEOF_TYPE(Type type)
 		case TYPE_DOUBLE:
 			return sizeof(double);
 		default:
-			fprintf(stderr, "Unknown type (%i) in %s", type, __func__);
+		{
+			messageCallback(
+				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				"Unknown type (%i)", type
+			);
 			return 0;
+		}
 	}
 }
 

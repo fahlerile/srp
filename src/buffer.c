@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include "buffer.h"
 #include "triangle.h"
+#include "message_callback.h"
 #include "utils.h"
 #include "vec.h"
 #include "defines.h"
@@ -74,7 +74,10 @@ static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
 			ret = (uint64_t) (*(uint64_t*) pIndex);
 			break;
 		default:
-			fprintf(stderr, "Unhandled type (%i) in %s", this->indicesType, __func__);
+			messageCallback(
+				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				"Unexpected type (%i)", this->indicesType
+			);
 			ret = 0;
 	}
 	return ret;
@@ -86,10 +89,24 @@ void srpDrawIndexBuffer(
 	size_t startIbIndex, size_t count, SRPShaderProgram* sp
 )
 {
-	assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
+	if (primitive != PRIMITIVE_TRIANGLES)
+	{
+		messageCallback(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Only triangles are implemented"
+		);
+		return;
+	}
 
 	size_t endIbIndex = startIbIndex + count;
-	assert(endIbIndex <= this->nIndices);
+	if (endIbIndex > this->nIndices)
+	{
+		messageCallback(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Attempt to OOB access index buffer"
+		);
+		return;
+	}
 
 	VSOutputVariable* triangleVSOutputVariables = \
 		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);

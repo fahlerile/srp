@@ -10,11 +10,20 @@ typedef struct Vertex
 	double color[3];
 } Vertex;
 
+SRPContext srpContext;
+
+void messageCallback(
+	SRPMessageType type, SRPMessageSeverity severity, const char* sourceFunction,
+	const char* message, void* userParameter
+);
 void vertexShader(SRPvsInput* in, SRPvsOutput* out);
 void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 
 int main()
 {
+	srpNewContext(&srpContext);
+	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void**) &messageCallback);
+
 	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
 	const double R = 0.8;
@@ -86,6 +95,15 @@ int main()
 	freeWindow(window);
 
 	return 0;
+}
+
+
+void messageCallback(
+	SRPMessageType type, SRPMessageSeverity severity, const char* sourceFunction,
+	const char* message, void* userParameter
+)
+{
+	fprintf(stderr, "%s: %s", sourceFunction, message);
 }
 
 

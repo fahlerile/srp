@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "message_callback.h"
 #include "defines.h"
 #include "math_utils.h"
 #include "stb_image.h"
@@ -25,9 +26,9 @@ SRPTexture* srpNewTexture(
 	this->data = stbi_load(image, &this->width, &this->height, NULL, N_CHANNELS_REQUESTED);
 	if (this->data == NULL)
 	{
-		fprintf(
-			stderr, "%s: failed to load image \"%s\"; %s\n",
-			__func__, image, stbi_failure_reason()
+		messageCallback(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Failed to load image `%s`: %s", image, stbi_failure_reason()
 		);
 		return NULL;
 	}

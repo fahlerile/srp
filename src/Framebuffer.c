@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "Framebuffer.h"
+#include "message_callback.h"
 #include "defines.h"
 
 SRPFramebuffer* srpNewFramebuffer(size_t width, size_t height)
@@ -29,8 +30,11 @@ void framebufferDrawPixel(
 	SRPFramebuffer* this, size_t x, size_t y, double depth, uint32_t color
 )
 {
-	assert(1 >= depth);
-	assert(depth >= -1);
+	if (1 < depth || depth < -1)
+		messageCallback(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Depth value is not inside [-1, 1] interval; depth=%lf", depth
+		);
 
 	double* pDepth = framebufferGetDepthPointer(this, x, y);
 	if (depth < *pDepth)
