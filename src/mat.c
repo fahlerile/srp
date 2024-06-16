@@ -44,7 +44,7 @@ SRP_FORCEINLINE void mat4dSetColumn(mat4d* a, vec4d column, uint8_t index)
 SRP_FORCEINLINE vec4d mat4dMultiplyVec4d(mat4d* a, vec4d b)
 {
 	vec4d res = {0};
-	for (size_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++)
 	{
 		res = vec4dAdd(res, vec4dMultiplyScalar(
 			mat4dGetColumn(a, i), vec4dIndex(b, i)
@@ -57,7 +57,7 @@ SRP_FORCEINLINE vec4d mat4dMultiplyVec4d(mat4d* a, vec4d b)
 SRP_FORCEINLINE mat4d mat4dMultiplyMat4d(mat4d* a, mat4d* b)
 {
 	mat4d res = {0};
-	for (size_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++)
 	{
 		vec4d column = mat4dMultiplyVec4d(a, mat4dGetColumn(b, i));
 		mat4dSetColumn(&res, column, i);
