@@ -9,6 +9,7 @@ set(
 	stb_image.c
 	vec.c
 	mat.c
+	alloc.c
 )
 
 add_library(rasterizer STATIC ${SOURCES})
