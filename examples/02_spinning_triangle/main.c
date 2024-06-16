@@ -1,21 +1,21 @@
+#include <stdio.h>
 #include "rasterizer.h"
-#include "Matrix/Matrix.h"
 #include "Window.h"
 #include "timer.h"
-#include "math_utils.h"
-#include "log.h"
+#include "mat.h"
+#include "rad.h"
 
-struct Vertex
+typedef struct Vertex
 {
 	double position[3];
 	double color[3];
-};
+} Vertex;
 
-struct Uniforms
+typedef struct Uniforms
 {
 	size_t frameCount;
-	Matrix4 rotation;
-};
+	mat4d rotation;
+} Uniforms;
 
 void vertexShader(VSInput* in, VSOutput* out);
 void fragmentShader(FSInput* in, FSOutput* out);
@@ -57,7 +57,7 @@ int main()
 		.uniforms = &uniforms,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(Vertex),
+			.nBytesPerOutputVariables = sizeof(double) * 3,
 			.nOutputVariables = 1,
 			.outputVariables = VSOutputVariables,
 		},
@@ -72,9 +72,7 @@ int main()
 	{
 		TIMER_START(frametime);
 
-		uniforms.rotation = Matrix4ConstructRotate((Vector3d) {
-			0, 0, uniforms.frameCount / 1000.
-		});
+		uniforms.rotation = mat4dConstructRotate(0, 0, uniforms.frameCount / 1000.);
 		framebufferClear(fb);
 		drawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
@@ -83,7 +81,7 @@ int main()
 
 		uniforms.frameCount++;
 		TIMER_STOP(frametime);
-		LOGI(
+		printf(
 			"Frametime: %li us; FPS: %lf; Framecount: %zu\n",
 			TIMER_REPORT_US(frametime, long),
 			1. / TIMER_REPORT_S(frametime, double),
@@ -103,10 +101,10 @@ int main()
 void vertexShader(VSInput* in, VSOutput* out)
 {
 	double* pos = in->pVertex->position;
-	out->position = (Vector4d) {
+	out->position = (vec4d) {
 		pos[0], pos[1], pos[2], 1.0
 	};
-	out->position = Matrix4MultiplyVector4d(&in->uniforms->rotation, out->position);
+	out->position = mat4dMultiplyVec4d(&in->uniforms->rotation, out->position);
 
 	double* colorOut = (double*) out->pOutputVariables;
 	colorOut[0] = in->pVertex->color[0] + sin(in->uniforms->frameCount * 2.5e-3) * 0.3;

@@ -1,12 +1,12 @@
 #pragma once
+
 #include "Framebuffer.h"
 #include "Primitive.h"
-#include "Vertex.h"
 #include "shaders.h"
 
 // Stores vertex data
 // Similar to VBO in OpenGL
-typedef struct
+typedef struct VertexBuffer
 {
 	size_t nBytesPerVertex;
 	size_t nBytesData;
@@ -16,7 +16,7 @@ typedef struct
 
 // Stores indices to vertices stored in `VertexBuffer`
 // Similar to EBO in OpenGL
-typedef struct
+typedef struct IndexBuffer
 {
 	Type indicesType;
 	size_t nBytesPerIndex;
@@ -24,6 +24,7 @@ typedef struct
 	void* data;
 } IndexBuffer;
 
+// TODO: drawVertexBuffer
 VertexBuffer* newVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data);
 void freeVertexBuffer(VertexBuffer* this);
 static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index);

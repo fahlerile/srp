@@ -1,8 +1,9 @@
 #pragma once
+
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct
+typedef struct Framebuffer
 {
 	size_t width;
 	size_t height;

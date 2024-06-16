@@ -1,10 +1,12 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "log.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "defines.h"
 #include "math_utils.h"
 #include "stb_image.h"
-#include "memoryUtils/memoryUtils.h"
+#include "utils.h"
 #include "Texture.h"
 
 #define N_CHANNELS_REQUESTED 3
@@ -16,12 +18,12 @@ Texture* newTexture(
 	TextureFilteringMode filteringModeMinifying
 )
 {
-	Texture* this = xmalloc(sizeof(Texture));
+	Texture* this = malloc(sizeof(Texture));
 	this->data = stbi_load(image, &this->width, &this->height, NULL, N_CHANNELS_REQUESTED);
 	if (this->data == NULL)
 	{
-		LOGE(
-			"%s: failed to load image \"%s\"; %s\n",
+		fprintf(
+			stderr, "%s: failed to load image \"%s\"; %s\n",
 			__func__, image, stbi_failure_reason()
 		);
 		return NULL;
@@ -36,12 +38,12 @@ Texture* newTexture(
 void freeTexture(Texture* this)
 {
 	stbi_image_free(this->data);
-	xfree(this);
+	free(this);
 }
 
 // TODO: now using only filteringModeMagnifying
 // how to know if texture is magnified or minified?
-// TODO: too much conditionals?
+// TODO: too many conditionals?
 Color textureGetFilteredColor(Texture* this, double u, double v)
 {
 	if (u < 0 || u > 1)
@@ -82,8 +84,7 @@ Color textureGetFilteredColor(Texture* this, double u, double v)
 
 static Color textureGetColor(Texture* this, size_t x, size_t y)
 {
-	uint8_t* start = \
-		(uint8_t*) this->data + (x + y * this->width) * N_CHANNELS_REQUESTED;
+	uint8_t* start = INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
 	return (Color) {
 		start[0],
 		start[1],

@@ -1,14 +1,14 @@
+#include <stdio.h>
 #include "rasterizer.h"
 #include "Window.h"
 #include "timer.h"
-#include "math_utils.h"
-#include "log.h"
+#include "rad.h"
 
-struct Vertex
+typedef struct Vertex
 {
 	double position[3];
 	double color[3];
-};
+} Vertex;
 
 void vertexShader(VSInput* in, VSOutput* out);
 void fragmentShader(FSInput* in, FSOutput* out);
@@ -72,7 +72,7 @@ int main()
 
 		frameCount++;
 		TIMER_STOP(frametime);
-		LOGI(
+		printf(
 			"Frametime: %li us; FPS: %lf; Framecount: %zu\n",
 			TIMER_REPORT_US(frametime, long),
 			1. / TIMER_REPORT_S(frametime, double),
@@ -92,7 +92,7 @@ int main()
 void vertexShader(VSInput* in, VSOutput* out)
 {
 	double* pos = in->pVertex->position;
-	out->position = (Vector4d) {
+	out->position = (vec4d) {
 		pos[0], pos[1], pos[2], 1.0
 	};
 

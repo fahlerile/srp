@@ -1,4 +1,6 @@
 #pragma once
+
+#include <stdint.h>
 #include <stddef.h>
 
 // Types that can be stored in vertex attributes
@@ -12,5 +14,5 @@ typedef enum
 	TYPE_DOUBLE
 } Type;
 
-size_t SIZEOF_TYPE(Type a);
+size_t SIZEOF_TYPE(Type type);
 

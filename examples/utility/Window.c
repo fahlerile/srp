@@ -1,11 +1,9 @@
-#include "Framebuffer.h"
-#include "memoryUtils/memoryUtils.h"
-#include "Color/Color.h"
 #include "Window.h"
+#include "color.h"
 
 Window* newWindow(size_t width, size_t height, char* title, bool fullscreen)
 {
-	Window* this = xmalloc(sizeof(Window));
+	Window* this = malloc(sizeof(Window));
 
 	this->window = SDL_CreateWindow(
 		title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -27,7 +25,7 @@ void freeWindow(Window* this)
 	SDL_DestroyWindow(this->window);
 	SDL_DestroyRenderer(this->renderer);
 	SDL_DestroyTexture(this->texture);
-	xfree(this);
+	free(this);
 }
 
 void windowPollEvents(Window* this)

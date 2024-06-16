@@ -1,10 +1,9 @@
-#include <stdint.h>
+#include <stdio.h>
 #include "Type.h"
-#include "log.h"
 
-size_t SIZEOF_TYPE(Type a)
+size_t SIZEOF_TYPE(Type type)
 {
-	switch (a)
+	switch (type)
 	{
 		case TYPE_UINT8:
 			return sizeof(uint8_t);
@@ -19,7 +18,7 @@ size_t SIZEOF_TYPE(Type a)
 		case TYPE_DOUBLE:
 			return sizeof(double);
 		default:
-			LOGE("Unknown type (%i) in %s", a, __func__);
+			fprintf(stderr, "Unknown type (%i) in %s", type, __func__);
 			return 0;
 	}
 }

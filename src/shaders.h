@@ -1,6 +1,7 @@
 #pragma once
-#include "Vector/Vector.h"
+#include <stdbool.h>
 #include "Vertex.h"
+#include "vec.h"
 
 typedef struct Interpolated Interpolated;
 
@@ -8,8 +9,6 @@ typedef struct Interpolated Interpolated;
 // TODO: multiple uniform types?
 typedef struct Uniforms Uniforms;
 
-// Circular dependency
-typedef struct ShaderProgram ShaderProgram;
 
 
 typedef struct
@@ -23,7 +22,7 @@ typedef struct VSOutputVariable VSOutputVariable;
 
 typedef struct
 {
-	Vector4d position;
+	vec4d position;
 	VSOutputVariable* pOutputVariables;
 } VSOutput;
 
@@ -42,14 +41,14 @@ typedef struct
 {
 	Uniforms* uniforms;
 	Interpolated* interpolated;
-	Vector4d fragCoord;
+	vec4d fragCoord;
 	bool frontFacing;
 	size_t primitiveID;
 } FSInput;
 
 typedef struct
 {
-	Vector4d color;
+	vec4d color;
 	double fragDepth;
 } FSOutput;
 
@@ -59,11 +58,11 @@ typedef struct
 } FragmentShader;
 
 
-struct ShaderProgram
+typedef struct ShaderProgram
 {
 	Uniforms* uniforms;
 
 	VertexShader vs;
 	FragmentShader fs;
-};
+} ShaderProgram;
 

@@ -1,20 +1,20 @@
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "buffer.h"
-#include "Vector/Vector3.h"
-#include "Vector/Vector4.h"
-#include "memoryUtils/memoryUtils.h"
 #include "triangle.h"
-#include "voidptr.h"
-#include "log.h"
+#include "utils.h"
+#include "vec.h"
+#include "defines.h"
 
 VertexBuffer* newVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data)
 {
-	VertexBuffer* this = xmalloc(sizeof(VertexBuffer));
+	VertexBuffer* this = malloc(sizeof(VertexBuffer));
 
 	this->nBytesPerVertex = nBytesPerVertex;
 	this->nBytesData = nBytesData;
 	this->nVertices = nBytesData / nBytesPerVertex;
-	this->data = xmalloc(nBytesData);
+	this->data = malloc(nBytesData);
 	memcpy(this->data, data, nBytesData);
 
 	return this;
@@ -22,8 +22,8 @@ VertexBuffer* newVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* d
 
 void freeVertexBuffer(VertexBuffer* this)
 {
-	xfree(this->data);
-	xfree(this);
+	free(this->data);
+	free(this);
 }
 
 static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index)
@@ -33,12 +33,12 @@ static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index)
 
 IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data)
 {
-	IndexBuffer* this = xmalloc(sizeof(IndexBuffer));
+	IndexBuffer* this = malloc(sizeof(IndexBuffer));
 
 	this->indicesType = indicesType;
 	this->nBytesPerIndex = SIZEOF_TYPE(indicesType);
 	this->nIndices = nBytesData / this->nBytesPerIndex;
-	this->data = xmalloc(nBytesData);
+	this->data = malloc(nBytesData);
 	memcpy(this->data, data, nBytesData);
 
 	return this;
@@ -46,13 +46,13 @@ IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data)
 
 void freeIndexBuffer(IndexBuffer* this)
 {
-	xfree(this->data);
-	xfree(this);
+	free(this->data);
+	free(this);
 }
 
 static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index)
 {
-	void* pIndex = ((uint8_t*) this->data + this->nBytesPerIndex * index);
+	void* pIndex = INDEX_VOID_PTR(this->data, index, this->nBytesPerIndex);
 	uint64_t ret;
 	switch (this->indicesType)
 	{
@@ -69,7 +69,7 @@ static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index)
 			ret = (uint64_t) (*(uint64_t*) pIndex);
 			break;
 		default:
-			LOGE("Unhandled type (%i) in %s", this->indicesType, __func__);
+			fprintf(stderr, "Unhandled type (%i) in %s", this->indicesType, __func__);
 			ret = 0;
 	}
 	return ret;
@@ -84,7 +84,7 @@ void drawIndexBuffer(
 	assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
 	VSOutputVariable* triangleVSOutputVariables = \
-		xmalloc(sp->vs.nBytesPerOutputVariables * 3);
+		malloc(sp->vs.nBytesPerOutputVariables * 3);
 
 	size_t endIndex = startIndex + count;
 	assert(endIndex <= this->nIndices);
@@ -112,14 +112,17 @@ void drawIndexBuffer(
 			};
 
 			sp->vs.shader(&vsIn[j], &vsOut[j]);
-			vsOut[j].position = Vector3dToVector4dHomogenous(
-				Vector4dHomogenousDivide(vsOut[j].position)
-			);
+			vsOut[j].position = (vec4d) {
+				vsOut[j].position.x / vsOut[j].position.w,
+				vsOut[j].position.y / vsOut[j].position.w,
+				vsOut[j].position.z / vsOut[j].position.w,
+				1.
+			};
 		}
 		drawTriangle(fb, vsOut, sp, primitiveID);
 		primitiveID++;
 	}
 
-	xfree(triangleVSOutputVariables);
+	free(triangleVSOutputVariables);
 }
 

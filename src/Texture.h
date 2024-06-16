@@ -1,7 +1,8 @@
 #pragma once
-#include "Color/Color.h"
+
 #include <stdint.h>
 #include <stddef.h>
+#include "color.h"
 
 typedef enum
 {

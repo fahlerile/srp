@@ -1,26 +1,27 @@
 #include <assert.h>
-#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "Framebuffer.h"
-#include "memoryUtils/memoryUtils.h"
+#include "defines.h"
 
 Framebuffer* newFramebuffer(size_t width, size_t height)
 {
-	Framebuffer* this = xmalloc(sizeof(Framebuffer));
+	Framebuffer* this = malloc(sizeof(Framebuffer));
 
 	this->width = width;
 	this->height = height;
 	this->size = width * height;
-	this->color = xmalloc(sizeof(uint32_t) * this->size);
-	this->depth = xmalloc(sizeof(double) * this->size);
+	this->color = malloc(sizeof(uint32_t) * this->size);
+	this->depth = malloc(sizeof(double) * this->size);
 
 	return this;
 }
 
 void freeFramebuffer(Framebuffer* this)
 {
-	xfree(this->color);
-	xfree(this->depth);
-	xfree(this);
+	free(this->color);
+	free(this->depth);
+	free(this);
 }
 
 void framebufferDrawPixel(
