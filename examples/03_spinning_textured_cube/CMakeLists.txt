@@ -1,7 +1,7 @@
 get_filename_component(NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
 
 add_executable(${NAME} main.c)
-target_link_libraries(${NAME} rasterizer SDL2 SDL2main window m)
+target_link_libraries(${NAME} srp SDL2 SDL2main window m)
 target_include_directories(
 	${NAME}
 	PRIVATE

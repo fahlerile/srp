@@ -12,5 +12,5 @@ set(
 	alloc.c
 )
 
-add_library(rasterizer STATIC ${SOURCES})
+add_library(srp STATIC ${SOURCES})
 
