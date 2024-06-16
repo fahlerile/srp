@@ -10,12 +10,12 @@ typedef struct Vertex
 	double color[3];
 } Vertex;
 
-void vertexShader(VSInput* in, VSOutput* out);
-void fragmentShader(FSInput* in, FSOutput* out);
+void vertexShader(SRPvsInput* in, SRPvsOutput* out);
+void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 
 int main()
 {
-	Framebuffer* fb = newFramebuffer(512, 512);
+	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
 	const double R = 0.8;
 	Vertex data[3] = {
@@ -33,10 +33,10 @@ int main()
 		0, 1, 2
 	};
 
-	VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
+	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
-	VertexVariable VSOutputVariables[1] = {
+	SRPVertexVariable VSOutputVariables[1] = {
 		{
 			.nItems = 3,
 			.type = TYPE_DOUBLE,
@@ -44,8 +44,8 @@ int main()
 		}
 	};
 
-	ShaderProgram shaderProgram = {
-		.uniforms = NULL,
+	SRPShaderProgram shaderProgram = {
+		.uniform = NULL,
 		.vs = {
 			.shader = vertexShader,
 			.nBytesPerOutputVariables = sizeof(double) * 3,
@@ -65,7 +65,7 @@ int main()
 		TIMER_START(frametime);
 
 		framebufferClear(fb);
-		drawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
@@ -80,29 +80,31 @@ int main()
 		);
 	}
 
-	freeVertexBuffer(vb);
-	freeIndexBuffer(ib);
-	freeFramebuffer(fb);
+	srpFreeVertexBuffer(vb);
+	srpFreeIndexBuffer(ib);
+	srpFreeFramebuffer(fb);
 	freeWindow(window);
 
 	return 0;
 }
 
 
-void vertexShader(VSInput* in, VSOutput* out)
+void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
-	double* pos = in->pVertex->position;
+	Vertex* pVertex = (Vertex*) in->pVertex;
+
+	double* pos = pVertex->position;
 	out->position = (vec4d) {
 		pos[0], pos[1], pos[2], 1.0
 	};
 
 	double* colorOut = (double*) out->pOutputVariables;
-	colorOut[0] = in->pVertex->color[0];
-	colorOut[1] = in->pVertex->color[1];
-	colorOut[2] = in->pVertex->color[2];
+	colorOut[0] = pVertex->color[0];
+	colorOut[1] = pVertex->color[1];
+	colorOut[2] = pVertex->color[2];
 }
 
-void fragmentShader(FSInput* in, FSOutput* out)
+void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
 	double* colorIn = (double*) in->interpolated;
 	memcpy(&out->color, colorIn, 3 * sizeof(double));

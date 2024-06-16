@@ -1,5 +1,16 @@
 #pragma once
 
+#if defined(SRP_MALLOC) && defined(SRP_FREE) && defined(SRP_REALLOC)
+	// ok
+#elif !defined(SRP_MALLOC) && !defined(SRP_FREE) && !defined(SRP_REALLOC)
+	#include <stdlib.h>
+	#define SRP_MALLOC(s) malloc(s)
+	#define SRP_REALLOC(p, s) realloc(p, s)
+	#define SRP_FREE(p) free(p)
+#else
+	#error "Must define all or none of SRP_MALLOC, SRP_FREE, and SRP_REALLOC"
+#endif
+
 #ifndef SRP_FORCEINLINE
 	#if defined(__clang__)   // clang
 		#define SRP_FORCEINLINE inline

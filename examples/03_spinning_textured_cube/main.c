@@ -10,21 +10,21 @@ typedef struct Vertex
 	double uv[2];
 } Vertex;
 
-typedef struct Uniforms
+typedef struct Uniform
 {
 	size_t frameCount;
 	mat4d model;
 	mat4d view;
 	mat4d projection;
-	Texture* texture;
-} Uniforms;
+	SRPTexture* texture;
+} Uniform;
 
-void vertexShader(VSInput* in, VSOutput* out);
-void fragmentShader(FSInput* in, FSOutput* out);
+void vertexShader(SRPvsInput* in, SRPvsOutput* out);
+void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 
 int main()
 {
-	Framebuffer* fb = newFramebuffer(512, 512);
+	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
 	Vertex data[] = {
 		{.position = {-1, -1, -1}, .uv = {0, 0}},
@@ -66,10 +66,10 @@ int main()
 		20, 23, 22,  20, 22, 21
 	};
 
-	VertexBuffer* vb = newVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
+	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
-	VertexVariable VSOutputVariables[1] = {
+	SRPVertexVariable VSOutputVariables[1] = {
 		{
 			.nItems = 2,
 			.type = TYPE_DOUBLE,
@@ -77,7 +77,7 @@ int main()
 		}
 	};
 
-	Uniforms uniforms = {
+	Uniform uniform = {
 		.model = mat4dConstructIdentity(),
 		.view = mat4dConstructView(
 			0, 0, -3,
@@ -85,15 +85,15 @@ int main()
 			1, 1, 1
 		),
 		.projection = mat4dConstructPerspectiveProjection(-1, 1, -1, 1, 1, 50),
-		.texture = newTexture(
+		.texture = srpNewTexture(
 			"./res/textures/stoneWall.png", TW_REPEAT, TW_REPEAT,
 			TF_NEAREST, TF_NEAREST
 		),
 		.frameCount = 0
 	};
 
-	ShaderProgram shaderProgram = {
-		.uniforms = &uniforms,
+	SRPShaderProgram shaderProgram = {
+		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
 			.nBytesPerOutputVariables = sizeof(double) * 2,
@@ -110,61 +110,64 @@ int main()
 	{
 		TIMER_START(frametime);
 
-		uniforms.model = mat4dConstructRotate(
-			uniforms.frameCount / 100.,
-			uniforms.frameCount / 200.,
-			uniforms.frameCount / 500.
+		uniform.model = mat4dConstructRotate(
+			uniform.frameCount / 100.,
+			uniform.frameCount / 200.,
+			uniform.frameCount / 500.
 		);
 		framebufferClear(fb);
-		drawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 36, &shaderProgram);
+		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 36, &shaderProgram);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
 
-		uniforms.frameCount++;
+		uniform.frameCount++;
 		TIMER_STOP(frametime);
 		printf(
 			"Frametime: %li us; FPS: %lf; Framecount: %zu\n",
 			TIMER_REPORT_US(frametime, long),
 			1. / TIMER_REPORT_S(frametime, double),
-			uniforms.frameCount
+			uniform.frameCount
 		);
 	}
 
-	freeTexture(uniforms.texture);
-	freeVertexBuffer(vb);
-	freeIndexBuffer(ib);
-	freeFramebuffer(fb);
+	srpFreeTexture(uniform.texture);
+	srpFreeVertexBuffer(vb);
+	srpFreeIndexBuffer(ib);
+	srpFreeFramebuffer(fb);
 	freeWindow(window);
 
 	return 0;
 }
 
 
-void vertexShader(VSInput* in, VSOutput* out)
+void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
-	double* pos = in->pVertex->position;
+	Vertex* pVertex = (Vertex*) in->pVertex;
+	Uniform* pUniform = (Uniform*) in->uniform;
+
+	double* pos = pVertex->position;
 	out->position = (vec4d) {
 		pos[0], pos[1], pos[2], 1.0
 	};
-	out->position = mat4dMultiplyVec4d(&in->uniforms->model, out->position);
-	out->position = mat4dMultiplyVec4d(&in->uniforms->view, out->position);
-	out->position = mat4dMultiplyVec4d(&in->uniforms->projection, out->position);
+	out->position = mat4dMultiplyVec4d(&pUniform->model, out->position);
+	out->position = mat4dMultiplyVec4d(&pUniform->view, out->position);
+	out->position = mat4dMultiplyVec4d(&pUniform->projection, out->position);
 
 	double* uvOut = (double*) out->pOutputVariables;
-	uvOut[0] = in->pVertex->uv[0];
-	uvOut[1] = in->pVertex->uv[1];
+	uvOut[0] = pVertex->uv[0];
+	uvOut[1] = pVertex->uv[1];
 }
 
-void fragmentShader(FSInput* in, FSOutput* out)
+void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
+	Uniform* pUniform = (Uniform*) in->uniform;
+
 	double* uv = (double*) in->interpolated;
-	Color color = textureGetFilteredColor(in->uniforms->texture, uv[0], uv[1]);
-	out->color = (vec4d) {
-		(double) color.r / 255,
-		(double) color.g / 255,
-		(double) color.b / 255,
-		(double) color.a / 255
-	};
+	SRPColor color = srpTextureGetFilteredColor(pUniform->texture, uv[0], uv[1]);
+	out->color.x = color.r / 255.;
+	out->color.y = color.g / 255.;
+	out->color.z = color.b / 255.;
+	out->color.w = color.a / 255.;
 }
 

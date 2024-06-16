@@ -1,3 +1,6 @@
+#define SRP_SOURCE
+
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,9 +11,25 @@
 #include "color.h"
 #include "utils.h"
 
+static double signedAreaParallelogram(
+	const vec3d* restrict a, const vec3d* restrict b
+);
+static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
+	const vec3d* restrict SSPositions, const vec3d* restrict edgeVectors,
+	const vec2d point, double* restrict barycentricCoordinates,
+	double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
+);
+static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector);
+
+static void triangleInterpolatePositionAndVertexVariables(
+	const SRPvsOutput vertices[3], const double barycentricCoordinates[3],
+	const SRPShaderProgram* restrict sp, SRPInterpolated* pInterpolatedBuffer,
+	vec4d* interpolatedPosition
+);
+
 void drawTriangle(
-	Framebuffer* fb, const VSOutput vertices[3], const ShaderProgram* restrict sp,
-	size_t primitiveID
+	SRPFramebuffer* fb, const SRPvsOutput vertices[3],
+	const SRPShaderProgram* restrict sp, size_t primitiveID
 )
 {
 	vec3d NDCPositions[3];
@@ -78,7 +97,7 @@ void drawTriangle(
 			{
 				// TODO: avoid VLA (custom allocator?)
 				uint8_t interpolatedBuffer[sp->vs.nBytesPerOutputVariables];
-				Interpolated* pInterpolated = (Interpolated*) interpolatedBuffer;
+				SRPInterpolated* pInterpolated = (SRPInterpolated*) interpolatedBuffer;
 				vec4d interpolatedPosition = {0};
 				triangleInterpolatePositionAndVertexVariables(
 					vertices, barycentricCoordinates, sp, pInterpolated,
@@ -87,18 +106,18 @@ void drawTriangle(
 
 				// TODO: fix rasterizer to accept both cw and ccw vertices
 				// and add correct `frontFacing` here!
-				FSInput fsIn = {
-					.uniforms = sp->uniforms,
+				SRPfsInput fsIn = {
+					.uniform = sp->uniform,
 					.interpolated = pInterpolated,
 					.fragCoord = interpolatedPosition,
 					.frontFacing = true,
 					.primitiveID = primitiveID,
 				};
-				FSOutput fsOut = {0};
+				SRPfsOutput fsOut = {0};
 
 				sp->fs.shader(&fsIn, &fsOut);
 
-				Color color = {
+				SRPColor color = {
 					CLAMP(0, 255, fsOut.color.x * 255),
 					CLAMP(0, 255, fsOut.color.y * 255),
 					CLAMP(0, 255, fsOut.color.z * 255),
@@ -106,7 +125,7 @@ void drawTriangle(
 				};
 				double depth = (fsOut.fragDepth == 0) ? fsIn.fragCoord.z : fsOut.fragDepth;
 
-				framebufferDrawPixel(fb, x, y, depth, COLOR_TO_UINT32_T(color));
+				framebufferDrawPixel(fb, x, y, depth, SRP_COLOR_TO_UINT32_T(color));
 			}
 
 nextPixel:
@@ -172,8 +191,8 @@ static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector)
 
 // @brief Interpolates variables in triangle
 static void triangleInterpolatePositionAndVertexVariables(
-	const VSOutput vertices[3], const double barycentricCoordinates[3],
-	const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer,
+	const SRPvsOutput vertices[3], const double barycentricCoordinates[3],
+	const SRPShaderProgram* restrict sp, SRPInterpolated* pInterpolatedBuffer,
 	vec4d* pInterpolatedPosition
 )
 {
@@ -198,7 +217,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 	// interpolate variables (attributes)
 	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
 	{
-		VertexVariable* attr = &sp->vs.outputVariables[attrI];
+		SRPVertexVariable* attr = &sp->vs.outputVariables[attrI];
 		size_t elemSize = 0;
 		switch (attr->type)
 		{

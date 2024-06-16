@@ -1,7 +1,8 @@
+#define SRP_SOURCE
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include "defines.h"
 #include "math_utils.h"
@@ -11,14 +12,16 @@
 
 #define N_CHANNELS_REQUESTED 3
 
-Texture* newTexture(
+static SRPColor textureGetColor(SRPTexture* this, size_t x, size_t y);
+
+SRPTexture* srpNewTexture(
 	const char* image,
-	TextureWrappingMode wrappingModeX, TextureWrappingMode wrappingModeY,
-	TextureFilteringMode filteringModeMagnifying,
-	TextureFilteringMode filteringModeMinifying
+	SRPTextureWrappingMode wrappingModeX, SRPTextureWrappingMode wrappingModeY,
+	SRPTextureFilteringMode filteringModeMagnifying,
+	SRPTextureFilteringMode filteringModeMinifying
 )
 {
-	Texture* this = malloc(sizeof(Texture));
+	SRPTexture* this = SRP_MALLOC(sizeof(SRPTexture));
 	this->data = stbi_load(image, &this->width, &this->height, NULL, N_CHANNELS_REQUESTED);
 	if (this->data == NULL)
 	{
@@ -35,16 +38,16 @@ Texture* newTexture(
 	return this;
 }
 
-void freeTexture(Texture* this)
+void srpFreeTexture(SRPTexture* this)
 {
 	stbi_image_free(this->data);
-	free(this);
+	SRP_FREE(this);
 }
 
 // TODO: now using only filteringModeMagnifying
 // how to know if texture is magnified or minified?
 // TODO: too many conditionals?
-Color textureGetFilteredColor(Texture* this, double u, double v)
+SRPColor srpTextureGetFilteredColor(SRPTexture* this, double u, double v)
 {
 	if (u < 0 || u > 1)
 	{
@@ -82,10 +85,10 @@ Color textureGetFilteredColor(Texture* this, double u, double v)
 	}
 }
 
-static Color textureGetColor(Texture* this, size_t x, size_t y)
+static SRPColor textureGetColor(SRPTexture* this, size_t x, size_t y)
 {
 	uint8_t* start = INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
-	return (Color) {
+	return (SRPColor) {
 		start[0],
 		start[1],
 		start[2],

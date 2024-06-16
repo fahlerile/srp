@@ -11,18 +11,18 @@ typedef struct Vertex
 	double color[3];
 } Vertex;
 
-typedef struct Uniforms
+typedef struct Uniform
 {
 	size_t frameCount;
 	mat4d rotation;
-} Uniforms;
+} Uniform;
 
-void vertexShader(VSInput* in, VSOutput* out);
-void fragmentShader(FSInput* in, FSOutput* out);
+void vertexShader(SRPvsInput* in, SRPvsOutput* out);
+void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 
 int main()
 {
-	Framebuffer* fb = newFramebuffer(512, 512);
+	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
 	const double R = 0.8;
 	Vertex data[3] = {
@@ -40,7 +40,7 @@ int main()
 		0, 1, 2
 	};
 
-	VertexVariable VSOutputVariables[1] = {
+	SRPVertexVariable VSOutputVariables[1] = {
 		{
 			.nItems = 3,
 			.type = TYPE_DOUBLE,
@@ -48,13 +48,12 @@ int main()
 		}
 	};
 
-	VertexBuffer* vb = \
-		newVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	IndexBuffer* ib = newIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
+	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
-	Uniforms uniforms = {0};
-	ShaderProgram shaderProgram = {
-		.uniforms = &uniforms,
+	Uniform uniform = {0};
+	SRPShaderProgram shaderProgram = {
+		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
 			.nBytesPerOutputVariables = sizeof(double) * 3,
@@ -72,47 +71,50 @@ int main()
 	{
 		TIMER_START(frametime);
 
-		uniforms.rotation = mat4dConstructRotate(0, 0, uniforms.frameCount / 1000.);
+		uniform.rotation = mat4dConstructRotate(0, 0, uniform.frameCount / 1000.);
 		framebufferClear(fb);
-		drawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
 
-		uniforms.frameCount++;
+		uniform.frameCount++;
 		TIMER_STOP(frametime);
 		printf(
 			"Frametime: %li us; FPS: %lf; Framecount: %zu\n",
 			TIMER_REPORT_US(frametime, long),
 			1. / TIMER_REPORT_S(frametime, double),
-			uniforms.frameCount
+			uniform.frameCount
 		);
 	}
 
-	freeVertexBuffer(vb);
-	freeIndexBuffer(ib);
-	freeFramebuffer(fb);
+	srpFreeVertexBuffer(vb);
+	srpFreeIndexBuffer(ib);
+	srpFreeFramebuffer(fb);
 	freeWindow(window);
 
 	return 0;
 }
 
 
-void vertexShader(VSInput* in, VSOutput* out)
+void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
-	double* pos = in->pVertex->position;
+	Vertex* pVertex = (Vertex*) in->pVertex;
+	Uniform* pUniform = (Uniform*) in->uniform;
+
+	double* pos = pVertex->position;
 	out->position = (vec4d) {
 		pos[0], pos[1], pos[2], 1.0
 	};
-	out->position = mat4dMultiplyVec4d(&in->uniforms->rotation, out->position);
+	out->position = mat4dMultiplyVec4d(&pUniform->rotation, out->position);
 
 	double* colorOut = (double*) out->pOutputVariables;
-	colorOut[0] = in->pVertex->color[0] + sin(in->uniforms->frameCount * 2.5e-3) * 0.3;
-	colorOut[1] = in->pVertex->color[1] + sin(in->uniforms->frameCount * 0.5e-3) * 0.1;
-	colorOut[2] = in->pVertex->color[2] + sin(in->uniforms->frameCount * 5e-3) * 0.5;
+	colorOut[0] = pVertex->color[0] + sin(pUniform->frameCount * 2.5e-3) * 0.3;
+	colorOut[1] = pVertex->color[1] + sin(pUniform->frameCount * 0.5e-3) * 0.1;
+	colorOut[2] = pVertex->color[2] + sin(pUniform->frameCount * 5e-3) * 0.5;
 }
 
-void fragmentShader(FSInput* in, FSOutput* out)
+void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
 	double* colorIn = (double*) in->interpolated;
 	memcpy(&out->color, colorIn, 3 * sizeof(double));

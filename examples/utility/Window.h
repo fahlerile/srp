@@ -1,4 +1,5 @@
 #pragma once
+
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include "Framebuffer.h"
@@ -16,5 +17,5 @@ Window* newWindow(size_t width, size_t height, char* title, bool fullscreen);
 void freeWindow(Window* this);
 
 void windowPollEvents(Window* this);
-void windowPresent(Window* this, Framebuffer* fb);
+void windowPresent(Window* this, SRPFramebuffer* fb);
 

@@ -1,56 +1,61 @@
+#define SRP_SOURCE
+
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <assert.h>
 #include "buffer.h"
 #include "triangle.h"
 #include "utils.h"
 #include "vec.h"
 #include "defines.h"
 
-VertexBuffer* newVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data)
+static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index);
+static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index);
+
+SRPVertexBuffer* srpNewVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data)
 {
-	VertexBuffer* this = malloc(sizeof(VertexBuffer));
+	SRPVertexBuffer* this = SRP_MALLOC(sizeof(SRPVertexBuffer));
 
 	this->nBytesPerVertex = nBytesPerVertex;
 	this->nBytesData = nBytesData;
 	this->nVertices = nBytesData / nBytesPerVertex;
-	this->data = malloc(nBytesData);
+	this->data = SRP_MALLOC(nBytesData);
 	memcpy(this->data, data, nBytesData);
 
 	return this;
 }
 
-void freeVertexBuffer(VertexBuffer* this)
+void srpFreeVertexBuffer(SRPVertexBuffer* this)
 {
-	free(this->data);
-	free(this);
+	SRP_FREE(this->data);
+	SRP_FREE(this);
 }
 
-static Vertex* indexVertexBuffer(VertexBuffer* this, size_t index)
+static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index)
 {
-	return (Vertex*) ((uint8_t*) this->data + this->nBytesPerVertex * index);
+	return (SRPVertex*) ((uint8_t*) this->data + this->nBytesPerVertex * index);
 }
 
-IndexBuffer* newIndexBuffer(Type indicesType, size_t nBytesData, void* data)
+SRPIndexBuffer* srpNewIndexBuffer(Type indicesType, size_t nBytesData, void* data)
 {
-	IndexBuffer* this = malloc(sizeof(IndexBuffer));
+	SRPIndexBuffer* this = SRP_MALLOC(sizeof(SRPIndexBuffer));
 
 	this->indicesType = indicesType;
 	this->nBytesPerIndex = SIZEOF_TYPE(indicesType);
 	this->nIndices = nBytesData / this->nBytesPerIndex;
-	this->data = malloc(nBytesData);
+	this->data = SRP_MALLOC(nBytesData);
 	memcpy(this->data, data, nBytesData);
 
 	return this;
 }
 
-void freeIndexBuffer(IndexBuffer* this)
+void srpFreeIndexBuffer(SRPIndexBuffer* this)
 {
-	free(this->data);
-	free(this);
+	SRP_FREE(this->data);
+	SRP_FREE(this);
 }
 
-static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index)
+static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
 {
 	void* pIndex = INDEX_VOID_PTR(this->data, index, this->nBytesPerIndex);
 	uint64_t ret;
@@ -76,37 +81,37 @@ static uint64_t indexIndexBuffer(IndexBuffer* this, size_t index)
 }
 
 // @brief Draw an index buffer with specified primitive mode
-void drawIndexBuffer(
-	Framebuffer* fb, IndexBuffer* this, VertexBuffer* vb, Primitive primitive, 
-	size_t startIndex, size_t count, ShaderProgram* sp
+void srpDrawIndexBuffer(
+	SRPFramebuffer* fb, SRPIndexBuffer* this, SRPVertexBuffer* vb, SRPPrimitive primitive,
+	size_t startIbIndex, size_t count, SRPShaderProgram* sp
 )
 {
 	assert(primitive == PRIMITIVE_TRIANGLES && "Only triangles are implemented");
 
+	size_t endIbIndex = startIbIndex + count;
+	assert(endIbIndex <= this->nIndices);
+
 	VSOutputVariable* triangleVSOutputVariables = \
-		malloc(sp->vs.nBytesPerOutputVariables * 3);
-
-	size_t endIndex = startIndex + count;
-	assert(endIndex <= this->nIndices);
-
+		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
 	size_t primitiveID = 0;
-	for (size_t i = startIndex; i < endIndex; i += 3)
+
+	for (size_t i = startIbIndex; i < endIbIndex; i += 3)
 	{
-		VSInput vsIn[3];
-		VSOutput vsOut[3];
+		SRPvsInput vsIn[3];
+		SRPvsOutput vsOut[3];
 		for (size_t j = 0; j < 3; j++)
 		{
 			uint64_t vertexIndex = indexIndexBuffer(this, i + j);
-			Vertex* pInVertex = indexVertexBuffer(vb, vertexIndex);
+			SRPVertex* pInVertex = indexVertexBuffer(vb, vertexIndex);
 			VSOutputVariable* pVSOutputVariables = (VSOutputVariable*) \
 				INDEX_VOID_PTR(triangleVSOutputVariables, j, sp->vs.nBytesPerOutputVariables);
 
-			vsIn[j] = (VSInput) {
+			vsIn[j] = (SRPvsInput) {
 				.vertexID = i+j,
 				.pVertex = pInVertex,
-				.uniforms = sp->uniforms
+				.uniform = sp->uniform
 			};
-			vsOut[j] = (VSOutput) {
+			vsOut[j] = (SRPvsOutput) {
 				.position = {0},
 				.pOutputVariables = pVSOutputVariables
 			};
@@ -123,6 +128,6 @@ void drawIndexBuffer(
 		primitiveID++;
 	}
 
-	free(triangleVSOutputVariables);
+	SRP_FREE(triangleVSOutputVariables);
 }
 

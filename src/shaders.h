@@ -1,22 +1,20 @@
 #pragma once
+
 #include <stdbool.h>
 #include "Vertex.h"
 #include "vec.h"
 
-typedef struct Interpolated Interpolated;
+typedef struct SRPInterpolated SRPInterpolated;
 
-// Assumed to be defined by the user
-// TODO: multiple uniform types?
-typedef struct Uniforms Uniforms;
-
+typedef struct SRPUniform SRPUniform;
 
 
 typedef struct
 {
-	Uniforms* uniforms;
-	Vertex* pVertex;
+	SRPUniform* uniform;
+	SRPVertex* pVertex;
 	size_t vertexID;
-} VSInput;
+} SRPvsInput;
 
 typedef struct VSOutputVariable VSOutputVariable;
 
@@ -24,45 +22,45 @@ typedef struct
 {
 	vec4d position;
 	VSOutputVariable* pOutputVariables;
-} VSOutput;
+} SRPvsOutput;
 
 typedef struct
 {
 	void (*shader)(
-		VSInput* in, VSOutput* out
+		SRPvsInput* in, SRPvsOutput* out
 	);
 	size_t nBytesPerOutputVariables;
 	size_t nOutputVariables;
-	VertexVariable* outputVariables;
-} VertexShader;
+	SRPVertexVariable* outputVariables;
+} SRPVertexShader;
 
 
 typedef struct
 {
-	Uniforms* uniforms;
-	Interpolated* interpolated;
+	SRPUniform* uniform;
+	SRPInterpolated* interpolated;
 	vec4d fragCoord;
 	bool frontFacing;
 	size_t primitiveID;
-} FSInput;
+} SRPfsInput;
 
 typedef struct
 {
 	vec4d color;
 	double fragDepth;
-} FSOutput;
+} SRPfsOutput;
 
 typedef struct
 {
-	void (*shader)(FSInput* in, FSOutput* out);
-} FragmentShader;
+	void (*shader)(SRPfsInput* in, SRPfsOutput* out);
+} SRPFragmentShader;
 
 
-typedef struct ShaderProgram
+typedef struct SRPShaderProgram
 {
-	Uniforms* uniforms;
+	SRPUniform* uniform;
 
-	VertexShader vs;
-	FragmentShader fs;
-} ShaderProgram;
+	SRPVertexShader vs;
+	SRPFragmentShader fs;
+} SRPShaderProgram;
 

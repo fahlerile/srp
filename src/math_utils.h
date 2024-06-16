@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef SRP_SOURCE
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -20,4 +22,6 @@
 	)
 
 #define FRACTIONAL(x) ( (x) - floor(x) )
+
+#endif  // ifdef SRP_SOURCE
 

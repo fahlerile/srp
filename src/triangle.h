@@ -1,27 +1,15 @@
 #pragma once
 
+#ifdef SRP_SOURCE
+
 #include "Framebuffer.h"
 #include "shaders.h"
 #include "vec.h"
 
 void drawTriangle(
-	Framebuffer* fb, const VSOutput vertices[3], const ShaderProgram* restrict sp,
-	size_t primitiveID
+	SRPFramebuffer* fb, const SRPvsOutput vertices[3],
+	const SRPShaderProgram* restrict sp, size_t primitiveID
 );
 
-static double signedAreaParallelogram(
-	const vec3d* restrict a, const vec3d* restrict b
-);
-static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
-	const vec3d* restrict SSPositions, const vec3d* restrict edgeVectors,
-	const vec2d point, double* restrict barycentricCoordinates,
-	double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
-);
-static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector);
-
-static void triangleInterpolatePositionAndVertexVariables(
-	const VSOutput vertices[3], const double barycentricCoordinates[3],
-	const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer,
-	vec4d* interpolatedPosition
-);
+#endif  // ifdef SRP_SOURCE
 
