@@ -39,6 +39,7 @@ And a lot more... Here I mentioned only those projects on which I looked at as a
     - https://www.youtube.com/watch?v=k5wtuKWmV48
     - https://dl.acm.org/doi/pdf/10.1145/54852.378457
     - https://acta.uni-obuda.hu/Mileff_Nehez_Dudra_63.pdf
+    - https://www.montis.pmf.ac.me/allissues/47/Mathematica-Montisnigri-47-13.pdf
 - Perspective-correct interpolation:
     - https://www.comp.nus.edu.sg/%7Elowkl/publications/lowk_persp_interp_techrep.pdf
     - https://www.youtube.com/watch?v=F5X6S35SW2s
