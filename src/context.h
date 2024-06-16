@@ -16,7 +16,7 @@ typedef enum SRPContextParameter
 } SRPContextParameter;
 
 void srpNewContext(SRPContext* context);
-void srpContextSetP(SRPContextParameter contextParameter, void** data);
+void srpContextSetP(SRPContextParameter contextParameter, void* data);
 
 extern SRPContext srpContext;
 

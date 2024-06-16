@@ -9,15 +9,15 @@ void srpNewContext(SRPContext* context)
 	context->messageCallbackUserParameter = NULL;
 }
 
-void srpContextSetP(SRPContextParameter contextParameter, void** data)
+void srpContextSetP(SRPContextParameter contextParameter, void* data)
 {
 	switch (contextParameter)
 	{
 	case CTX_PARAM_MESSAGE_CALLBACK:
-		srpContext.messageCallback = *data;
+		srpContext.messageCallback = data;
 		return;
 	case CTX_PARAM_MESSAGE_CALLBACK_USER_PARAMETER:
-		srpContext.messageCallbackUserParameter = *data;
+		srpContext.messageCallbackUserParameter = data;
 		return;
 	default:
 		messageCallback(

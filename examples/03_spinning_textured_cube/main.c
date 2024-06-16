@@ -31,7 +31,7 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 int main()
 {
 	srpNewContext(&srpContext);
-	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void**) &messageCallback);
+	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void*) &messageCallback);
 
 	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
