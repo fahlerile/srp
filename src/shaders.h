@@ -15,12 +15,10 @@ typedef struct
 	size_t vertexID;
 } SRPvsInput;
 
-typedef struct VSOutputVariable VSOutputVariable;
-
 typedef struct
 {
 	double position[4];
-	VSOutputVariable* pOutputVariables;
+	SRPVertexVariable* pOutputVariables;
 } SRPvsOutput;
 
 // TODO: are nBytesPerOutputVariables and outputVariables[i].offsetBytes
@@ -32,7 +30,7 @@ typedef struct
 	);
 	size_t nBytesPerOutputVariables;
 	size_t nOutputVariables;
-	SRPVertexVariable* outputVariables;
+	SRPVertexVariableInformation* outputVariables;
 } SRPVertexShader;
 
 

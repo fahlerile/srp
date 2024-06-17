@@ -74,7 +74,7 @@ int main()
 
 	// This stores the information about vertex shader's output variables that
 	// is necessary to interpolate them inside the primitive
-	SRPVertexVariable VSOutputVariables[1] = {
+	SRPVertexVariableInformation VSOutputVariables[1] = {
 		{
 			.nItems = 3,
 			.type = TYPE_DOUBLE,

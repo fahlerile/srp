@@ -58,7 +58,7 @@ int main()
 		0, 1, 2
 	};
 
-	SRPVertexVariable VSOutputVariables[1] = {
+	SRPVertexVariableInformation VSOutputVariables[1] = {
 		{
 			.nItems = 3,
 			.type = TYPE_DOUBLE,

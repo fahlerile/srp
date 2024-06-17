@@ -108,7 +108,7 @@ void srpDrawIndexBuffer(
 		return;
 	}
 
-	VSOutputVariable* triangleVSOutputVariables = \
+	SRPVertexVariable* triangleVSOutputVariables = \
 		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
 	size_t primitiveID = 0;
 
@@ -120,7 +120,7 @@ void srpDrawIndexBuffer(
 		{
 			uint64_t vertexIndex = indexIndexBuffer(this, i + j);
 			SRPVertex* pInVertex = indexVertexBuffer(vb, vertexIndex);
-			VSOutputVariable* pVSOutputVariables = (VSOutputVariable*) \
+			SRPVertexVariable* pVSOutputVariables = (SRPVertexVariable*) \
 				INDEX_VOID_PTR(triangleVSOutputVariables, j, sp->vs.nBytesPerOutputVariables);
 
 			vsIn[j] = (SRPvsInput) {

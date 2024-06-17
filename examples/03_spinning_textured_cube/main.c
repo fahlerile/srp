@@ -82,10 +82,11 @@ int main()
 		20, 23, 22,  20, 22, 21
 	};
 
+	// Create vertex and index buffers, these are similar to VBO and EBO
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
-	SRPVertexVariable VSOutputVariables[1] = {
+	SRPVertexVariableInformation VSOutputVariables[1] = {
 		{
 			.nItems = 2,
 			.type = TYPE_DOUBLE,
