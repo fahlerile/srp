@@ -49,8 +49,8 @@ And many, many more, all of which I will not find anymore...
 
 ## TODO
 ### Documentation/examples
+- [x] Add comments to the examples
 - [ ] Prettify the API (think about convenience macros/functions)
-- [ ] Add comments to the examples
 - [ ] Write the documentation about the main pipeline and individual functions
 
 ### Features
