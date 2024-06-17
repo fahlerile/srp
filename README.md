@@ -69,7 +69,8 @@ And many, many more, all of which I will not find anymore...
 - [ ] Draw primitives in parallel (OpenMP)
 
 ### Portability
-- [ ] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
+- [x] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
+- [ ] Use `const` in function declarations where needed
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:
