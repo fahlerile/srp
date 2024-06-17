@@ -20,7 +20,7 @@ void srpContextSetP(SRPContextParameter contextParameter, void* data)
 		srpContext.messageCallbackUserParameter = data;
 		return;
 	default:
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Unknown type (%i)", contextParameter
 		);

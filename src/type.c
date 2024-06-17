@@ -22,7 +22,7 @@ size_t SIZEOF_TYPE(Type type)
 			return sizeof(double);
 		default:
 		{
-			messageCallback(
+			srpMessageCallbackHelper(
 				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 				"Unknown type (%i)", type
 			);

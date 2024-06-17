@@ -31,7 +31,7 @@ void framebufferDrawPixel(
 )
 {
 	if (1 < depth || depth < -1)
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Depth value is not inside [-1, 1] interval; depth=%lf", depth
 		);

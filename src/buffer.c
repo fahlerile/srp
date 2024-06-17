@@ -74,7 +74,7 @@ static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
 			ret = (uint64_t) (*(uint64_t*) pIndex);
 			break;
 		default:
-			messageCallback(
+			srpMessageCallbackHelper(
 				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", this->indicesType
 			);
@@ -91,7 +91,7 @@ void srpDrawIndexBuffer(
 {
 	if (primitive != PRIMITIVE_TRIANGLES)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Only triangles are implemented"
 		);
@@ -101,7 +101,7 @@ void srpDrawIndexBuffer(
 	size_t endIbIndex = startIbIndex + count;
 	if (endIbIndex > this->nIndices)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Attempt to OOB access index buffer"
 		);

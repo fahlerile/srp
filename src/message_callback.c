@@ -7,7 +7,7 @@
 
 #define MAX_CHARS_IN_MESSAGE 1024
 
-void messageCallback(
+void srpMessageCallbackHelper(
 	SRPMessageType type, SRPMessageSeverity severity,
 	const char* sourceFunction, const char* format, ...
 )
@@ -17,7 +17,7 @@ void messageCallback(
 		char string[MAX_CHARS_IN_MESSAGE];
 		va_list variadic;
 		va_start(variadic, format);
-		snprintf(string, MAX_CHARS_IN_MESSAGE, format, variadic);
+		vsnprintf(string, MAX_CHARS_IN_MESSAGE, format, variadic);
 
 		srpContext.messageCallback(
 			type, severity, sourceFunction, string,

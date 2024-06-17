@@ -9,7 +9,7 @@ SRP_FORCEINLINE vec4d mat4dGetColumn(mat4d* a, uint8_t index)
 {
 	if (index >= 4)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Attempt to OBB access mat4d (read): column index (%i)", index
 		);
@@ -28,7 +28,7 @@ SRP_FORCEINLINE void mat4dSetColumn(mat4d* a, vec4d column, uint8_t index)
 {
 	if (index >= 4)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Attempt to OBB access mat4d (write): column index (%i)", index
 		);

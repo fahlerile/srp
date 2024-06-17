@@ -250,7 +250,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 			break;
 		}
 		default:
-			messageCallback(
+			srpMessageCallbackHelper(
 				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", attr->type
 			);

@@ -10,6 +10,7 @@ set(
 	vec.c
 	mat.c
 	alloc.c
+	message_callback.c
 )
 
 add_library(srp STATIC ${SOURCES})

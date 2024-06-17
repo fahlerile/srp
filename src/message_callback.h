@@ -20,7 +20,7 @@ typedef void (*SRPMessageCallbackType)(
 
 #ifdef SRP_SOURCE
 
-void messageCallback(
+void srpMessageCallbackHelper(
 	SRPMessageType type, SRPMessageSeverity severity,
 	const char* sourceFunction, const char* message, ...
 );

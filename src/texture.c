@@ -27,7 +27,7 @@ SRPTexture* srpNewTexture(
 	this->data = stbi_load(image, &this->width, &this->height, NULL, N_CHANNELS_REQUESTED);
 	if (this->data == NULL)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Failed to load image `%s`: %s", image, stbi_failure_reason()
 		);
