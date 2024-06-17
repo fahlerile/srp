@@ -67,25 +67,19 @@ int main()
 	// Creating the vertex buffer object, it is similar to OpenGL's VBO
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 
-	// This stores the information about vertex shader's output variables that
-	// is necessary to interpolate them inside the primitive
-	SRPVertexVariableInformation VSOutputVariables[1] = {
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
-	};
-
 	// Shader program is not actually a program, but named like this to
 	// be similar to OpenGL
 	SRPShaderProgram shaderProgram = {
 		.uniform = NULL,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(VSOutput),
+			// This stores the information about vertex shader's output variables
+			// that is necessary to interpolate them inside the primitive
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables
+			.outputVariables = (SRPVertexVariableInformation[]) {
+				{.nItems = 3, .type = TYPE_DOUBLE}
+			},
+			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -152,10 +146,7 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 	*outPosition = (vec4d) {
 		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
-
-	pOutVars->color.x = pVertex->color.x;
-	pOutVars->color.y = pVertex->color.y;
-	pOutVars->color.z = pVertex->color.z;
+	pOutVars->color = pVertex->color;
 
 	// What we have done is just copied the inputs to the outputs
 	// The simplest vertex shader possible!

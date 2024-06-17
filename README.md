@@ -57,6 +57,7 @@ And many, many more, all of which I will not find anymore...
 - [ ] Add interpolation with perspective correction
 - [ ] Fix rasterization rules (see the gaps between triangles in `03_spinning_textured_cube` example)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
+- [ ] Implement interpolation for types other than `double` (shouldn't it just be `double` and `float`?)
 - [ ] Add multisampling
 - [ ] Advanced texture techniques:
     - [ ] (Bi)linear filtering
@@ -69,9 +70,11 @@ And many, many more, all of which I will not find anymore...
 - [ ] Use a profiler to find bottlenecks in frequently-used functions
 - [ ] Draw primitives in parallel (OpenMP)
 
-### Portability
+### Portability/API design
 - [x] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
 - [x] Use `const` in function declarations where needed
+- [ ] Reorder arguments in drawcalls
+- [ ] Hide the API structure definitions to avoid users modifying structure members themselves
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:

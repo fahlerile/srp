@@ -55,14 +55,6 @@ int main()
 		}
 	};
 
-	SRPVertexVariableInformation VSOutputVariables[1] = {
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
-	};
-
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 
 	// Uniform requires a cast to an opaque `SRPUniform` type to avoid
@@ -72,9 +64,11 @@ int main()
 		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables,
+			.outputVariables = (SRPVertexVariableInformation[]) {
+				{.nItems = 3, .type = TYPE_DOUBLE}
+			},
+			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
 		.fs = {
 			.shader = fragmentShader

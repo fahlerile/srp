@@ -10,6 +10,5 @@ typedef struct
 {
 	size_t nItems;
 	Type type;
-	size_t offsetBytes;
 } SRPVertexVariableInformation;
 

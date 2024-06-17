@@ -1,3 +1,4 @@
+#include "vertex.h"
 #define SRP_INCLUDE_VEC
 #define SRP_INCLUDE_MAT
 
@@ -86,14 +87,6 @@ int main()
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
-	SRPVertexVariableInformation VSOutputVariables[1] = {
-		{
-			.nItems = 2,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
-	};
-
 	Uniform uniform = {
 		.model = mat4dConstructIdentity(),
 		.view = mat4dConstructView(
@@ -114,9 +107,11 @@ int main()
 		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables,
+			.outputVariables = (SRPVertexVariableInformation[])	{
+				{.nItems = 2, .type = TYPE_DOUBLE}
+			},
+			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
 		.fs = {
 			.shader = fragmentShader

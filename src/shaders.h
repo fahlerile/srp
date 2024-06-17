@@ -28,9 +28,9 @@ typedef struct
 	void (*shader)(
 		SRPvsInput* in, SRPvsOutput* out
 	);
-	size_t nBytesPerOutputVariables;
 	size_t nOutputVariables;
 	SRPVertexVariableInformation* outputVariables;
+	size_t nBytesPerOutputVariables;
 } SRPVertexShader;
 
 

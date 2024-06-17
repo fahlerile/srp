@@ -221,6 +221,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 	}
 
 	// interpolate variables (attributes)
+	size_t attrOffsetBytes = 0;
 	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
 	{
 		SRPVertexVariableInformation* attr = &sp->vs.outputVariables[attrI];
@@ -234,11 +235,11 @@ static void triangleInterpolatePositionAndVertexVariables(
 
 			// pointers to the current attribute of 0th, 1st and 2nd vertices
 			double* AV0 = (double*) \
-				ADD_VOID_PTR(vertices[0].pOutputVariables, attr->offsetBytes);
+				ADD_VOID_PTR(vertices[0].pOutputVariables, attrOffsetBytes);
 			double* AV1 = (double*) \
-				ADD_VOID_PTR(vertices[1].pOutputVariables, attr->offsetBytes);
+				ADD_VOID_PTR(vertices[1].pOutputVariables, attrOffsetBytes);
 			double* AV2 = (double*) \
-				ADD_VOID_PTR(vertices[2].pOutputVariables, attr->offsetBytes);
+				ADD_VOID_PTR(vertices[2].pOutputVariables, attrOffsetBytes);
 
 			for (size_t elemI = 0; elemI < attr->nItems; elemI++)
 			{
@@ -257,6 +258,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 		}
 		size_t attrSize = elemSize * attr->nItems;
 		pInterpolatedAttrVoid = (uint8_t*) pInterpolatedAttrVoid + attrSize;
+		attrOffsetBytes += attrSize;
 	}
 }
 
