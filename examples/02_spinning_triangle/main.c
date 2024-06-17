@@ -76,7 +76,7 @@ int main()
 		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(double) * 3,
+			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
 			.outputVariables = VSOutputVariables,
 		},
