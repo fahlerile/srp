@@ -9,10 +9,17 @@
 
 typedef struct Vertex
 {
-	double position[3];
-	double color[3];
+	vec3d position;
+	vec3d color;
 } Vertex;
 
+typedef struct VSOutput
+{
+	vec3d color;
+} VSOutput;
+
+// A structure to hold the uniform for shaders
+// Can be used to pass arbitrary data to the shader
 typedef struct Uniform
 {
 	size_t frameCount;
@@ -62,6 +69,8 @@ int main()
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
+	// Uniform requires a cast to an opaque `SRPUniform` type to avoid
+	// a compiler warning
 	Uniform uniform = {0};
 	SRPShaderProgram shaderProgram = {
 		.uniform = (SRPUniform*) &uniform,
@@ -82,6 +91,9 @@ int main()
 	{
 		TIMER_START(frametime);
 
+		// Part of the `mat` API. Again, you can use your own functions
+		// (or an external math library) if you remove the `define`s at the
+		// top of this file (`SRP_INCLUDE_...`)
 		uniform.rotation = mat4dConstructRotate(0, 0, uniform.frameCount / 1000.);
 		framebufferClear(fb);
 		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
@@ -121,24 +133,29 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
 	Vertex* pVertex = (Vertex*) in->pVertex;
 	Uniform* pUniform = (Uniform*) in->uniform;
+	VSOutput* pOutVars = (VSOutput*) out->pOutputVariables;
 
-	vec3d* inPosition = (vec3d*) pVertex->position;
+	vec3d* inPosition = &pVertex->position;
 	vec4d* outPosition = (vec4d*) out->position;
 	*outPosition = (vec4d) {
 		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
+	// Transform the position vector by the rotation matrix from uniform
 	*outPosition = mat4dMultiplyVec4d(&pUniform->rotation, *outPosition);
 
-	double* colorOut = (double*) out->pOutputVariables;
-	colorOut[0] = pVertex->color[0] + sin(pUniform->frameCount * 2.5e-3) * 0.3;
-	colorOut[1] = pVertex->color[1] + sin(pUniform->frameCount * 0.5e-3) * 0.1;
-	colorOut[2] = pVertex->color[2] + sin(pUniform->frameCount * 5e-3) * 0.5;
+	// Transform the color values just for fun
+	pOutVars->color.x = pVertex->color.x + sin(pUniform->frameCount * 2.5e-3) * 0.3;
+	pOutVars->color.y = pVertex->color.y + sin(pUniform->frameCount * 0.5e-3) * 0.1;
+	pOutVars->color.z = pVertex->color.z + sin(pUniform->frameCount * 5e-3) * 0.5;
 }
 
 void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
-	double* colorIn = (double*) in->interpolated;
-	memcpy(&out->color, colorIn, 3 * sizeof(double));
-	out->color[3] = 1.;
+	VSOutput* interpolated = (VSOutput*) in->interpolated;
+	vec4d* outColor = (vec4d*) out->color;
+	outColor->x = interpolated->color.x;
+	outColor->y = interpolated->color.y;
+	outColor->z = interpolated->color.z;
+	outColor->w = 1.;
 }
 
