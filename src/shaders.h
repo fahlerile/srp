@@ -2,7 +2,6 @@
 
 #include <stdbool.h>
 #include "vertex.h"
-#include "vec.h"
 
 typedef struct SRPInterpolated SRPInterpolated;
 
@@ -20,7 +19,7 @@ typedef struct VSOutputVariable VSOutputVariable;
 
 typedef struct
 {
-	vec4d position;
+	double position[4];
 	VSOutputVariable* pOutputVariables;
 } SRPvsOutput;
 
@@ -39,14 +38,14 @@ typedef struct
 {
 	SRPUniform* uniform;
 	SRPInterpolated* interpolated;
-	vec4d fragCoord;
+	double fragCoord[4];
 	bool frontFacing;
 	size_t primitiveID;
 } SRPfsInput;
 
 typedef struct
 {
-	vec4d color;
+	double color[4];
 	double fragDepth;
 } SRPfsOutput;
 

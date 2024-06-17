@@ -1,8 +1,10 @@
+#define SRP_INCLUDE_VEC
+#define SRP_INCLUDE_MAT
+
 #include <stdio.h>
 #include "srp.h"
 #include "window.h"
 #include "timer.h"
-#include "mat.h"
 
 typedef struct Vertex
 {
@@ -164,13 +166,14 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 	Vertex* pVertex = (Vertex*) in->pVertex;
 	Uniform* pUniform = (Uniform*) in->uniform;
 
-	double* pos = pVertex->position;
-	out->position = (vec4d) {
-		pos[0], pos[1], pos[2], 1.0
+	vec3d* inPosition = (vec3d*) pVertex->position;
+	vec4d* outPosition = (vec4d*) out->position;
+	*outPosition = (vec4d) {
+		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
-	out->position = mat4dMultiplyVec4d(&pUniform->model, out->position);
-	out->position = mat4dMultiplyVec4d(&pUniform->view, out->position);
-	out->position = mat4dMultiplyVec4d(&pUniform->projection, out->position);
+	*outPosition = mat4dMultiplyVec4d(&pUniform->model, *outPosition);
+	*outPosition = mat4dMultiplyVec4d(&pUniform->view, *outPosition);
+	*outPosition = mat4dMultiplyVec4d(&pUniform->projection, *outPosition);
 
 	double* uvOut = (double*) out->pOutputVariables;
 	uvOut[0] = pVertex->uv[0];
@@ -183,9 +186,9 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 
 	double* uv = (double*) in->interpolated;
 	SRPColor color = srpTextureGetFilteredColor(pUniform->texture, uv[0], uv[1]);
-	out->color.x = color.r / 255.;
-	out->color.y = color.g / 255.;
-	out->color.z = color.b / 255.;
-	out->color.w = color.a / 255.;
+	out->color[0] = color.r / 255.;
+	out->color[1] = color.g / 255.;
+	out->color[2] = color.b / 255.;
+	out->color[3] = color.a / 255.;
 }
 

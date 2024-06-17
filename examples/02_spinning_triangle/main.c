@@ -1,8 +1,10 @@
+#define SRP_INCLUDE_VEC
+#define SRP_INCLUDE_MAT
+
 #include <stdio.h>
 #include "srp.h"
 #include "window.h"
 #include "timer.h"
-#include "mat.h"
 #include "rad.h"
 
 typedef struct Vertex
@@ -120,11 +122,12 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 	Vertex* pVertex = (Vertex*) in->pVertex;
 	Uniform* pUniform = (Uniform*) in->uniform;
 
-	double* pos = pVertex->position;
-	out->position = (vec4d) {
-		pos[0], pos[1], pos[2], 1.0
+	vec3d* inPosition = (vec3d*) pVertex->position;
+	vec4d* outPosition = (vec4d*) out->position;
+	*outPosition = (vec4d) {
+		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
-	out->position = mat4dMultiplyVec4d(&pUniform->rotation, out->position);
+	*outPosition = mat4dMultiplyVec4d(&pUniform->rotation, *outPosition);
 
 	double* colorOut = (double*) out->pOutputVariables;
 	colorOut[0] = pVertex->color[0] + sin(pUniform->frameCount * 2.5e-3) * 0.3;
@@ -136,6 +139,6 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
 	double* colorIn = (double*) in->interpolated;
 	memcpy(&out->color, colorIn, 3 * sizeof(double));
-	out->color.w = 1.;
+	out->color[3] = 1.;
 }
 

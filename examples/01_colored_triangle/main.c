@@ -1,3 +1,6 @@
+#define SRP_INCLUDE_VEC
+#define SRP_INCLUDE_MAT
+
 #include <stdio.h>
 #include "srp.h"
 #include "window.h"
@@ -111,9 +114,12 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
 	Vertex* pVertex = (Vertex*) in->pVertex;
 
-	double* pos = pVertex->position;
-	out->position = (vec4d) {
-		pos[0], pos[1], pos[2], 1.0
+	// `vec` structures are tightly packed, so it is safe to
+	// cast float/double arrays to vecXf/vecXd and vice versa
+	vec3d* inPosition = (vec3d*) pVertex->position;
+	vec4d* outPosition = (vec4d*) out->position;
+	*outPosition = (vec4d) {
+		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
 
 	double* colorOut = (double*) out->pOutputVariables;
@@ -126,6 +132,6 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
 	double* colorIn = (double*) in->interpolated;
 	memcpy(&out->color, colorIn, 3 * sizeof(double));
-	out->color.w = 1.;
+	out->color[4] = 1.;
 }
 

@@ -134,12 +134,12 @@ void srpDrawIndexBuffer(
 			};
 
 			sp->vs.shader(&vsIn[j], &vsOut[j]);
-			vsOut[j].position = (vec4d) {
-				vsOut[j].position.x / vsOut[j].position.w,
-				vsOut[j].position.y / vsOut[j].position.w,
-				vsOut[j].position.z / vsOut[j].position.w,
-				1.
-			};
+
+			// Perspective divide
+			vsOut[j].position[0] = vsOut[j].position[0] / vsOut[j].position[3],
+			vsOut[j].position[1] = vsOut[j].position[1] / vsOut[j].position[3];
+			vsOut[j].position[2] = vsOut[j].position[2] / vsOut[j].position[3];
+			vsOut[j].position[3] = 1.;
 		}
 		drawTriangle(fb, vsOut, sp, primitiveID);
 		primitiveID++;

@@ -36,9 +36,9 @@ void drawTriangle(
 	vec3d NDCPositions[3];
 	for (uint8_t i = 0; i < 3; i++)
 		NDCPositions[i] = (vec3d) {
-			vertices[i].position.x,
-			vertices[i].position.y,
-			vertices[i].position.z
+			vertices[i].position[0],
+			vertices[i].position[1],
+			vertices[i].position[2]
 		};
 
 	// Do not traverse triangles with clockwise vertices
@@ -110,7 +110,12 @@ void drawTriangle(
 				SRPfsInput fsIn = {
 					.uniform = sp->uniform,
 					.interpolated = pInterpolated,
-					.fragCoord = interpolatedPosition,
+					.fragCoord = {
+						interpolatedPosition.x,
+						interpolatedPosition.y,
+						interpolatedPosition.z,
+						interpolatedPosition.w
+					},
 					.frontFacing = true,
 					.primitiveID = primitiveID,
 				};
@@ -119,12 +124,12 @@ void drawTriangle(
 				sp->fs.shader(&fsIn, &fsOut);
 
 				SRPColor color = {
-					CLAMP(0, 255, fsOut.color.x * 255),
-					CLAMP(0, 255, fsOut.color.y * 255),
-					CLAMP(0, 255, fsOut.color.z * 255),
-					CLAMP(0, 255, fsOut.color.w * 255)
+					CLAMP(0, 255, fsOut.color[0] * 255),
+					CLAMP(0, 255, fsOut.color[1] * 255),
+					CLAMP(0, 255, fsOut.color[2] * 255),
+					CLAMP(0, 255, fsOut.color[3] * 255)
 				};
-				double depth = (fsOut.fragDepth == 0) ? fsIn.fragCoord.z : fsOut.fragDepth;
+				double depth = (fsOut.fragDepth == 0) ? fsIn.fragCoord[2] : fsOut.fragDepth;
 
 				framebufferDrawPixel(fb, x, y, depth, SRP_COLOR_TO_UINT32_T(color));
 			}
