@@ -148,7 +148,7 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
 	// Cast the opaque input pointers to known types to make computations easier
 	Vertex* pVertex = (Vertex*) in->pVertex;
-	VSOutput* outVars = (VSOutput*) out->pOutputVariables;
+	VSOutput* pOutVars = (VSOutput*) out->pOutputVariables;
 
 	// `out->position` is defined as `double[4]`, but we cast it to `vec4d*`
 	// `vec` structures are tightly packed, so it is safe to cast float/double
@@ -159,9 +159,9 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
 
-	outVars->color.x = pVertex->color.x;
-	outVars->color.y = pVertex->color.y;
-	outVars->color.z = pVertex->color.z;
+	pOutVars->color.x = pVertex->color.x;
+	pOutVars->color.y = pVertex->color.y;
+	pOutVars->color.z = pVertex->color.z;
 
 	// What we have done is just copied the inputs to the outputs
 	// The simplest vertex shader possible!
