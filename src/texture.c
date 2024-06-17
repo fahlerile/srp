@@ -14,7 +14,7 @@
 
 #define N_CHANNELS_REQUESTED 3
 
-static vec4d textureGetColor(SRPTexture* this, size_t x, size_t y);
+static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y);
 
 SRPTexture* srpNewTexture(
 	const char* image,
@@ -56,7 +56,9 @@ void srpFreeTexture(SRPTexture* this)
 // through `out` argument
 // P.S: does not return `vec4d` because the user API should not enforce the use
 // of `vec` and `mat`
-void srpTextureGetFilteredColor(SRPTexture* this, double u, double v, double out[4])
+void srpTextureGetFilteredColor(
+	const SRPTexture* this, double u, double v, double out[4]
+)
 {
 	if (u < 0 || u > 1)
 	{
@@ -101,7 +103,7 @@ void srpTextureGetFilteredColor(SRPTexture* this, double u, double v, double out
 	}
 }
 
-static vec4d textureGetColor(SRPTexture* this, size_t x, size_t y)
+static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y)
 {
 	// Each pixel is N_CHANNELS_REQUESTED bytes, and an image is stored
 	// row-major

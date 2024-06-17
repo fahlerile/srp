@@ -65,12 +65,13 @@ And many, many more, all of which I will not find anymore...
     - [ ] Transparent textures?
 
 ### Optimization
+- [ ] Are `vec` and `mat` functions inlined by the compiler? Should they be? Are `mat` or `vec` ever passed by-value?
 - [ ] Use a profiler to find bottlenecks in frequently-used functions
 - [ ] Draw primitives in parallel (OpenMP)
 
 ### Portability
 - [x] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
-- [ ] Use `const` in function declarations where needed
+- [x] Use `const` in function declarations where needed
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:

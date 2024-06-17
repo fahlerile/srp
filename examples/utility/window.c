@@ -46,7 +46,7 @@ void windowPollEvents(Window* this)
 	}
 }
 
-void windowPresent(Window* this, SRPFramebuffer* fb)
+void windowPresent(const Window* this, const SRPFramebuffer* fb)
 {
 	SDL_UpdateTexture(this->texture, NULL, fb->color, fb->width * sizeof(SRPColor));
 	SDL_RenderCopy(this->renderer, this->texture, NULL, NULL);

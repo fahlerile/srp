@@ -10,11 +10,12 @@
 #include "defines.h"
 
 static void drawBuffer(
-	SRPFramebuffer* fb, SRPIndexBuffer* this, SRPVertexBuffer* vb,
-	SRPPrimitive primitive, size_t startIndex, size_t count, SRPShaderProgram* sp
+	const SRPFramebuffer* fb, const SRPIndexBuffer* this,
+	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIndex,
+	size_t count, const SRPShaderProgram* sp
 );
-static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index);
-static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index);
+static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index);
+static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index);
 
 // An internal function to draw either index or vertex buffer
 // If `ib == NULL`, draws the vertex buffer, else draws index buffer
@@ -22,8 +23,9 @@ static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index);
 // Created because vertex and index buffer drawing are very similar,
 // with an intent to avoid code duplication
 static void drawBuffer(
-	SRPFramebuffer* fb, SRPIndexBuffer* ib, SRPVertexBuffer* vb,
-	SRPPrimitive primitive, size_t startIndex, size_t count, SRPShaderProgram* sp
+	const SRPFramebuffer* fb, const SRPIndexBuffer* ib,
+	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIndex,
+	size_t count, const SRPShaderProgram* sp
 )
 {
 	const bool isDrawingIndexBuffer = (ib != NULL);
@@ -98,7 +100,9 @@ static void drawBuffer(
 	SRP_FREE(triangleOutputVertexVariables);
 }
 
-SRPVertexBuffer* srpNewVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data)
+SRPVertexBuffer* srpNewVertexBuffer(
+	size_t nBytesPerVertex, size_t nBytesData, const void* data
+)
 {
 	SRPVertexBuffer* this = SRP_MALLOC(sizeof(SRPVertexBuffer));
 
@@ -118,19 +122,21 @@ void srpFreeVertexBuffer(SRPVertexBuffer* this)
 }
 
 void srpDrawVertexBuffer(
-	SRPFramebuffer* fb, SRPVertexBuffer* this, SRPPrimitive primitive,
-	size_t startIndex, size_t count, SRPShaderProgram* sp
+	const SRPFramebuffer* fb, const SRPVertexBuffer* this, SRPPrimitive primitive,
+	size_t startIndex, size_t count, const SRPShaderProgram* sp
 )
 {
 	drawBuffer(fb, NULL, this, primitive, startIndex, count, sp);
 }
 
-static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index)
+static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index)
 {
 	return (SRPVertex*) INDEX_VOID_PTR(this->data, index, this->nBytesPerVertex);
 }
 
-SRPIndexBuffer* srpNewIndexBuffer(Type indicesType, size_t nBytesData, void* data)
+SRPIndexBuffer* srpNewIndexBuffer(
+	Type indicesType, size_t nBytesData, const void* data
+)
 {
 	SRPIndexBuffer* this = SRP_MALLOC(sizeof(SRPIndexBuffer));
 
@@ -149,7 +155,7 @@ void srpFreeIndexBuffer(SRPIndexBuffer* this)
 	SRP_FREE(this);
 }
 
-static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
+static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index)
 {
 	void* pIndex = INDEX_VOID_PTR(this->data, index, this->nBytesPerIndex);
 	uint64_t ret;
@@ -179,8 +185,9 @@ static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
 
 // @brief Draw an index buffer with specified primitive mode
 void srpDrawIndexBuffer(
-	SRPFramebuffer* fb, SRPIndexBuffer* this, SRPVertexBuffer* vb, SRPPrimitive primitive,
-	size_t startIbIndex, size_t count, SRPShaderProgram* sp
+	const SRPFramebuffer* fb, const SRPIndexBuffer* this,
+	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIbIndex,
+	size_t count, const SRPShaderProgram* sp
 )
 {
 	drawBuffer(fb, this, vb, primitive, startIbIndex, count, sp);

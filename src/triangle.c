@@ -17,7 +17,7 @@ static double signedAreaParallelogram(
 );
 static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
 	const vec3d* restrict SSPositions, const vec3d* restrict edgeVectors,
-	const vec2d point, double* restrict barycentricCoordinates,
+	vec2d point, double* restrict barycentricCoordinates,
 	double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
 );
 static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector);
@@ -29,7 +29,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 );
 
 void drawTriangle(
-	SRPFramebuffer* fb, const SRPvsOutput vertices[3],
+	const SRPFramebuffer* fb, const SRPvsOutput vertices[3],
 	const SRPShaderProgram* restrict sp, size_t primitiveID
 )
 {
