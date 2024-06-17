@@ -28,16 +28,15 @@ SRPVertexBuffer* srpNewVertexBuffer
 	(size_t nBytesPerVertex, size_t nBytesData, const void* data);
 void srpFreeVertexBuffer(SRPVertexBuffer* this);
 void srpDrawVertexBuffer(
-	const SRPFramebuffer* fb, const SRPVertexBuffer* this, SRPPrimitive primitive,
-	size_t startIndex, size_t count, const SRPShaderProgram* sp
+	const SRPVertexBuffer* this, const SRPFramebuffer* fb, const SRPShaderProgram* sp,
+	SRPPrimitive primitive, size_t startIndex, size_t count
 );
 
 SRPIndexBuffer* srpNewIndexBuffer
 	(Type indicesType, size_t nBytesData, const void* data);
 void srpFreeIndexBuffer(SRPIndexBuffer* this);
 void srpDrawIndexBuffer(
-	const SRPFramebuffer* fb, const SRPIndexBuffer* this,
-	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIndex,
-	size_t count, const SRPShaderProgram* sp
+	const SRPIndexBuffer* this, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 );
 

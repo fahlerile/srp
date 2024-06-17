@@ -10,9 +10,8 @@
 #include "defines.h"
 
 static void drawBuffer(
-	const SRPFramebuffer* fb, const SRPIndexBuffer* this,
-	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIndex,
-	size_t count, const SRPShaderProgram* sp
+	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 );
 static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index);
 static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index);
@@ -23,9 +22,8 @@ static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index);
 // Created because vertex and index buffer drawing are very similar,
 // with an intent to avoid code duplication
 static void drawBuffer(
-	const SRPFramebuffer* fb, const SRPIndexBuffer* ib,
-	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIndex,
-	size_t count, const SRPShaderProgram* sp
+	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 )
 {
 	const bool isDrawingIndexBuffer = (ib != NULL);
@@ -122,11 +120,11 @@ void srpFreeVertexBuffer(SRPVertexBuffer* this)
 }
 
 void srpDrawVertexBuffer(
-	const SRPFramebuffer* fb, const SRPVertexBuffer* this, SRPPrimitive primitive,
-	size_t startIndex, size_t count, const SRPShaderProgram* sp
+	const SRPVertexBuffer* this, const SRPFramebuffer* fb, const SRPShaderProgram* sp,
+	SRPPrimitive primitive, size_t startIndex, size_t count
 )
 {
-	drawBuffer(fb, NULL, this, primitive, startIndex, count, sp);
+	drawBuffer(NULL, this, fb, sp, primitive, startIndex, count);
 }
 
 static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index)
@@ -185,11 +183,10 @@ static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index)
 
 // @brief Draw an index buffer with specified primitive mode
 void srpDrawIndexBuffer(
-	const SRPFramebuffer* fb, const SRPIndexBuffer* this,
-	const SRPVertexBuffer* vb, SRPPrimitive primitive, size_t startIbIndex,
-	size_t count, const SRPShaderProgram* sp
+	const SRPIndexBuffer* this, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 )
 {
-	drawBuffer(fb, this, vb, primitive, startIbIndex, count, sp);
+	drawBuffer(this, vb, fb, sp, primitive, startIndex, count);
 }
 
