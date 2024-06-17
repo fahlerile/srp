@@ -54,9 +54,6 @@ int main()
 			.color = {0., 1., 0.}
 		}
 	};
-	uint8_t indices[3] = {
-		0, 1, 2
-	};
 
 	SRPVertexVariableInformation VSOutputVariables[1] = {
 		{
@@ -67,7 +64,6 @@ int main()
 	};
 
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
 	// Uniform requires a cast to an opaque `SRPUniform` type to avoid
 	// a compiler warning
@@ -96,7 +92,7 @@ int main()
 		// top of this file (`SRP_INCLUDE_...`)
 		uniform.rotation = mat4dConstructRotate(0, 0, uniform.frameCount / 1000.);
 		framebufferClear(fb);
-		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawVertexBuffer(fb, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
@@ -112,7 +108,6 @@ int main()
 	}
 
 	srpFreeVertexBuffer(vb);
-	srpFreeIndexBuffer(ib);
 	srpFreeFramebuffer(fb);
 	freeWindow(window);
 

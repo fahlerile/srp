@@ -27,6 +27,10 @@ typedef struct SRPIndexBuffer
 // TODO: drawVertexBuffer
 SRPVertexBuffer* srpNewVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data);
 void srpFreeVertexBuffer(SRPVertexBuffer* this);
+void srpDrawVertexBuffer(
+	SRPFramebuffer* fb, SRPVertexBuffer* this, SRPPrimitive primitive,
+	size_t startIndex, size_t count, SRPShaderProgram* sp
+);
 
 SRPIndexBuffer* srpNewIndexBuffer(Type indicesType, size_t nBytesData, void* data);
 void srpFreeIndexBuffer(SRPIndexBuffer* this);

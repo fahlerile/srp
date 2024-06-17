@@ -63,14 +63,9 @@ int main()
 			.color = {0., 1., 0.}
 		}
 	};
-	uint8_t indices[3] = {
-		0, 1, 2
-	};
 
-	// Creating the vertex and index buffer objects. These are similar to
-	// OpenGL's VBO and EBO
+	// Creating the vertex buffer object, it is similar to OpenGL's VBO
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
 	// This stores the information about vertex shader's output variables that
 	// is necessary to interpolate them inside the primitive
@@ -90,7 +85,7 @@ int main()
 			.shader = vertexShader,
 			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables,
+			.outputVariables = VSOutputVariables
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -110,7 +105,7 @@ int main()
 
 		// Clear the framebuffer and draw the index buffer as triangles
 		framebufferClear(fb);
-		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawVertexBuffer(fb, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
@@ -127,7 +122,6 @@ int main()
 
 	// Destroy objects
 	srpFreeVertexBuffer(vb);
-	srpFreeIndexBuffer(ib);
 	srpFreeFramebuffer(fb);
 	freeWindow(window);
 
