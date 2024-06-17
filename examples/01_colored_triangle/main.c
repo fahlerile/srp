@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "rasterizer.h"
+#include "srp.h"
 #include "window.h"
 #include "timer.h"
 #include "rad.h"
