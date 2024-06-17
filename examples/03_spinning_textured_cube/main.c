@@ -169,7 +169,6 @@ void messageCallback(
 
 void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
-
 	Vertex* pVertex = (Vertex*) in->pVertex;
 	Uniform* pUniform = (Uniform*) in->uniform;
 	VSOutput* pOutVars = (VSOutput*) out->pOutputVariables;
@@ -194,10 +193,6 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 	vec4d* outColor = (vec4d*) out->color;
 
 	vec2d uv = interpolated->uv;
-	SRPColor color = srpTextureGetFilteredColor(pUniform->texture, uv.x, uv.y);
-	outColor->x = color.r / 255.;
-	outColor->y = color.g / 255.;
-	outColor->z = color.b / 255.;
-	outColor->w = color.a / 255.;
+	srpTextureGetFilteredColor(pUniform->texture, uv.x, uv.y, (double*) outColor);
 }
 
