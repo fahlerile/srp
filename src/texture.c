@@ -48,6 +48,8 @@ void srpFreeTexture(SRPTexture* this)
 // TODO: now using only filteringModeMagnifying
 // how to know if texture is magnified or minified?
 // TODO: too many conditionals?
+// TODO: return vec4 with values in [0, 1]? (this is what fragment shader
+// output assumes)
 SRPColor srpTextureGetFilteredColor(SRPTexture* this, double u, double v)
 {
 	if (u < 0 || u > 1)
