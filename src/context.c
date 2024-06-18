@@ -9,7 +9,7 @@ void srpNewContext(SRPContext* context)
 	context->messageCallbackUserParameter = NULL;
 }
 
-void srpContextSetP(SRPContextParameter contextParameter, void* data)
+void srpContextSetP(SRPContextParameter contextParameter, const void* data)
 {
 	switch (contextParameter)
 	{
@@ -17,10 +17,11 @@ void srpContextSetP(SRPContextParameter contextParameter, void* data)
 		srpContext.messageCallback = data;
 		return;
 	case CTX_PARAM_MESSAGE_CALLBACK_USER_PARAMETER:
-		srpContext.messageCallbackUserParameter = data;
+		// TODO: is this cast OK?
+		srpContext.messageCallbackUserParameter = (void*) data;
 		return;
 	default:
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Unknown type (%i)", contextParameter
 		);

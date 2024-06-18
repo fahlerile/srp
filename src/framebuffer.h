@@ -15,18 +15,20 @@ typedef struct SRPFramebuffer
 SRPFramebuffer* srpNewFramebuffer(size_t width, size_t height);
 void srpFreeFramebuffer(SRPFramebuffer* this);
 
-void framebufferClear(SRPFramebuffer* this);
+void framebufferClear(const SRPFramebuffer* this);
 
 #ifdef SRP_SOURCE
 
+// The `const` qualifier is completely legal: only the buffer pointed to by
+// `framebuffer->color` is modified, not the structure itself!
 void framebufferDrawPixel(
-	SRPFramebuffer* this, size_t x, size_t y, double depth, uint32_t color
+	const SRPFramebuffer* this, size_t x, size_t y, double depth,
+	uint32_t color
 );
 
-void framebufferNDCToScreenSpace(SRPFramebuffer* this, double* NDC, double* SS);
-
-uint32_t* framebufferGetPixelPointer(SRPFramebuffer* this, size_t x, size_t y);
-double* framebufferGetDepthPointer(SRPFramebuffer* this, size_t x, size_t y);
+void framebufferNDCToScreenSpace(
+	const SRPFramebuffer* this, const double* NDC, double* SS
+);
 
 #endif  // ifdef SRP_SOURCE
 

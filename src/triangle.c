@@ -17,7 +17,7 @@ static double signedAreaParallelogram(
 );
 static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
 	const vec3d* restrict SSPositions, const vec3d* restrict edgeVectors,
-	const vec2d point, double* restrict barycentricCoordinates,
+	vec2d point, double* restrict barycentricCoordinates,
 	double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
 );
 static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector);
@@ -29,7 +29,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 );
 
 void drawTriangle(
-	SRPFramebuffer* fb, const SRPvsOutput vertices[3],
+	const SRPFramebuffer* fb, const SRPvsOutput vertices[3],
 	const SRPShaderProgram* restrict sp, size_t primitiveID
 )
 {
@@ -221,9 +221,10 @@ static void triangleInterpolatePositionAndVertexVariables(
 	}
 
 	// interpolate variables (attributes)
+	size_t attrOffsetBytes = 0;
 	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
 	{
-		SRPVertexVariable* attr = &sp->vs.outputVariables[attrI];
+		SRPVertexVariableInformation* attr = &sp->vs.outputVariables[attrI];
 		size_t elemSize = 0;
 		switch (attr->type)
 		{
@@ -234,11 +235,11 @@ static void triangleInterpolatePositionAndVertexVariables(
 
 			// pointers to the current attribute of 0th, 1st and 2nd vertices
 			double* AV0 = (double*) \
-				ADD_VOID_PTR(vertices[0].pOutputVariables, attr->offsetBytes);
+				ADD_VOID_PTR(vertices[0].pOutputVariables, attrOffsetBytes);
 			double* AV1 = (double*) \
-				ADD_VOID_PTR(vertices[1].pOutputVariables, attr->offsetBytes);
+				ADD_VOID_PTR(vertices[1].pOutputVariables, attrOffsetBytes);
 			double* AV2 = (double*) \
-				ADD_VOID_PTR(vertices[2].pOutputVariables, attr->offsetBytes);
+				ADD_VOID_PTR(vertices[2].pOutputVariables, attrOffsetBytes);
 
 			for (size_t elemI = 0; elemI < attr->nItems; elemI++)
 			{
@@ -250,13 +251,14 @@ static void triangleInterpolatePositionAndVertexVariables(
 			break;
 		}
 		default:
-			messageCallback(
+			srpMessageCallbackHelper(
 				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", attr->type
 			);
 		}
 		size_t attrSize = elemSize * attr->nItems;
 		pInterpolatedAttrVoid = (uint8_t*) pInterpolatedAttrVoid + attrSize;
+		attrOffsetBytes += attrSize;
 	}
 }
 

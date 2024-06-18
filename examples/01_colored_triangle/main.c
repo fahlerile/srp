@@ -63,24 +63,9 @@ int main()
 			.color = {0., 1., 0.}
 		}
 	};
-	uint8_t indices[3] = {
-		0, 1, 2
-	};
 
-	// Creating the vertex and index buffer objects. These are similar to
-	// OpenGL's VBO and EBO
+	// Creating the vertex buffer object, it is similar to OpenGL's VBO
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
-
-	// This stores the information about vertex shader's output variables that
-	// is necessary to interpolate them inside the primitive
-	SRPVertexVariable VSOutputVariables[1] = {
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
-	};
 
 	// Shader program is not actually a program, but named like this to
 	// be similar to OpenGL
@@ -88,9 +73,13 @@ int main()
 		.uniform = NULL,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(VSOutput),
+			// This stores the information about vertex shader's output variables
+			// that is necessary to interpolate them inside the primitive
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables,
+			.outputVariables = (SRPVertexVariableInformation[]) {
+				{.nItems = 3, .type = TYPE_DOUBLE}
+			},
+			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -110,7 +99,7 @@ int main()
 
 		// Clear the framebuffer and draw the index buffer as triangles
 		framebufferClear(fb);
-		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawVertexBuffer(vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 3);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
@@ -127,7 +116,6 @@ int main()
 
 	// Destroy objects
 	srpFreeVertexBuffer(vb);
-	srpFreeIndexBuffer(ib);
 	srpFreeFramebuffer(fb);
 	freeWindow(window);
 
@@ -158,10 +146,7 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 	*outPosition = (vec4d) {
 		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
-
-	pOutVars->color.x = pVertex->color.x;
-	pOutVars->color.y = pVertex->color.y;
-	pOutVars->color.z = pVertex->color.z;
+	pOutVars->color = pVertex->color;
 
 	// What we have done is just copied the inputs to the outputs
 	// The simplest vertex shader possible!

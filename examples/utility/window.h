@@ -17,5 +17,5 @@ Window* newWindow(size_t width, size_t height, char* title, bool fullscreen);
 void freeWindow(Window* this);
 
 void windowPollEvents(Window* this);
-void windowPresent(Window* this, SRPFramebuffer* fb);
+void windowPresent(const Window* this, const SRPFramebuffer* fb);
 

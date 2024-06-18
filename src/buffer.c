@@ -9,10 +9,98 @@
 #include "vec.h"
 #include "defines.h"
 
-static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index);
-static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index);
+static void drawBuffer(
+	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
+);
+static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index);
+static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index);
 
-SRPVertexBuffer* srpNewVertexBuffer(size_t nBytesPerVertex, size_t nBytesData, void* data)
+// An internal function to draw either index or vertex buffer
+// If `ib == NULL`, draws the vertex buffer, else draws index buffer
+// Used in `srpDrawVertexBuffer` and `srpDrawIndexBuffer`
+// Created because vertex and index buffer drawing are very similar,
+// with an intent to avoid code duplication
+static void drawBuffer(
+	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
+)
+{
+	const bool isDrawingIndexBuffer = (ib != NULL);
+
+	if (primitive != PRIMITIVE_TRIANGLES)
+	{
+		srpMessageCallbackHelper(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Only triangles are implemented"
+		);
+		return;
+	}
+
+	// Index of the last vertex that will be touched
+	// That is, only vertices with indices [startIndex, endIndex] will be drawn
+	const size_t endIndex = startIndex + count - 1;
+	const size_t bufferSize = (isDrawingIndexBuffer) ? ib->nIndices : vb->nVertices;
+	if (endIndex >= bufferSize)
+	{
+		const char* errorMessage = (isDrawingIndexBuffer) ? \
+			"Attempt to OOB access index buffer (read) at indices %i-%i (size: %i)\n" : \
+			"Attempt to OOB access vertex buffer (read) at indices %i-%i (size: %i)\n";
+		srpMessageCallbackHelper(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			errorMessage, startIndex, endIndex, bufferSize
+		);
+		return;
+	}
+
+	// Allocate memory for three vertex shader output variables (triangle = 3 vertices)
+	SRPVertexVariable* triangleOutputVertexVariables = \
+		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
+	size_t primitiveID = 0;
+
+	for (size_t i = startIndex; i <= endIndex; i += 3)
+	{
+		SRPvsInput vsIn[3];
+		SRPvsOutput vsOut[3];
+		for (uint8_t j = 0; j < 3; j++)
+		{
+			size_t vertexIndex;
+			if (isDrawingIndexBuffer)
+				vertexIndex = indexIndexBuffer(ib, i+j);
+			else
+				vertexIndex = i+j;
+			SRPVertex* pVertex = indexVertexBuffer(vb, vertexIndex);
+			SRPVertexVariable* pOutputVertexVariables = (SRPVertexVariable*) \
+				INDEX_VOID_PTR(triangleOutputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
+
+			vsIn[j] = (SRPvsInput) {
+				.vertexID = i+j,
+				.pVertex = pVertex,
+				.uniform = sp->uniform
+			};
+			vsOut[j] = (SRPvsOutput) {
+				.position = {0},
+				.pOutputVariables = pOutputVertexVariables
+			};
+
+			sp->vs.shader(&vsIn[j], &vsOut[j]);
+
+			// Perspective divide
+			vsOut[j].position[0] = vsOut[j].position[0] / vsOut[j].position[3],
+			vsOut[j].position[1] = vsOut[j].position[1] / vsOut[j].position[3];
+			vsOut[j].position[2] = vsOut[j].position[2] / vsOut[j].position[3];
+			vsOut[j].position[3] = 1.;
+		}
+		drawTriangle(fb, vsOut, sp, primitiveID);
+		primitiveID++;
+	}
+
+	SRP_FREE(triangleOutputVertexVariables);
+}
+
+SRPVertexBuffer* srpNewVertexBuffer(
+	size_t nBytesPerVertex, size_t nBytesData, const void* data
+)
 {
 	SRPVertexBuffer* this = SRP_MALLOC(sizeof(SRPVertexBuffer));
 
@@ -31,12 +119,22 @@ void srpFreeVertexBuffer(SRPVertexBuffer* this)
 	SRP_FREE(this);
 }
 
-static SRPVertex* indexVertexBuffer(SRPVertexBuffer* this, size_t index)
+void srpDrawVertexBuffer(
+	const SRPVertexBuffer* this, const SRPFramebuffer* fb, const SRPShaderProgram* sp,
+	SRPPrimitive primitive, size_t startIndex, size_t count
+)
 {
-	return (SRPVertex*) ((uint8_t*) this->data + this->nBytesPerVertex * index);
+	drawBuffer(NULL, this, fb, sp, primitive, startIndex, count);
 }
 
-SRPIndexBuffer* srpNewIndexBuffer(Type indicesType, size_t nBytesData, void* data)
+static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index)
+{
+	return (SRPVertex*) INDEX_VOID_PTR(this->data, index, this->nBytesPerVertex);
+}
+
+SRPIndexBuffer* srpNewIndexBuffer(
+	Type indicesType, size_t nBytesData, const void* data
+)
 {
 	SRPIndexBuffer* this = SRP_MALLOC(sizeof(SRPIndexBuffer));
 
@@ -55,7 +153,7 @@ void srpFreeIndexBuffer(SRPIndexBuffer* this)
 	SRP_FREE(this);
 }
 
-static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
+static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index)
 {
 	void* pIndex = INDEX_VOID_PTR(this->data, index, this->nBytesPerIndex);
 	uint64_t ret;
@@ -74,7 +172,7 @@ static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
 			ret = (uint64_t) (*(uint64_t*) pIndex);
 			break;
 		default:
-			messageCallback(
+			srpMessageCallbackHelper(
 				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", this->indicesType
 			);
@@ -85,66 +183,10 @@ static uint64_t indexIndexBuffer(SRPIndexBuffer* this, size_t index)
 
 // @brief Draw an index buffer with specified primitive mode
 void srpDrawIndexBuffer(
-	SRPFramebuffer* fb, SRPIndexBuffer* this, SRPVertexBuffer* vb, SRPPrimitive primitive,
-	size_t startIbIndex, size_t count, SRPShaderProgram* sp
+	const SRPIndexBuffer* this, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
+	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 )
 {
-	if (primitive != PRIMITIVE_TRIANGLES)
-	{
-		messageCallback(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
-			"Only triangles are implemented"
-		);
-		return;
-	}
-
-	size_t endIbIndex = startIbIndex + count;
-	if (endIbIndex > this->nIndices)
-	{
-		messageCallback(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
-			"Attempt to OOB access index buffer"
-		);
-		return;
-	}
-
-	VSOutputVariable* triangleVSOutputVariables = \
-		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
-	size_t primitiveID = 0;
-
-	for (size_t i = startIbIndex; i < endIbIndex; i += 3)
-	{
-		SRPvsInput vsIn[3];
-		SRPvsOutput vsOut[3];
-		for (size_t j = 0; j < 3; j++)
-		{
-			uint64_t vertexIndex = indexIndexBuffer(this, i + j);
-			SRPVertex* pInVertex = indexVertexBuffer(vb, vertexIndex);
-			VSOutputVariable* pVSOutputVariables = (VSOutputVariable*) \
-				INDEX_VOID_PTR(triangleVSOutputVariables, j, sp->vs.nBytesPerOutputVariables);
-
-			vsIn[j] = (SRPvsInput) {
-				.vertexID = i+j,
-				.pVertex = pInVertex,
-				.uniform = sp->uniform
-			};
-			vsOut[j] = (SRPvsOutput) {
-				.position = {0},
-				.pOutputVariables = pVSOutputVariables
-			};
-
-			sp->vs.shader(&vsIn[j], &vsOut[j]);
-
-			// Perspective divide
-			vsOut[j].position[0] = vsOut[j].position[0] / vsOut[j].position[3],
-			vsOut[j].position[1] = vsOut[j].position[1] / vsOut[j].position[3];
-			vsOut[j].position[2] = vsOut[j].position[2] / vsOut[j].position[3];
-			vsOut[j].position[3] = 1.;
-		}
-		drawTriangle(fb, vsOut, sp, primitiveID);
-		primitiveID++;
-	}
-
-	SRP_FREE(triangleVSOutputVariables);
+	drawBuffer(this, vb, fb, sp, primitive, startIndex, count);
 }
 

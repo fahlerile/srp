@@ -1,3 +1,4 @@
+#include "vertex.h"
 #define SRP_INCLUDE_VEC
 #define SRP_INCLUDE_MAT
 
@@ -82,16 +83,9 @@ int main()
 		20, 23, 22,  20, 22, 21
 	};
 
+	// Create vertex and index buffers, these are similar to VBO and EBO
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
-
-	SRPVertexVariable VSOutputVariables[1] = {
-		{
-			.nItems = 2,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
-	};
 
 	Uniform uniform = {
 		.model = mat4dConstructIdentity(),
@@ -113,9 +107,11 @@ int main()
 		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables,
+			.outputVariables = (SRPVertexVariableInformation[])	{
+				{.nItems = 2, .type = TYPE_DOUBLE}
+			},
+			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -133,7 +129,7 @@ int main()
 			uniform.frameCount / 500.
 		);
 		framebufferClear(fb);
-		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 36, &shaderProgram);
+		srpDrawIndexBuffer(ib, vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 36);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
@@ -169,7 +165,6 @@ void messageCallback(
 
 void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
-
 	Vertex* pVertex = (Vertex*) in->pVertex;
 	Uniform* pUniform = (Uniform*) in->uniform;
 	VSOutput* pOutVars = (VSOutput*) out->pOutputVariables;
@@ -194,10 +189,6 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 	vec4d* outColor = (vec4d*) out->color;
 
 	vec2d uv = interpolated->uv;
-	SRPColor color = srpTextureGetFilteredColor(pUniform->texture, uv.x, uv.y);
-	outColor->x = color.r / 255.;
-	outColor->y = color.g / 255.;
-	outColor->z = color.b / 255.;
-	outColor->w = color.a / 255.;
+	srpTextureGetFilteredColor(pUniform->texture, uv.x, uv.y, (double*) outColor);
 }
 

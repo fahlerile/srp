@@ -5,11 +5,11 @@
 #include "defines.h"
 #include "mat.h"
 
-SRP_FORCEINLINE vec4d mat4dGetColumn(mat4d* a, uint8_t index)
+SRP_FORCEINLINE vec4d mat4dGetColumn(const mat4d* a, uint8_t index)
 {
 	if (index >= 4)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Attempt to OBB access mat4d (read): column index (%i)", index
 		);
@@ -28,7 +28,7 @@ SRP_FORCEINLINE void mat4dSetColumn(mat4d* a, vec4d column, uint8_t index)
 {
 	if (index >= 4)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Attempt to OBB access mat4d (write): column index (%i)", index
 		);
@@ -41,7 +41,7 @@ SRP_FORCEINLINE void mat4dSetColumn(mat4d* a, vec4d column, uint8_t index)
 	a->data[3][index] = column.w;
 }
 
-SRP_FORCEINLINE vec4d mat4dMultiplyVec4d(mat4d* a, vec4d b)
+SRP_FORCEINLINE vec4d mat4dMultiplyVec4d(const mat4d* a, vec4d b)
 {
 	vec4d res = {0};
 	for (uint8_t i = 0; i < 4; i++)
@@ -54,7 +54,7 @@ SRP_FORCEINLINE vec4d mat4dMultiplyVec4d(mat4d* a, vec4d b)
 }
 
 
-SRP_FORCEINLINE mat4d mat4dMultiplyMat4d(mat4d* a, mat4d* b)
+SRP_FORCEINLINE mat4d mat4dMultiplyMat4d(const mat4d* a, mat4d* b)
 {
 	mat4d res = {0};
 	for (uint8_t i = 0; i < 4; i++)

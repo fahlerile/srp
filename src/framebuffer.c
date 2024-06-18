@@ -6,6 +6,11 @@
 #include "message_callback.h"
 #include "defines.h"
 
+static uint32_t* framebufferGetPixelPointer
+	(const SRPFramebuffer* this, size_t x, size_t y);
+static double* framebufferGetDepthPointer
+	(const SRPFramebuffer* this, size_t x, size_t y);
+
 SRPFramebuffer* srpNewFramebuffer(size_t width, size_t height)
 {
 	SRPFramebuffer* this = SRP_MALLOC(sizeof(SRPFramebuffer));
@@ -27,11 +32,12 @@ void srpFreeFramebuffer(SRPFramebuffer* this)
 }
 
 void framebufferDrawPixel(
-	SRPFramebuffer* this, size_t x, size_t y, double depth, uint32_t color
+	const SRPFramebuffer* this, size_t x, size_t y, double depth,
+	uint32_t color
 )
 {
 	if (1 < depth || depth < -1)
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Depth value is not inside [-1, 1] interval; depth=%lf", depth
 		);
@@ -44,14 +50,16 @@ void framebufferDrawPixel(
 	*pDepth = depth;
 }
 
-void framebufferNDCToScreenSpace(SRPFramebuffer* this, double* NDC, double* SS)
+void framebufferNDCToScreenSpace(
+	const SRPFramebuffer* this, const double* NDC, double* SS
+)
 {
 	SS[0] =  (((double) this->width  - 1) / 2) * (NDC[0] + 1);
 	SS[1] = -(((double) this->height - 1) / 2) * (NDC[1] - 1),
 	SS[2] = NDC[2];
 }
 
-void framebufferClear(SRPFramebuffer *this)
+void framebufferClear(const SRPFramebuffer* this)
 {
 	for (size_t y = 0; y < this->height; y++)
 	{
@@ -63,12 +71,12 @@ void framebufferClear(SRPFramebuffer *this)
 	}
 }
 
-uint32_t* framebufferGetPixelPointer(SRPFramebuffer* this, size_t x, size_t y)
+uint32_t* framebufferGetPixelPointer(const SRPFramebuffer* this, size_t x, size_t y)
 {
 	return this->color + (y * this->width + x);
 }
 
-double* framebufferGetDepthPointer(SRPFramebuffer* this, size_t x, size_t y)
+double* framebufferGetDepthPointer(const SRPFramebuffer* this, size_t x, size_t y)
 {
 	return this->depth + (y * this->width + x);
 }

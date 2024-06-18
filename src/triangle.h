@@ -7,7 +7,7 @@
 #include "vec.h"
 
 void drawTriangle(
-	SRPFramebuffer* fb, const SRPvsOutput vertices[3],
+	const SRPFramebuffer* fb, const SRPvsOutput vertices[3],
 	const SRPShaderProgram* restrict sp, size_t primitiveID
 );
 

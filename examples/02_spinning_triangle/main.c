@@ -54,20 +54,8 @@ int main()
 			.color = {0., 1., 0.}
 		}
 	};
-	uint8_t indices[3] = {
-		0, 1, 2
-	};
-
-	SRPVertexVariable VSOutputVariables[1] = {
-		{
-			.nItems = 3,
-			.type = TYPE_DOUBLE,
-			.offsetBytes = 0
-		}
-	};
 
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
 	// Uniform requires a cast to an opaque `SRPUniform` type to avoid
 	// a compiler warning
@@ -76,9 +64,11 @@ int main()
 		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
-			.outputVariables = VSOutputVariables,
+			.outputVariables = (SRPVertexVariableInformation[]) {
+				{.nItems = 3, .type = TYPE_DOUBLE}
+			},
+			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
 		.fs = {
 			.shader = fragmentShader
@@ -96,7 +86,7 @@ int main()
 		// top of this file (`SRP_INCLUDE_...`)
 		uniform.rotation = mat4dConstructRotate(0, 0, uniform.frameCount / 1000.);
 		framebufferClear(fb);
-		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawVertexBuffer(vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 3);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
@@ -112,7 +102,6 @@ int main()
 	}
 
 	srpFreeVertexBuffer(vb);
-	srpFreeIndexBuffer(ib);
 	srpFreeFramebuffer(fb);
 	freeWindow(window);
 

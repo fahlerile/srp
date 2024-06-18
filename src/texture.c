@@ -9,11 +9,12 @@
 #include "math_utils.h"
 #include "stb_image.h"
 #include "utils.h"
+#include "vec.h"
 #include "texture.h"
 
 #define N_CHANNELS_REQUESTED 3
 
-static SRPColor textureGetColor(SRPTexture* this, size_t x, size_t y);
+static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y);
 
 SRPTexture* srpNewTexture(
 	const char* image,
@@ -26,7 +27,7 @@ SRPTexture* srpNewTexture(
 	this->data = stbi_load(image, &this->width, &this->height, NULL, N_CHANNELS_REQUESTED);
 	if (this->data == NULL)
 	{
-		messageCallback(
+		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
 			"Failed to load image `%s`: %s", image, stbi_failure_reason()
 		);
@@ -45,12 +46,19 @@ void srpFreeTexture(SRPTexture* this)
 	SRP_FREE(this);
 }
 
-// TODO: now using only filteringModeMagnifying
-// how to know if texture is magnified or minified?
+// TODO: now using only filteringModeMagnifying; how to know if texture is 
+// magnified or minified?
 // TODO: too many conditionals?
-// TODO: return vec4 with values in [0, 1]? (this is what fragment shader
-// output assumes)
-SRPColor srpTextureGetFilteredColor(SRPTexture* this, double u, double v)
+// TODO: wrappingMode is untested!
+
+// Get a filtered color from texture and UV values
+// Returns an array of 4 double values each inside the interval [0, 1]
+// through `out` argument
+// P.S: does not return `vec4d` because the user API should not enforce the use
+// of `vec` and `mat`
+void srpTextureGetFilteredColor(
+	const SRPTexture* this, double u, double v, double out[4]
+)
 {
 	if (u < 0 || u > 1)
 	{
@@ -77,25 +85,35 @@ SRPColor srpTextureGetFilteredColor(SRPTexture* this, double u, double v)
 		}
 	}
 
+	// V axis is pointed down-up, but images are stored up-down, so (1-v) here
 	double x = (this->width-1) * u;
 	double y = (this->height-1) * (1-v);
-	size_t x_min, y_min, x_max, y_max;
 
 	switch (this->filteringModeMagnifying)
 	{
 	case TF_NEAREST:
-		return textureGetColor(this, round(x), round(y));
+	{
+		vec4d ret = textureGetColor(this, round(x), round(y));
+		out[0] = ret.x;
+		out[1] = ret.y;
+		out[2] = ret.z;
+		out[3] = ret.w;
+		return;
+	}
 	}
 }
 
-static SRPColor textureGetColor(SRPTexture* this, size_t x, size_t y)
+static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y)
 {
-	uint8_t* start = INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
-	return (SRPColor) {
-		start[0],
-		start[1],
-		start[2],
-		(N_CHANNELS_REQUESTED == 3) ? 255 : start[3]
+	// Each pixel is N_CHANNELS_REQUESTED bytes, and an image is stored
+	// row-major
+	uint8_t* start = \
+		INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
+	return (vec4d) {
+		start[0] / 255.,
+		start[1] / 255.,
+		start[2] / 255.,
+		(N_CHANNELS_REQUESTED == 3) ? 1. : (start[3] / 255.)
 	};
 }
 

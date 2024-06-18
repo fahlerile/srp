@@ -6,11 +6,11 @@
 typedef struct mat4 { float data[4][4]; } mat4;
 typedef struct mat4d { double data[4][4]; } mat4d;
 
-vec4d mat4dGetColumn(mat4d* a, uint8_t index);
+vec4d mat4dGetColumn(const mat4d* a, uint8_t index);
 void mat4dSetColumn(mat4d* a, vec4d column, uint8_t index);
 
-vec4d mat4dMultiplyVec4d(mat4d* a, vec4d b);
-mat4d mat4dMultiplyMat4d(mat4d* a, mat4d* b);
+vec4d mat4dMultiplyVec4d(const mat4d* a, vec4d b);
+mat4d mat4dMultiplyMat4d(const mat4d* a, mat4d* b);
 
 mat4d mat4dConstructIdentity();
 mat4d mat4dConstructScale(double x, double y, double z);

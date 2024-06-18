@@ -50,13 +50,14 @@ And many, many more, all of which I will not find anymore...
 ## TODO
 ### Documentation/examples
 - [x] Add comments to the examples
-- [ ] Prettify the API (think about convenience macros/functions)
+- [x] Prettify the API (think about convenience macros/functions)
 - [ ] Write the documentation about the main pipeline and individual functions
 
 ### Features
 - [ ] Add interpolation with perspective correction
 - [ ] Fix rasterization rules (see the gaps between triangles in `03_spinning_textured_cube` example)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
+- [ ] Implement interpolation for types other than `double` (shouldn't it just be `double` and `float`?)
 - [ ] Add multisampling
 - [ ] Advanced texture techniques:
     - [ ] (Bi)linear filtering
@@ -65,11 +66,15 @@ And many, many more, all of which I will not find anymore...
     - [ ] Transparent textures?
 
 ### Optimization
+- [ ] Are `vec` and `mat` functions inlined by the compiler? Should they be? Are `mat` or `vec` ever passed by-value?
 - [ ] Use a profiler to find bottlenecks in frequently-used functions
 - [ ] Draw primitives in parallel (OpenMP)
 
-### Portability
-- [ ] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
+### Portability/API design
+- [x] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
+- [x] Use `const` in function declarations where needed
+- [x] Reorder arguments in drawcalls
+- [ ] Add realloc and etc. functions for buffer objects (see OpenGL for reference)
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:

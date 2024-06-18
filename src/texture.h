@@ -34,5 +34,7 @@ SRPTexture* srpNewTexture(
 );
 void srpFreeTexture(SRPTexture* this);
 
-SRPColor srpTextureGetFilteredColor(SRPTexture* this, double u, double v);
+void srpTextureGetFilteredColor(
+	const SRPTexture* this, double u, double v, double out[4]
+);
 
