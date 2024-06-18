@@ -1,34 +1,56 @@
+// Do not add these `define`s if you don't want to include 
+// `vec` and `mat` types and functions
 #define SRP_INCLUDE_VEC
 #define SRP_INCLUDE_MAT
 
 #include <stdio.h>
-#include "srp.h"
+#include "srp.h"  // the only header you need to include
 #include "window.h"
 #include "timer.h"
 #include "rad.h"
 
+// A structure to hold initial vertex data, stored in `SRPVertexBuffer`
+// Is not necessary, just convenient to use
 typedef struct Vertex
 {
-	double position[3];
-	double color[3];
+	vec3d position;
+	vec3d color;
 } Vertex;
 
+// A structure to hold custom outputs from vertex shader, these will be
+// interpolated inside the primitive
+typedef struct VSOutput
+{
+	vec3d color;
+} VSOutput;
+
+// Library context, you should always define *and initialize* (see later) this!
 SRPContext srpContext;
 
+// Message callback: this is called for every error or warning
+// Is not necessary
 void messageCallback(
 	SRPMessageType type, SRPMessageSeverity severity, const char* sourceFunction,
 	const char* message, void* userParameter
 );
+
+// Vertex and fragment shaders, these should be always defined
 void vertexShader(SRPvsInput* in, SRPvsOutput* out);
 void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 
 int main()
 {
+	// Initializing the context
 	srpNewContext(&srpContext);
 	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void*) &messageCallback);
 
+	// Framebuffer object is necessary and stores the depth and
+	// color (RGBA8888) buffers
 	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
+	// Initializing vertex and index data, computations made here (sin, cos, etc.
+	// are only to build an equialeral (TODO: have I spelled this correctly?)
+	// triangle
 	const double R = 0.8;
 	Vertex data[3] = {
 		{.position = {0., R, 0.}, .color = {1., 0., 0.}},
@@ -45,9 +67,13 @@ int main()
 		0, 1, 2
 	};
 
+	// Creating the vertex and index buffer objects. These are similar to
+	// OpenGL's VBO and EBO
 	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
 	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
 
+	// This stores the information about vertex shader's output variables that
+	// is necessary to interpolate them inside the primitive
 	SRPVertexVariable VSOutputVariables[1] = {
 		{
 			.nItems = 3,
@@ -56,11 +82,13 @@ int main()
 		}
 	};
 
+	// Shader program is not actually a program, but named like this to
+	// be similar to OpenGL
 	SRPShaderProgram shaderProgram = {
 		.uniform = NULL,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(double) * 3,
+			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
 			.outputVariables = VSOutputVariables,
 		},
@@ -69,13 +97,18 @@ int main()
 		}
 	};
 
+	// Is not a part of the library, this is a part of the example
+	// See examples/utility/window.*
 	Window* window = newWindow(512, 512, "Rasterizer", false);
 
+	// Main rendering loop
 	size_t frameCount = 0;
 	while (window->running)
 	{
+		// Is not a part of the library, see examples/utility/timer.h
 		TIMER_START(frametime);
 
+		// Clear the framebuffer and draw the index buffer as triangles
 		framebufferClear(fb);
 		srpDrawIndexBuffer(fb, ib, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
 
@@ -92,6 +125,7 @@ int main()
 		);
 	}
 
+	// Destroy objects
 	srpFreeVertexBuffer(vb);
 	srpFreeIndexBuffer(ib);
 	srpFreeFramebuffer(fb);
@@ -112,26 +146,40 @@ void messageCallback(
 
 void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
+	// Cast the opaque input pointers to known types to make computations easier
 	Vertex* pVertex = (Vertex*) in->pVertex;
+	VSOutput* pOutVars = (VSOutput*) out->pOutputVariables;
 
-	// `vec` structures are tightly packed, so it is safe to
-	// cast float/double arrays to vecXf/vecXd and vice versa
-	vec3d* inPosition = (vec3d*) pVertex->position;
+	// `out->position` is defined as `double[4]`, but we cast it to `vec4d*`
+	// `vec` structures are tightly packed, so it is safe to cast float/double
+	// arrays to vecXf/vecXd and vice versa!
+	vec3d* inPosition = &pVertex->position;
 	vec4d* outPosition = (vec4d*) out->position;
 	*outPosition = (vec4d) {
 		inPosition->x, inPosition->y, inPosition->z, 1.0
 	};
 
-	double* colorOut = (double*) out->pOutputVariables;
-	colorOut[0] = pVertex->color[0];
-	colorOut[1] = pVertex->color[1];
-	colorOut[2] = pVertex->color[2];
+	pOutVars->color.x = pVertex->color.x;
+	pOutVars->color.y = pVertex->color.y;
+	pOutVars->color.z = pVertex->color.z;
+
+	// What we have done is just copied the inputs to the outputs
+	// The simplest vertex shader possible!
 }
 
 void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
-	double* colorIn = (double*) in->interpolated;
-	memcpy(&out->color, colorIn, 3 * sizeof(double));
-	out->color[4] = 1.;
+	// Because the vertex shader's outputs are interpolated, in->interpolated
+	// is an opaque pointer to VSOutput, so we cast it to this known type
+	VSOutput* interpolated = (VSOutput*) in->interpolated;
+
+	// See `vertexShader` comments
+	vec4d* outColor = (vec4d*) out->color;
+	outColor->x = interpolated->color.x;
+	outColor->y = interpolated->color.y;
+	outColor->z = interpolated->color.z;
+	outColor->w = 1.;
 }
+
+// See the complete API reference in `docs/` directory
 

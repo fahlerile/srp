@@ -8,9 +8,14 @@
 
 typedef struct Vertex
 {
-	double position[3];
-	double uv[2];
+	vec3d position;
+	vec2d uv;
 } Vertex;
+
+typedef struct VSOutput
+{
+	vec2d uv;
+} VSOutput;
 
 typedef struct Uniform
 {
@@ -69,9 +74,9 @@ int main()
 		{.position = {-1, -1,  1}, .uv = {0, 1}}
 	};
 	uint8_t indices[] = {
-		0, 1, 2,  0, 2, 3,
-		4, 5, 6,  4, 6, 7,
-		8, 9, 10,  8, 10, 11,
+		 0,  1,  2,   0,  2,  3,
+		 4,  5,  6,   4,  6,  7,
+		 8,  9, 10,   8, 10, 11,
 		12, 15, 14,  12, 14, 13,
 		16, 18, 17,  16, 19, 18,
 		20, 23, 22,  20, 22, 21
@@ -97,7 +102,8 @@ int main()
 		),
 		.projection = mat4dConstructPerspectiveProjection(-1, 1, -1, 1, 1, 50),
 		.texture = srpNewTexture(
-			"./res/textures/stoneWall.png", TW_REPEAT, TW_REPEAT,
+			"./res/textures/stoneWall.png",
+			TW_REPEAT, TW_REPEAT,
 			TF_NEAREST, TF_NEAREST
 		),
 		.frameCount = 0
@@ -107,7 +113,7 @@ int main()
 		.uniform = (SRPUniform*) &uniform,
 		.vs = {
 			.shader = vertexShader,
-			.nBytesPerOutputVariables = sizeof(double) * 2,
+			.nBytesPerOutputVariables = sizeof(VSOutput),
 			.nOutputVariables = 1,
 			.outputVariables = VSOutputVariables,
 		},
@@ -163,10 +169,12 @@ void messageCallback(
 
 void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 {
+
 	Vertex* pVertex = (Vertex*) in->pVertex;
 	Uniform* pUniform = (Uniform*) in->uniform;
+	VSOutput* pOutVars = (VSOutput*) out->pOutputVariables;
 
-	vec3d* inPosition = (vec3d*) pVertex->position;
+	vec3d* inPosition = &pVertex->position;
 	vec4d* outPosition = (vec4d*) out->position;
 	*outPosition = (vec4d) {
 		inPosition->x, inPosition->y, inPosition->z, 1.0
@@ -175,20 +183,21 @@ void vertexShader(SRPvsInput* in, SRPvsOutput* out)
 	*outPosition = mat4dMultiplyVec4d(&pUniform->view, *outPosition);
 	*outPosition = mat4dMultiplyVec4d(&pUniform->projection, *outPosition);
 
-	double* uvOut = (double*) out->pOutputVariables;
-	uvOut[0] = pVertex->uv[0];
-	uvOut[1] = pVertex->uv[1];
+	pOutVars->uv.x = pVertex->uv.x;
+	pOutVars->uv.y = pVertex->uv.y;
 }
 
 void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 {
+	VSOutput* interpolated = (VSOutput*) in->interpolated;
 	Uniform* pUniform = (Uniform*) in->uniform;
+	vec4d* outColor = (vec4d*) out->color;
 
-	double* uv = (double*) in->interpolated;
-	SRPColor color = srpTextureGetFilteredColor(pUniform->texture, uv[0], uv[1]);
-	out->color[0] = color.r / 255.;
-	out->color[1] = color.g / 255.;
-	out->color[2] = color.b / 255.;
-	out->color[3] = color.a / 255.;
+	vec2d uv = interpolated->uv;
+	SRPColor color = srpTextureGetFilteredColor(pUniform->texture, uv.x, uv.y);
+	outColor->x = color.r / 255.;
+	outColor->y = color.g / 255.;
+	outColor->z = color.b / 255.;
+	outColor->w = color.a / 255.;
 }
 

@@ -23,6 +23,8 @@ typedef struct
 	VSOutputVariable* pOutputVariables;
 } SRPvsOutput;
 
+// TODO: are nBytesPerOutputVariables and outputVariables[i].offsetBytes
+// useless? Can I compute those? Where would I? Do I need to?
 typedef struct
 {
 	void (*shader)(
