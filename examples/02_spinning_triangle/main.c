@@ -86,7 +86,7 @@ int main()
 		// top of this file (`SRP_INCLUDE_...`)
 		uniform.rotation = mat4dConstructRotate(0, 0, uniform.frameCount / 1000.);
 		framebufferClear(fb);
-		srpDrawVertexBuffer(fb, vb, PRIMITIVE_TRIANGLES, 0, 3, &shaderProgram);
+		srpDrawVertexBuffer(vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 3);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);

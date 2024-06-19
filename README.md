@@ -50,7 +50,7 @@ And many, many more, all of which I will not find anymore...
 ## TODO
 ### Documentation/examples
 - [x] Add comments to the examples
-- [ ] Prettify the API (think about convenience macros/functions)
+- [x] Prettify the API (think about convenience macros/functions)
 - [ ] Write the documentation about the main pipeline and individual functions
 
 ### Features
@@ -73,8 +73,8 @@ And many, many more, all of which I will not find anymore...
 ### Portability/API design
 - [x] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
 - [x] Use `const` in function declarations where needed
-- [ ] Reorder arguments in drawcalls
-- [ ] Hide the API structure definitions to avoid users modifying structure members themselves
+- [x] Reorder arguments in drawcalls
+- [ ] Add realloc and etc. functions for buffer objects (see OpenGL for reference)
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:
