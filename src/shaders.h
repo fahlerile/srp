@@ -1,40 +1,57 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
+
+/** @file
+ *  Typedefs related to shaders */
 
 #include <stdbool.h>
 #include "vertex.h"
 
+/** @ingroup Shaders
+ *  @{ */
+
+/** Represents interpolated vertex shader's output variables
+ *  @see SRPVertexVariable */
 typedef struct SRPInterpolated SRPInterpolated;
 
+/** Represents user's shader uniform
+ *  @see SRPShaderProgram */
 typedef struct SRPUniform SRPUniform;
 
 
-typedef struct
+/** Holds inputs to vertex shader
+ *  @see SRPVertexShader */
+typedef struct SRPvsInput
 {
 	SRPUniform* uniform;
 	SRPVertex* pVertex;
 	size_t vertexID;
 } SRPvsInput;
 
-typedef struct
+/** Holds outputs from vertex shader
+ *  @see SRPVertexShader */
+typedef struct SRPvsOutput
 {
 	double position[4];
 	SRPVertexVariable* pOutputVariables;
 } SRPvsOutput;
 
-// TODO: are nBytesPerOutputVariables and outputVariables[i].offsetBytes
-// useless? Can I compute those? Where would I? Do I need to?
-typedef struct
+/** Represents the vertex shader
+ *  @see SRPShaderProgram */
+typedef struct SRPVertexShader
 {
-	void (*shader)(
-		SRPvsInput* in, SRPvsOutput* out
-	);
+	void (*shader)(SRPvsInput* in, SRPvsOutput* out);
 	size_t nOutputVariables;
 	SRPVertexVariableInformation* outputVariables;
 	size_t nBytesPerOutputVariables;
 } SRPVertexShader;
 
 
-typedef struct
+/** Holds inputs to fragment shader
+ *  @see SRPFragmentShader */
+typedef struct SRPfsInput
 {
 	SRPUniform* uniform;
 	SRPInterpolated* interpolated;
@@ -43,18 +60,26 @@ typedef struct
 	size_t primitiveID;
 } SRPfsInput;
 
-typedef struct
+/** Holds outputs from fragment shader
+ *  @see SRPFragmentShader */
+typedef struct SRPfsOutput
 {
 	double color[4];
 	double fragDepth;
 } SRPfsOutput;
 
-typedef struct
+/** Represents the fragment shader
+ *  @see ShaderProgram */
+typedef struct SRPFragmentShader
 {
 	void (*shader)(SRPfsInput* in, SRPfsOutput* out);
 } SRPFragmentShader;
 
 
+/** Holds shaders and a uniform.
+ *  While not being a program (is not compiled or anything), the naming is
+ *  chosen because it is similar to OpenGL's shader program 
+ *  @see srpDrawVertexBuffer srpDrawIndexBuffer */
 typedef struct SRPShaderProgram
 {
 	SRPUniform* uniform;
@@ -62,4 +87,6 @@ typedef struct SRPShaderProgram
 	SRPVertexShader vs;
 	SRPFragmentShader fs;
 } SRPShaderProgram;
+
+/** @} */  // defgroup Shaders
 

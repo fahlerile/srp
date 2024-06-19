@@ -1,0 +1,22 @@
+/** @defgroup Context
+ *  @brief SRPContext and its subtypes for runtime settings management */
+
+/** @defgroup Buffer
+ *  @brief VBO and EBO OpenGL-like objects to store vertex and other data
+ *  which is used directly in the drawcalls. */
+
+/** @defgroup Framebuffer
+ *  @brief SRPFramebuffer and SRPColor for color and depth buffer management */
+
+/** @defgroup Shaders
+ *  @brief SRPShaderProgram and its subtypes */
+
+/** @defgroup Texture
+ *  @brief SRPTexture */
+
+/** @defgroup Vector
+ *  @brief Vector API, only included if you define `SRP_INCLUDE_VECTOR` */
+
+/** @defgroup Matrix
+ *  @brief Matrix API, only included if you define `SRP_INCLUDE_MAT` */
+

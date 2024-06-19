@@ -1,5 +1,10 @@
-#pragma once
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
 
+/** @file
+ *  Macro definitions for the library */
+
+#pragma once
 
 #if defined(SRP_MALLOC) && defined(SRP_FREE) && defined(SRP_REALLOC)
 	// ok

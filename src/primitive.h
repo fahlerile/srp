@@ -1,5 +1,13 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
 
+/** @file
+ *  \ref SRPPrimitive */
+
+/** An enumeration to hold drawing primitives
+ *  @see `srpDrawVertexBuffer` and `srpDrawIndexBuffer` */
 typedef enum SRPPrimitive
 {
 	PRIMITIVE_POINTS,

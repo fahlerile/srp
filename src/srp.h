@@ -1,4 +1,10 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
+
+/** @file
+ *  The only header the end user needs to include */
 
 #include "context.h"
 #include "buffer.h"

@@ -1,4 +1,10 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
+
+/** @file
+ *  Utility macros related to mathematics */
 
 #ifdef SRP_SOURCE
 

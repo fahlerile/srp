@@ -1,3 +1,6 @@
+# Software Rendering Pipeline (SRP) library
+# Licensed under GNU GPLv3
+
 cmake_minimum_required(VERSION 3.18.4)
 project(srp)
 

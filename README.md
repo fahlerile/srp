@@ -51,7 +51,9 @@ And many, many more, all of which I will not find anymore...
 ### Documentation/examples
 - [x] Add comments to the examples
 - [x] Prettify the API (think about convenience macros/functions)
-- [ ] Write the documentation about the main pipeline and individual functions
+- [x] Write the API documentation in Doxygen
+- [ ] Build Doxygen docs with CMake
+- [ ] Write the implementation documentation (data flow, static functions and etc.)
 
 ### Features
 - [ ] Add interpolation with perspective correction
@@ -75,6 +77,8 @@ And many, many more, all of which I will not find anymore...
 - [x] Use `const` in function declarations where needed
 - [x] Reorder arguments in drawcalls
 - [ ] Add realloc and etc. functions for buffer objects (see OpenGL for reference)
+- [ ] Should I avoid heap allocation in `srpNew...` and use a pointer to a user pre-allocated buffer?
+- [ ] Rename enum members to avoid namespace pollution
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:

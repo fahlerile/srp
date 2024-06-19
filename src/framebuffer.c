@@ -1,3 +1,6 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #define SRP_SOURCE
 
 #include <stdio.h>
@@ -31,11 +34,15 @@ void srpFreeFramebuffer(SRPFramebuffer* this)
 	SRP_FREE(this);
 }
 
+// The `const` qualifier is completely legal: only the buffer pointed to by
+// `framebuffer->color` is modified, not the structure itself!
 void framebufferDrawPixel(
 	const SRPFramebuffer* this, size_t x, size_t y, double depth,
 	uint32_t color
 )
 {
+	// TODO: this is not the job of the framebuffer to check this,
+	// this should be deleted after the primitive clipping implementation
 	if (1 < depth || depth < -1)
 		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,

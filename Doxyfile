@@ -1,0 +1,26 @@
+# Doxyfile 1.9.4
+
+# This file describes the settings to be used by the documentation system
+# doxygen (www.doxygen.org) for a project.
+
+PROJECT_NAME = srp
+PROJECT_BRIEF = software rendering pipeline
+
+SORT_BRIEF_DOCS = NO
+
+INPUT = src/ docs/overview.md docs/groups.dox docs/examples.dox
+OUTPUT_DIRECTORY = build/docs/
+EXAMPLE_PATH = examples/
+
+GENERATE_HTML = YES
+GENERATE_LATEX = NO
+
+# See https://github.com/jothepro/doxygen-awesome-css
+GENERATE_TREEVIEW = YES
+DISABLE_INDEX = NO
+FULL_SIDEBAR = NO
+HTML_EXTRA_STYLESHEET = docs/doxygen-awesome.css \
+                        docs/doxygen-awesome-sidebar-only.css
+HTML_COLORSTYLE = LIGHT
+
+

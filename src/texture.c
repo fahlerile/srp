@@ -1,3 +1,6 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #define SRP_SOURCE
 
 #include <math.h>

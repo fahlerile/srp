@@ -166,5 +166,6 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 	outColor->w = 1.;
 }
 
-// See the complete API reference in `docs/` directory
+// See the complete API reference by building Doxygen documentation
+// (see README)
 

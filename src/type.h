@@ -1,9 +1,16 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
+
+/** @file
+ *  Functions and types to help dealing with opaque types */
 
 #include <stdint.h>
 #include <stddef.h>
 
-// Types that can be stored in vertex attributes
+/** An enumeration to hold types. This is needed for internal handling of
+ *  opaque types */
 typedef enum
 {
 	TYPE_UINT8 = 0,

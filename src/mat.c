@@ -1,3 +1,6 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #define SRP_SOURCE
 
 #include <math.h>
@@ -54,7 +57,7 @@ SRP_FORCEINLINE vec4d mat4dMultiplyVec4d(const mat4d* a, vec4d b)
 }
 
 
-SRP_FORCEINLINE mat4d mat4dMultiplyMat4d(const mat4d* a, mat4d* b)
+SRP_FORCEINLINE mat4d mat4dMultiplyMat4d(const mat4d* a, const mat4d* b)
 {
 	mat4d res = {0};
 	for (uint8_t i = 0; i < 4; i++)
@@ -131,13 +134,13 @@ SRP_FORCEINLINE mat4d mat4dConstructTRS(
 }
 
 SRP_FORCEINLINE mat4d mat4dConstructView(
-	double transX, double transY, double transZ,
+	double cameraX, double cameraY, double cameraZ,
 	double rotataionX, double rotataionY, double rotataionZ,
 	double scaleX, double scaleY, double scaleZ
 )
 {
 	return mat4dConstructTRS(
-		-transX, -transY, -transZ,
+		-cameraX, -cameraY, -cameraZ,
 		-rotataionX, -rotataionY, -rotataionZ,
 		scaleX, scaleY, scaleZ
 	);

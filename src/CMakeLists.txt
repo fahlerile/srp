@@ -1,3 +1,6 @@
+# Software Rendering Pipeline (SRP) library
+# Licensed under GNU GPLv3
+
 set(
 	SOURCES
 	context.c

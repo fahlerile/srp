@@ -1,12 +1,15 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #define SRP_SOURCE
 
 #include "message_callback.h"
 #include "context.h"
 
-void srpNewContext(SRPContext* context)
+void srpNewContext(SRPContext* pContext)
 {
-	context->messageCallback = NULL;
-	context->messageCallbackUserParameter = NULL;
+	pContext->messageCallback = NULL;
+	pContext->messageCallbackUserParameter = NULL;
 }
 
 void srpContextSetP(SRPContextParameter contextParameter, const void* data)
