@@ -22,7 +22,7 @@ make
 cd bin
 ```
 
-You can also build the examples by providing the `-D BUILD_EXAMPLES=1` argument to `cmake`.
+You can also build the examples with `-D BUILD_EXAMPLES=1` and the documentation with `-D BUILD_DOCS=1` arguments passed to `cmake`.
 
 ## Similar/related projects
 - https://github.com/rswinkle/PortableGL

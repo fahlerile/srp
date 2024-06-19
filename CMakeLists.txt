@@ -38,4 +38,7 @@ add_subdirectory(src)
 if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
+if (BUILD_DOCS)
+	add_subdirectory(docs)
+endif()
 

@@ -8,6 +8,15 @@ PROJECT_BRIEF = software rendering pipeline
 
 SORT_BRIEF_DOCS = NO
 
+QUIET = YES
+WARNINGS = NO
+WARN_IF_UNDOCUMENTED = NO
+WARN_IF_DOC_ERROR = NO
+WARN_IF_INCOMPLETE_DOC = NO
+WARN_NO_PARAMDOC = NO
+WARN_IF_UNDOC_ENUM_VAL = NO
+WARN_AS_ERROR = NO
+
 INPUT = src/ docs/overview.md docs/groups.dox docs/examples.dox
 OUTPUT_DIRECTORY = build/docs/
 EXAMPLE_PATH = examples/
