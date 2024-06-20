@@ -70,7 +70,7 @@ int main()
 	// be similar to OpenGL
 	SRPShaderProgram shaderProgram = {
 		.uniform = NULL,
-		.vs = {
+		.vs = &(SRPVertexShader) {
 			.shader = vertexShader,
 			// This stores the information about vertex shader's output variables
 			// that is necessary to interpolate them inside the primitive
@@ -80,7 +80,7 @@ int main()
 			},
 			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
-		.fs = {
+		.fs = &(SRPFragmentShader) {
 			.shader = fragmentShader
 		}
 	};

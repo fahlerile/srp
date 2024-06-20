@@ -62,7 +62,7 @@ int main()
 	Uniform uniform = {0};
 	SRPShaderProgram shaderProgram = {
 		.uniform = (SRPUniform*) &uniform,
-		.vs = {
+		.vs = &(SRPVertexShader) {
 			.shader = vertexShader,
 			.nOutputVariables = 1,
 			.outputVariablesInfo = (SRPVertexVariableInformation[]) {
@@ -70,7 +70,7 @@ int main()
 			},
 			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
-		.fs = {
+		.fs = &(SRPFragmentShader) {
 			.shader = fragmentShader
 		}
 	};

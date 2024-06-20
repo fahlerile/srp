@@ -143,7 +143,7 @@ void drawTriangle(
 				barycentricCoordinates[2] >= 0)
 			{
 				/** @todo Avoid VLA (custom allocator?) */
-				uint8_t interpolatedBuffer[sp->vs.nBytesPerOutputVariables];
+				uint8_t interpolatedBuffer[sp->vs->nBytesPerOutputVariables];
 				SRPInterpolated* pInterpolated = (SRPInterpolated*) interpolatedBuffer;
 				vec4d interpolatedPosition = {0};
 				triangleInterpolatePositionAndVertexVariables(
@@ -169,7 +169,7 @@ void drawTriangle(
 				};
 				SRPfsOutput fsOut = {0};
 
-				sp->fs.shader(&fsIn, &fsOut);
+				sp->fs->shader(&fsIn, &fsOut);
 
 				SRPColor color = {
 					CLAMP(0, 255, fsOut.color[0] * 255),
@@ -316,9 +316,9 @@ static void triangleInterpolatePositionAndVertexVariables(
 
 	// Interpolate variables (attributes)
 	size_t attrOffsetBytes = 0;
-	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
+	for (size_t attrI = 0; attrI < sp->vs->nOutputVariables; attrI++)
 	{
-		SRPVertexVariableInformation* attr = &sp->vs.outputVariablesInfo[attrI];
+		SRPVertexVariableInformation* attr = &sp->vs->outputVariablesInfo[attrI];
 		size_t elemSize = 0;
 		switch (attr->type)
 		{

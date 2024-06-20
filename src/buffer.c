@@ -73,7 +73,7 @@ static void drawBuffer(
 	}
 
 	// Allocate memory for three vertex shader output variables (triangle = 3 vertices)
-	SRPVertexVariable* outputVertexVariables = SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
+	SRPVertexVariable* outputVertexVariables = SRP_MALLOC(sp->vs->nBytesPerOutputVariables * 3);
 	size_t primitiveID = 0;
 
 	for (size_t i = startIndex; i <= endIndex; i += 3)
@@ -89,7 +89,7 @@ static void drawBuffer(
 				vertexIndex = i+j;
 			SRPVertex* pVertex = indexVertexBuffer(vb, vertexIndex);
 			SRPVertexVariable* pOutputVertexVariables = (SRPVertexVariable*) \
-				INDEX_VOID_PTR(outputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
+				INDEX_VOID_PTR(outputVertexVariables, j, sp->vs->nBytesPerOutputVariables);
 
 			vsIn[j] = (SRPvsInput) {
 				.vertexID = i+j,
@@ -101,7 +101,7 @@ static void drawBuffer(
 				.pOutputVariables = pOutputVertexVariables
 			};
 
-			sp->vs.shader(&vsIn[j], &vsOut[j]);
+			sp->vs->shader(&vsIn[j], &vsOut[j]);
 
 			// Perspective divide
 			vsOut[j].position[0] = vsOut[j].position[0] / vsOut[j].position[3],

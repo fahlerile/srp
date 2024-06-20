@@ -86,8 +86,8 @@ typedef struct SRPShaderProgram
 {
 	SRPUniform* uniform;   /** Pointer to uniform to use */
 
-	SRPVertexShader vs;    /** Vertex shader to use */
-	SRPFragmentShader fs;  /** Fragment shader to use */
+	SRPVertexShader* vs;    /** Pointer to vertex shader to use */
+	SRPFragmentShader* fs;  /** Pointer to fragment shader to use */
 } SRPShaderProgram;
 
 /** @} */  // defgroup Shaders
