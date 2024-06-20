@@ -39,7 +39,7 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 int main()
 {
 	srpNewContext(&srpContext);
-	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void*) &messageCallback);
+	srpContextSetP(SRP_CONTEXT_MESSAGE_CALLBACK, (void*) &messageCallback);
 
 	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
@@ -129,7 +129,7 @@ int main()
 			uniform.frameCount / 500.
 		);
 		framebufferClear(fb);
-		srpDrawIndexBuffer(ib, vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 36);
+		srpDrawIndexBuffer(ib, vb, fb, &shaderProgram, SRP_PRIM_TRIANGLES, 0, 36);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);

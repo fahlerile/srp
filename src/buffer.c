@@ -47,10 +47,10 @@ static void drawBuffer(
 {
 	const bool isDrawingIndexBuffer = (ib != NULL);
 
-	if (primitive != PRIMITIVE_TRIANGLES)
+	if (primitive != SRP_PRIM_TRIANGLES)
 	{
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Only triangles are implemented"
 		);
 		return;
@@ -66,7 +66,7 @@ static void drawBuffer(
 			"Attempt to OOB access index buffer (read) at indices %i-%i (size: %i)\n" : \
 			"Attempt to OOB access vertex buffer (read) at indices %i-%i (size: %i)\n";
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			errorMessage, startIndex, endIndex, bufferSize
 		);
 		return;
@@ -191,7 +191,7 @@ static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index)
 			break;
 		default:
 			srpMessageCallbackHelper(
-				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", this->indicesType
 			);
 			ret = 0;

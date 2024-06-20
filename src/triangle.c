@@ -153,6 +153,8 @@ void drawTriangle(
 
 				/** @todo fix rasterizer to accept both cw and ccw vertices
 				 *  and add correct `frontFacing` here! */
+				/** @todo `fragCoord` should be window-space: see
+				 *  https://www.khronos.org/opengl/wiki/Fragment_Shader#Inputs */
 				SRPfsInput fsIn = {
 					.uniform = sp->uniform,
 					.interpolated = pInterpolated,
@@ -175,6 +177,7 @@ void drawTriangle(
 					CLAMP(0, 255, fsOut.color[2] * 255),
 					CLAMP(0, 255, fsOut.color[3] * 255)
 				};
+				/** @todo `SRPfsOutput.fragDepth` may be set to 0 manually by the user */
 				double depth = (fsOut.fragDepth == 0) ? fsIn.fragCoord[2] : fsOut.fragDepth;
 
 				srpFramebufferDrawPixel(fb, x, y, depth, SRP_COLOR_TO_UINT32_T(color));
@@ -354,7 +357,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 		}
 		default:
 			srpMessageCallbackHelper(
-				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", attr->type
 			);
 		}

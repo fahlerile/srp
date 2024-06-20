@@ -42,7 +42,7 @@ SRPTexture* srpNewTexture(
 	if (this->data == NULL)
 	{
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Failed to load image `%s`: %s", image, stbi_failure_reason()
 		);
 		return NULL;

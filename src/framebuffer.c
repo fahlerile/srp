@@ -60,7 +60,7 @@ void srpFramebufferDrawPixel(
 	 *  this should be deleted after the primitive clipping implementation */
 	if (1 < depth || depth < -1)
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Depth value is not inside [-1, 1] interval; depth=%lf", depth
 		);
 

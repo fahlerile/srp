@@ -24,7 +24,7 @@ size_t srpSizeofType(SRPType type)
 		default:
 		{
 			srpMessageCallbackHelper(
-				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 				"Unknown type (%i)", type
 			);
 			return 0;

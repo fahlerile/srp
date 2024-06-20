@@ -15,16 +15,16 @@ void srpContextSetP(SRPContextParameter contextParameter, const void* data)
 {
 	switch (contextParameter)
 	{
-	case CTX_PARAM_MESSAGE_CALLBACK:
+	case SRP_CONTEXT_MESSAGE_CALLBACK:
 		srpContext.messageCallback = data;
 		return;
-	case CTX_PARAM_MESSAGE_CALLBACK_USER_PARAMETER:
+	case SRP_CONTEXT_MESSAGE_CALLBACK_USER_PARAMETER:
 		/** @todo Is this cast OK? */
 		srpContext.messageCallbackUserParameter = (void*) data;
 		return;
 	default:
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Unknown type (%i)", contextParameter
 		);
 		return;
@@ -35,11 +35,11 @@ void srpContextSetI(SRPContextParameter contextParameter, int data)
 {
 	switch (contextParameter)
 	{
-	case CTX_PARAM_ATTRIBUTE_INTERPOLATION_TYPE:
+	case SRP_CONTEXT_INTERPOLATION_MODE:
 		srpContext.interpolationMode = data;
 	default:
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Unknown type (%i)", contextParameter
 		);
 		return;
