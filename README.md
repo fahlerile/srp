@@ -11,6 +11,8 @@ This is a rendering pipeline written fully in software that uses only the CPU fo
 - Shader uniforms
 - Affine attribute interpolation
 
+Read the documentation for `master` branch [here](https://fahlerile.github.io/srp/), or build the documentation yourself (see Building section)
+
 ## Building
 
 ```bash
