@@ -51,7 +51,7 @@ And many, many more, all of which I will not find anymore...
 
 ## TODO
 ### Features
-- [ ] Add interpolation with perspective correction
+- [x] Add interpolation with perspective correction
 - [ ] Fix rasterization rules (see the gaps between triangles in `03_spinning_textured_cube` example)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
 - [ ] Implement interpolation for types other than `double` (shouldn't it just be `double` and `float`?)
@@ -66,11 +66,6 @@ And many, many more, all of which I will not find anymore...
 - [ ] Are `vec` and `mat` functions inlined by the compiler? Should they be? Are `mat` or `vec` ever passed by-value?
 - [ ] Use a profiler to find bottlenecks in frequently-used functions
 - [ ] Draw primitives in parallel (OpenMP)
-
-### Portability/API design
-- [x] Separate constructors into two functions for buffer objects (create and copy data)
-- [x] Getters and setters for `SRPTexture`
-- [ ] Rename enum members to avoid namespace pollution
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:
