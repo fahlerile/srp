@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "buffer.h"
-#include "triangle.h"
+#include "buffer_p.h"
 #include "message_callback_p.h"
+#include "triangle.h"
 #include "utils.h"
 #include "defines.h"
 

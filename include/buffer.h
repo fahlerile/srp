@@ -27,23 +27,10 @@ typedef enum SRPPrimitive
 } SRPPrimitive;
 
 /** Stores vertex data, similarly to VBO in OpenGL */
-typedef struct SRPVertexBuffer
-{
-	size_t nBytesPerVertex;
-	size_t nBytesData;
-	size_t nVertices;
-	SRPVertex* data;
-} SRPVertexBuffer;
+typedef struct SRPVertexBuffer SRPVertexBuffer;
 
-/** Stores indices to vertices from SRPVertexBuffer,
- *  similarly to EBO in OpenGL */
-typedef struct SRPIndexBuffer
-{
-	SRPType indicesType;
-	size_t nBytesPerIndex;
-	size_t nIndices;
-	void* data;
-} SRPIndexBuffer;
+/** Stores indices to vertices from SRPVertexBuffer similarly to EBO in OpenGL */
+typedef struct SRPIndexBuffer SRPIndexBuffer;
 
 /** Initialize the vertex buffer with vertex data
  *  @param[in] nBytesPerVertex The size of one vertex, in bytes
