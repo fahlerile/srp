@@ -51,9 +51,11 @@ static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
 );
 
 /** Check if a triangle's edge is flat top or left. Used in rasterization rules.
- *  @param[in] A pointer to an edge vector (pointing from one vertex to the other)
+ *  @param[in] edgeVector A pointer to an edge vector (pointing from one vertex
+ *  to the other)
  *  @return Whether or not this edge is flat top or left
- *  @todo Does it matter if I pass edge 0->1 or 1->0 (numbers = vertex indices)? */
+ *  @todo Does it matter if I pass edge 0->1 or 1->0 (numbers = vertex indices)?
+ *        This should be documented. */
 static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector);
 
 /** Interpolate the fragment position and vertex variables inside the triangle.
@@ -239,17 +241,35 @@ static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector)
 	return ((edgeVector->x > 0) && (edgeVector->y == 0)) || (edgeVector->y < 0);
 }
 
-/** @todo Document the algorithm and why it works. P.S: I have no idea */
 static void triangleInterpolatePositionAndVertexVariables(
 	const SRPvsOutput vertices[3], const double barycentricCoordinates[3],
 	const SRPShaderProgram* restrict sp, SRPInterpolated* pInterpolatedBuffer,
 	vec4d* pInterpolatedPosition
 )
 {
-	// *vertices.pOutputVariables =
-	// (						   V0							 )	(		V1		) (		  V2	  )
-	// (		  V0A0			) ...  (		   V0An			 )	(V1A0, ..., V1An) (V2A0, ..., V2An)
-	// V0A0E0, V0A0E1, ... V0A0En, ... V0AnE0, V0AnE1, ..., V0AnEn, ...
+	/** Let @f$ v_0, v_1, v_2 @f$ be points in space that form a triangle and
+	 *  @f$ a, b, c @f$ be barycentric coordinates for a point @f$ P @f$
+	 *  according to @f$ v_0, v_1, v_2 @f$ respectively. Then, by the property
+	 *  of barycentric coordinates @f$ P = av_0 + bv_1 + cv_2 @f$. This can be
+	 *  extrapolated to arbitrary values assigned to vertices, so this property
+	 *  lies in the core of so-called "affine" attribute interpolation.
+     *
+	 *  But this method does not take into account that we have performed the
+	 *  perspective divide, so the texture (or whatever) will appear "skewed"
+	 *  on the primitive.
+	 *
+	 *  It can be shown (see the "see also" section) that perspective-correct Z
+	 *  value can be obtained by linearly interpolating between the reciprocals
+	 *  of input Z values, and similarly for arbitrary parameters. This is
+	 *  called perspective-correct attribute interpolation.
+	 *
+	 *  @see https://www.comp.nus.edu.sg/%7Elowkl/publications/lowk_persp_interp_techrep.pdf
+	 *  @see https://www.youtube.com/watch?v=F5X6S35SW2s  */
+
+	// vertices[i].pOutputVariables =
+	// (                        Vi                              )
+	// (          ViA0          )(          ViA1          ) ...
+	// (ViA0E0 ViA0E1 ... ViA0En)(ViA1E0 ViA1E1 ... ViA1En) ...
 	// [V]ertex, [A]ttribute, [E]lement
 
 	// Points to current attribute in output buffer
