@@ -1,6 +1,7 @@
-#define SRP_SOURCE
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
 
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "defines.h"
 #include "vec.h"
 

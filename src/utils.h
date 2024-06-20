@@ -1,13 +1,22 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
 
-#ifdef SRP_SOURCE
+/** @file
+ *  Various utility macros */
 
 #include <stddef.h>
 
+/** @ingroup Various_internal
+ *  @{ */
+
+/** Index `void*` as if it was an array with `nBytesPerElement` bytes per element */
 #define INDEX_VOID_PTR(ptr, idx, nBytesPerElement) \
 	( ( (uint8_t*) (ptr) ) + (idx) * (nBytesPerElement) )
+/** Add `nBytes` bytes to the `void*` */
 #define ADD_VOID_PTR(ptr, nBytes) \
 	( ( (uint8_t*) (ptr) ) + (nBytes) )
 
-#endif  // ifdef SRP_SOURCE
+/** @} */  // ingroup Various_internal
 

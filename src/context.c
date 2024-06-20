@@ -1,12 +1,13 @@
-#define SRP_SOURCE
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
 
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "context.h"
 
-void srpNewContext(SRPContext* context)
+void srpNewContext(SRPContext* pContext)
 {
-	context->messageCallback = NULL;
-	context->messageCallbackUserParameter = NULL;
+	pContext->messageCallback = NULL;
+	pContext->messageCallbackUserParameter = NULL;
 }
 
 void srpContextSetP(SRPContextParameter contextParameter, const void* data)
@@ -17,7 +18,7 @@ void srpContextSetP(SRPContextParameter contextParameter, const void* data)
 		srpContext.messageCallback = data;
 		return;
 	case CTX_PARAM_MESSAGE_CALLBACK_USER_PARAMETER:
-		// TODO: is this cast OK?
+		/** @todo Is this cast OK? */
 		srpContext.messageCallbackUserParameter = (void*) data;
 		return;
 	default:

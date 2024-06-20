@@ -1,3 +1,6 @@
+# Software Rendering Pipeline (SRP) library
+# Licensed under GNU GPLv3
+
 cmake_minimum_required(VERSION 3.18.4)
 project(srp)
 
@@ -29,10 +32,11 @@ if (ENABLE_GPROF)
 	add_link_options(-pg)
 endif()
 
-include_directories(lib/)
-
 add_subdirectory(src)
 if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
+endif()
+if (BUILD_DOCS)
+	add_subdirectory(docs)
 endif()
 

@@ -1,6 +1,13 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
+/** @file
+ *  Macro definitions for the library */
+
 #pragma once
 
-
+/** @ingroup Memory_allocation
+ *  @{ */
 #if defined(SRP_MALLOC) && defined(SRP_FREE) && defined(SRP_REALLOC)
 	// ok
 #elif !defined(SRP_MALLOC) && !defined(SRP_FREE) && !defined(SRP_REALLOC)
@@ -11,7 +18,10 @@
 #else
 	#error "Must define all or none of SRP_MALLOC, SRP_FREE, and SRP_REALLOC"
 #endif
+/** @} */  // ingroup Memory_allocation
 
+/** @ingroup Various_internal
+ *  @{ */
 #ifndef SRP_FORCEINLINE
 	#if defined(__clang__)   // clang
 		#define SRP_FORCEINLINE inline
@@ -26,4 +36,5 @@
 			(it is not forced anymore!)"
 	#endif
 #endif
+/** @} */  // ingroup Various_internal
 

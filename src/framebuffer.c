@@ -1,15 +1,33 @@
-#define SRP_SOURCE
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
 
 #include <stdio.h>
 #include <assert.h>
 #include "framebuffer.h"
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "defines.h"
 
+/** @file
+ *  Framebuffer implementation */
+
+/** @ingroup Framebuffer_internal
+ *  @{ */
+
+/** Get pointer to a pixel inside color buffer
+ *  @param[in] this Pointer to SRPFramebuffer
+ *  @param[in] x,y Position of requested pixel
+ *  @return Requested pointer */
 static uint32_t* framebufferGetPixelPointer
 	(const SRPFramebuffer* this, size_t x, size_t y);
+
+/** Get pointer to a pixel inside depth buffer
+ *  @param[in] this Pointer to SRPFramebuffer
+ *  @param[in] x,y Position of requested pixel
+ *  @return Requested pointer */
 static double* framebufferGetDepthPointer
 	(const SRPFramebuffer* this, size_t x, size_t y);
+
+/** @} */  // ingroup Framebuffer_internal
 
 SRPFramebuffer* srpNewFramebuffer(size_t width, size_t height)
 {
@@ -31,11 +49,15 @@ void srpFreeFramebuffer(SRPFramebuffer* this)
 	SRP_FREE(this);
 }
 
-void framebufferDrawPixel(
+// The `const` qualifier is completely legal: only the buffer pointed to by
+// `framebuffer->color` is modified, not the structure itself!
+void srpFramebufferDrawPixel(
 	const SRPFramebuffer* this, size_t x, size_t y, double depth,
 	uint32_t color
 )
 {
+	/** @todo This is not the job of the framebuffer to check this,
+	 *  this should be deleted after the primitive clipping implementation */
 	if (1 < depth || depth < -1)
 		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
@@ -50,7 +72,7 @@ void framebufferDrawPixel(
 	*pDepth = depth;
 }
 
-void framebufferNDCToScreenSpace(
+void srpFramebufferNDCToScreenSpace(
 	const SRPFramebuffer* this, const double* NDC, double* SS
 )
 {

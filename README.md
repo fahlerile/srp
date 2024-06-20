@@ -22,7 +22,7 @@ make
 cd bin
 ```
 
-You can also build the examples by providing the `-D BUILD_EXAMPLES=1` argument to `cmake`.
+You can also build the examples with `-D BUILD_EXAMPLES=1` and the documentation with `-D BUILD_DOCS=1` arguments passed to `cmake`. Building the documentation requires having [`dot`](https://en.wikipedia.org/wiki/Graphviz) binary in `PATH`.
 
 ## Similar/related projects
 - https://github.com/rswinkle/PortableGL
@@ -51,7 +51,12 @@ And many, many more, all of which I will not find anymore...
 ### Documentation/examples
 - [x] Add comments to the examples
 - [x] Prettify the API (think about convenience macros/functions)
-- [ ] Write the documentation about the main pipeline and individual functions
+- [x] Write the API documentation in Doxygen
+- [x] Build Doxygen docs with CMake
+- [ ] Write the implementation documentation (data flow, static functions and etc.)
+- [ ] Use Github CI to host the documentation on Github Pages
+    - https://github.com/marketplace/actions/doxygen-action
+- [ ] Customize the examples' page to include images and explanations in text form (not in comments form)
 
 ### Features
 - [ ] Add interpolation with perspective correction
@@ -75,6 +80,8 @@ And many, many more, all of which I will not find anymore...
 - [x] Use `const` in function declarations where needed
 - [x] Reorder arguments in drawcalls
 - [ ] Add realloc and etc. functions for buffer objects (see OpenGL for reference)
+- [ ] Should I avoid heap allocation in `srpNew...` and use a pointer to a user pre-allocated buffer?
+- [ ] Rename enum members to avoid namespace pollution
 
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:

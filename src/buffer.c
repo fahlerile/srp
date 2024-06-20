@@ -1,26 +1,45 @@
-#define SRP_SOURCE
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
 
 #include <stdio.h>
 #include <string.h>
 #include "buffer.h"
 #include "triangle.h"
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "utils.h"
-#include "vec.h"
 #include "defines.h"
 
+/** @file
+ *  Buffer implementation */
+
+/** @ingroup Buffer_internal
+ *  @{ */
+
+/** Draw either SRPIndexBuffer or SRPVertexBuffer.
+ *  If `ib == NULL`, draws the vertex buffer, else draws index buffer.
+ *  Created because vertex and index buffer drawing are very similar,
+ *  with an intent to avoid code duplication
+ *  @see srpDrawVertexBuffer() srpDrawIndexBuffer() for parameter documentation */
 static void drawBuffer(
 	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
 	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 );
-static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index);
+
+/** Get an element stored in SRPIndexBuffer.
+ *  Needed because SRPIndexBuffer stores opaque index types.
+ *  @param[in] this Pointer to SRPIndexBuffer
+ *  @param[in] ibIndex Index of the element in the SRPIndexBuffer
+ *  @return Element upcasted to `uint64_t` */
+static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t ibIndex);
+
+/** Get a vertex stored in SRPVertexBuffer.
+ *  @param[in] this Pointer to SRPVertexBuffer
+ *  @param[in] index Index of the vertex to get
+ *  @return Requested vertex */
 static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index);
 
-// An internal function to draw either index or vertex buffer
-// If `ib == NULL`, draws the vertex buffer, else draws index buffer
-// Used in `srpDrawVertexBuffer` and `srpDrawIndexBuffer`
-// Created because vertex and index buffer drawing are very similar,
-// with an intent to avoid code duplication
+/** @} */
+
 static void drawBuffer(
 	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
 	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
@@ -54,8 +73,7 @@ static void drawBuffer(
 	}
 
 	// Allocate memory for three vertex shader output variables (triangle = 3 vertices)
-	SRPVertexVariable* triangleOutputVertexVariables = \
-		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
+	SRPVertexVariable* outputVertexVariables = SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
 	size_t primitiveID = 0;
 
 	for (size_t i = startIndex; i <= endIndex; i += 3)
@@ -71,7 +89,7 @@ static void drawBuffer(
 				vertexIndex = i+j;
 			SRPVertex* pVertex = indexVertexBuffer(vb, vertexIndex);
 			SRPVertexVariable* pOutputVertexVariables = (SRPVertexVariable*) \
-				INDEX_VOID_PTR(triangleOutputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
+				INDEX_VOID_PTR(outputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
 
 			vsIn[j] = (SRPvsInput) {
 				.vertexID = i+j,
@@ -95,7 +113,7 @@ static void drawBuffer(
 		primitiveID++;
 	}
 
-	SRP_FREE(triangleOutputVertexVariables);
+	SRP_FREE(outputVertexVariables);
 }
 
 SRPVertexBuffer* srpNewVertexBuffer(
@@ -133,13 +151,13 @@ static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index)
 }
 
 SRPIndexBuffer* srpNewIndexBuffer(
-	Type indicesType, size_t nBytesData, const void* data
+	SRPType indicesType, size_t nBytesData, const void* data
 )
 {
 	SRPIndexBuffer* this = SRP_MALLOC(sizeof(SRPIndexBuffer));
 
 	this->indicesType = indicesType;
-	this->nBytesPerIndex = SIZEOF_TYPE(indicesType);
+	this->nBytesPerIndex = srpSizeofType(indicesType);
 	this->nIndices = nBytesData / this->nBytesPerIndex;
 	this->data = SRP_MALLOC(nBytesData);
 	memcpy(this->data, data, nBytesData);

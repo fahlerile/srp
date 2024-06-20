@@ -1,10 +1,11 @@
-#define SRP_SOURCE
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
 
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "defines.h"
 #include "math_utils.h"
 #include "stb_image.h"
@@ -12,9 +13,22 @@
 #include "vec.h"
 #include "texture.h"
 
+/** @file
+ *  Texture implementation */
+
+/** @ingroup Texture_internal
+ *  @{ */
+
+/** Number of channels requested from the `stbi_load()` call. */
 #define N_CHANNELS_REQUESTED 3
 
+/** Get texture color at specified pixel position
+ *  @param[in] this Pointer to SRPTexture
+ *  @param[in] x,y Position of the requested pixel
+ *  @return Requested pixel's color */
 static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y);
+
+/** @} */  // ingroup Texture_internal
 
 SRPTexture* srpNewTexture(
 	const char* image,
@@ -46,16 +60,10 @@ void srpFreeTexture(SRPTexture* this)
 	SRP_FREE(this);
 }
 
-// TODO: now using only filteringModeMagnifying; how to know if texture is 
-// magnified or minified?
-// TODO: too many conditionals?
-// TODO: wrappingMode is untested!
-
-// Get a filtered color from texture and UV values
-// Returns an array of 4 double values each inside the interval [0, 1]
-// through `out` argument
-// P.S: does not return `vec4d` because the user API should not enforce the use
-// of `vec` and `mat`
+/** @todo Now using only filteringModeMagnifying; how to know if texture is 
+ *  magnified or minified?
+ *  @todo Too many conditionals?
+ *  @todo wrappingMode is untested! */
 void srpTextureGetFilteredColor(
 	const SRPTexture* this, double u, double v, double out[4]
 )
@@ -105,8 +113,7 @@ void srpTextureGetFilteredColor(
 
 static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y)
 {
-	// Each pixel is N_CHANNELS_REQUESTED bytes, and an image is stored
-	// row-major
+	// Each pixel is N_CHANNELS_REQUESTED bytes, and an image is stored row-major
 	uint8_t* start = \
 		INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
 	return (vec4d) {

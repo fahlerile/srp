@@ -49,8 +49,7 @@ int main()
 	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
 	// Initializing vertex and index data, computations made here (sin, cos, etc.
-	// are only to build an equialeral (TODO: have I spelled this correctly?)
-	// triangle
+	// are only to build an quilateral triangle
 	const double R = 0.8;
 	Vertex data[3] = {
 		{.position = {0., R, 0.}, .color = {1., 0., 0.}},
@@ -166,5 +165,6 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out)
 	outColor->w = 1.;
 }
 
-// See the complete API reference in `docs/` directory
+// See the complete API reference by building Doxygen documentation
+// (see README)
 
