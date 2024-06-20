@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          sudo apt install doxygen graphviz ttf-freefont -y
+          sudo apt install doxygen graphviz -y
           cd ${{ github.workspace }}
           mkdir -p build/docs
           doxygen ./Doxyfile
