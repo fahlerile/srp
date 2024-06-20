@@ -13,8 +13,10 @@
 	#include <arpa/inet.h>
 #endif
 
-/** Holds RGBA8888 color data
- *  @ingroup Framebuffer */
+/** @ingroup Framebuffer
+ *  @{ */
+
+/** Holds RGBA8888 color data */
 typedef struct SRPColor
 {
 	uint8_t r, g, b, a;
@@ -24,4 +26,6 @@ typedef struct SRPColor
 // Using `htonl` since we need to convert host endian data to big endian data
 // (we want red component to be the most significant one!)
 #define SRP_COLOR_TO_UINT32_T(color) (htonl(*(uint32_t*) &color))
+
+/** @} */  // ingroup Framebuffer
 
