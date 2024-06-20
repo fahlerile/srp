@@ -1,30 +1,25 @@
+# Software Rendering Pipeline (SRP) library
+# Licensed under GNU GPLv3
+
 set(
-    SOURCES
-
-    main.c
-    Context.c
-    Renderer.c
-    VertexBuffer.c
-    Shaders.c
-    triangle.c
+	SOURCES
+	context.c
+	buffer.c
+	triangle.c
+	framebuffer.c
+	type.c
+	texture.c
+	stb_image.c
+	vec.c
+	mat.c
+	alloc.c
+	message_callback.c
 )
 
-add_executable(${EXECUTABLE_NAME} ${SOURCES})
-target_include_directories(${EXECUTABLE_NAME} PUBLIC .)
-target_compile_options(${EXECUTABLE_NAME} PRIVATE
-    -Wall -Wextra -Wpedantic -Wno-unused -std=c2x -march=native -O3
+add_library(srp STATIC ${SOURCES})
+target_include_directories(
+	srp PRIVATE
+	${CMAKE_SOURCE_DIR}/lib
+	${CMAKE_SOURCE_DIR}/include
 )
-
-if (ENABLE_ASAN)
-    target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=address)
-endif()
-if (ENABLE_UBSAN)
-    target_compile_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=undefined)
-    target_link_options(${EXECUTABLE_NAME} PRIVATE -fsanitize=undefined)
-endif()
-
-if (ENABLE_GPROF)
-    target_compile_options(${EXECUTABLE_NAME} PRIVATE -pg)
-    target_link_options(${EXECUTABLE_NAME} PRIVATE -pg)
-endif()
 

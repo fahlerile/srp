@@ -1,31 +1,26 @@
+// Software Rendering Pipeline (SRP) library
+// Licensed under GNU GPLv3
+
 #pragma once
-#include <stdbool.h>
-#include "Vector/Vector.h"
-#include "Shaders.h"
 
-typedef struct
-{
-    double barycentricCoordinates[3];
-    double barycentricDeltaX[3];
-    double barycentricDeltaY[3];
-    bool isEdgeNotFlatTopOrLeft[3];
-    Vector2d minBP, maxBP;
-} triangleData;
+/** @file
+ *  Triangle rasterization functions */
 
-void drawTriangle(const GSOutput* restrict gsOutput, const ShaderProgram* restrict sp);
+#include "framebuffer.h"
+#include "shaders.h"
 
-static double signedAreaParallelogram(
-    const Vector3d* restrict a, const Vector3d* restrict b
+/** @ingroup Rasterization
+ *  @{ */
+
+/** Draw the triangle that is specified by three vertices to the framebuffer
+ *  @param[in] `fb` The framebuffer to draw to
+ *  @param[in] `vertices` Pointer to an array of 3 `SRPvsOutput`s
+ *  @param[in] `sp` The shader program to use
+ *  @param[in] `primitiveID` Primitive ID of this triangle */
+void drawTriangle(
+	const SRPFramebuffer* fb, const SRPvsOutput vertices[3],
+	const SRPShaderProgram* restrict sp, size_t primitiveID
 );
-static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
-    const Vector3d* restrict SSPositions, const Vector3d* restrict edgeVectors,
-    const Vector2d point, double* restrict barycentricCoordinates,
-    double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
-);
-static bool triangleIsEdgeFlatTopOrLeft(const Vector3d* restrict edgeVector);
 
-static void triangleInterpolateGsOutput(
-    const void* gsOutput, const double barycentricCoordinates[3],
-    const ShaderProgram* restrict sp, Interpolated* pInterpolatedBuffer
-);
+/** @} */  // ingroup Rasterization
 
