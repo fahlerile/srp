@@ -8,6 +8,7 @@ void srpNewContext(SRPContext* pContext)
 {
 	pContext->messageCallback = NULL;
 	pContext->messageCallbackUserParameter = NULL;
+	pContext->attributeInterpolation = SRP_ATTR_INTERPOLATION_PERSPECTIVE;
 }
 
 void srpContextSetP(SRPContextParameter contextParameter, const void* data)
@@ -21,6 +22,21 @@ void srpContextSetP(SRPContextParameter contextParameter, const void* data)
 		/** @todo Is this cast OK? */
 		srpContext.messageCallbackUserParameter = (void*) data;
 		return;
+	default:
+		srpMessageCallbackHelper(
+			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			"Unknown type (%i)", contextParameter
+		);
+		return;
+	}
+}
+
+void srpContextSetI(SRPContextParameter contextParameter, int data)
+{
+	switch (contextParameter)
+	{
+	case CTX_PARAM_ATTRIBUTE_INTERPOLATION_TYPE:
+		srpContext.attributeInterpolation = data;
 	default:
 		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,

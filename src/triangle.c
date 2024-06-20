@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "triangle.h"
+#include "context.h"
 #include "vertex.h"
 #include "framebuffer_p.h"
 #include "message_callback_p.h"
@@ -238,7 +239,7 @@ static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector)
 	return ((edgeVector->x > 0) && (edgeVector->y == 0)) || (edgeVector->y < 0);
 }
 
-// @brief Interpolates variables in triangle
+/** @todo Document the algorithm and why it works. P.S: I have no idea */
 static void triangleInterpolatePositionAndVertexVariables(
 	const SRPvsOutput vertices[3], const double barycentricCoordinates[3],
 	const SRPShaderProgram* restrict sp, SRPInterpolated* pInterpolatedBuffer,
@@ -251,19 +252,46 @@ static void triangleInterpolatePositionAndVertexVariables(
 	// V0A0E0, V0A0E1, ... V0A0En, ... V0AnE0, V0AnE1, ..., V0AnEn, ...
 	// [V]ertex, [A]ttribute, [E]lement
 
-	// points to attribute in output buffer
+	// Points to current attribute in output buffer
 	void* pInterpolatedAttrVoid = pInterpolatedBuffer;
 
-	// interpolate position
-	for (uint8_t i = 0; i < 4; i++)
+	// Vertices' Z values without negatives, in preserved order
+	// Needed because perspective correction does not like negative values
+	double noNegativeZ[3];
+	if (srpContext.attributeInterpolation == SRP_ATTR_INTERPOLATION_PERSPECTIVE)
+	{
+		noNegativeZ[0] = (vertices[0].position[2] + 1) / 2;
+		noNegativeZ[1] = (vertices[1].position[2] + 1) / 2;
+		noNegativeZ[2] = (vertices[2].position[2] + 1) / 2;
+	}
+
+	// Interpolate position
+	for (uint8_t i = 0; i < 2; i++)
 	{
 		((double*) pInterpolatedPosition)[i] = \
 			((double*) &vertices[0].position)[i] * barycentricCoordinates[0] + \
 			((double*) &vertices[1].position)[i] * barycentricCoordinates[1] + \
 			((double*) &vertices[2].position)[i] * barycentricCoordinates[2];
 	}
+	pInterpolatedPosition->w = 1;
+	if (srpContext.attributeInterpolation == SRP_ATTR_INTERPOLATION_PERSPECTIVE)
+	{
+		pInterpolatedPosition->z = 1 / (
+			(1 / noNegativeZ[0]) * barycentricCoordinates[0] + \
+			(1 / noNegativeZ[1]) * barycentricCoordinates[1] + \
+			(1 / noNegativeZ[2]) * barycentricCoordinates[2]
+		);
+	}
+	else  // affine
+	{
+		pInterpolatedPosition->z = (
+			vertices[0].position[2] * barycentricCoordinates[0] + \
+			vertices[1].position[2] * barycentricCoordinates[1] + \
+			vertices[2].position[2] * barycentricCoordinates[2]
+		);
+	}
 
-	// interpolate variables (attributes)
+	// Interpolate variables (attributes)
 	size_t attrOffsetBytes = 0;
 	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
 	{
@@ -286,10 +314,21 @@ static void triangleInterpolatePositionAndVertexVariables(
 
 			for (size_t elemI = 0; elemI < attr->nItems; elemI++)
 			{
-				pInterpolatedAttr[elemI] = \
-					AV0[elemI] * barycentricCoordinates[0] + \
-					AV1[elemI] * barycentricCoordinates[1] + \
-					AV2[elemI] * barycentricCoordinates[2];
+				if (srpContext.attributeInterpolation == SRP_ATTR_INTERPOLATION_PERSPECTIVE)
+				{
+					pInterpolatedAttr[elemI] = pInterpolatedPosition->z * (
+						(AV0[elemI] / noNegativeZ[0]) * barycentricCoordinates[0] + \
+						(AV1[elemI] / noNegativeZ[1]) * barycentricCoordinates[1] + \
+						(AV2[elemI] / noNegativeZ[2]) * barycentricCoordinates[2]
+					);
+				}
+				else  // affine
+				{
+					pInterpolatedAttr[elemI] = \
+						AV0[elemI] * barycentricCoordinates[0] + \
+						AV1[elemI] * barycentricCoordinates[1] + \
+						AV2[elemI] * barycentricCoordinates[2];
+				}
 			}
 			break;
 		}
