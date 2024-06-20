@@ -55,6 +55,16 @@ void srpContextSetP(SRPContextParameter contextParameter, const void* data);
  *  @param[in] data The value you want to assign to specified context parameter */
 void srpContextSetI(SRPContextParameter contextParameter, int data);
 
+/** Get a pointer parameter in the context
+ *  @param[in] contextParameter The context parameter you want to get
+ *  @return Requested parameter or NULL on error */
+void* srpContextGetP(SRPContextParameter contextParameter);
+
+/** Get an integer/enum parameter in the context
+ *  @param[in] contextParameter The context parameter you want to get
+ *  @return Requested parameter or 0 on error */
+int srpContextGetI(SRPContextParameter contextParameter);
+
 /** @} */  // defgroup Context
 
 extern SRPContext srpContext;

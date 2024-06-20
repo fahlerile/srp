@@ -46,3 +46,35 @@ void srpContextSetI(SRPContextParameter contextParameter, int data)
 	}
 }
 
+void* srpContextGetP(SRPContextParameter contextParameter)
+{
+	switch (contextParameter)
+	{
+	case SRP_CONTEXT_MESSAGE_CALLBACK:
+		return srpContext.messageCallback;
+	case SRP_CONTEXT_MESSAGE_CALLBACK_USER_PARAMETER:
+		return srpContext.messageCallbackUserParameter;
+	default:
+		srpMessageCallbackHelper(
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
+			"Unknown type (%i)", contextParameter
+		);
+		return NULL;
+	}
+}
+
+int srpContextGetI(SRPContextParameter contextParameter)
+{
+	switch (contextParameter)
+	{
+	case SRP_CONTEXT_INTERPOLATION_MODE:
+		return srpContext.interpolationMode;
+	default:
+		srpMessageCallbackHelper(
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
+			"Unknown type (%i)", contextParameter
+		);
+		return 0;
+	}
+}
+
