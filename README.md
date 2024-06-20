@@ -50,18 +50,8 @@ And a lot more... Here I mentioned only those projects on which I looked at as a
 And many, many more, all of which I will not find anymore...
 
 ## TODO
-### Documentation/examples
-- [x] Add comments to the examples
-- [x] Prettify the API (think about convenience macros/functions)
-- [x] Write the API documentation in Doxygen
-- [x] Build Doxygen docs with CMake
-- [ ] Write the implementation documentation (data flow, static functions and etc.)
-- [ ] Use Github CI to host the documentation on Github Pages
-    - https://github.com/marketplace/actions/doxygen-action
-- [ ] Customize the examples' page to include images and explanations in text form (not in comments form)
-
 ### Features
-- [ ] Add interpolation with perspective correction
+- [x] Add interpolation with perspective correction
 - [ ] Fix rasterization rules (see the gaps between triangles in `03_spinning_textured_cube` example)
 - [ ] Implement other primitives (lines, points, lines/triangles strip/adjacency etc.)
 - [ ] Implement interpolation for types other than `double` (shouldn't it just be `double` and `float`?)
@@ -77,20 +67,9 @@ And many, many more, all of which I will not find anymore...
 - [ ] Use a profiler to find bottlenecks in frequently-used functions
 - [ ] Draw primitives in parallel (OpenMP)
 
-### Portability/API design
-- [x] Give the user an opportunity to avoid including `vec.h` and `mat.h` (one more header guard?)
-- [x] Use `const` in function declarations where needed
-- [x] Reorder arguments in drawcalls
-- [ ] Add realloc and etc. functions for buffer objects (see OpenGL for reference)
-- [ ] Should I avoid heap allocation in `srpNew...` and use a pointer to a user pre-allocated buffer?
-- [ ] Rename enum members to avoid namespace pollution
-
 ## What I learned
 This is a section specially for my portfolio, so feel free to skip it. Well, I learned:
-- Advanced (I think so) C programming techniques:
-    - Opaque types
-    - Use of header guards to incapsulate internal functions & types
-    - Many more...
+- Some C programming techniques and library design
 - Importance of having a plan, an end goal:
     - This project started as something completely different from what it is now
 - Basic Git workflow

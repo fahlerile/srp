@@ -26,6 +26,7 @@ EXAMPLE_PATH = examples/
 
 GENERATE_HTML = YES
 GENERATE_LATEX = NO
+USE_MATHJAX = YES
 
 # See https://github.com/jothepro/doxygen-awesome-css
 GENERATE_TREEVIEW = YES

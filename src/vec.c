@@ -40,7 +40,7 @@ SRP_FORCEINLINE double vec4dIndex(vec4d a, uint8_t index)
 	if (index >= 4)
 	{
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Attempt to OBB access vec4d: index (%i)", index
 		);
 		return 0;

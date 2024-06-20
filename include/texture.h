@@ -13,31 +13,21 @@
 /** @ingroup Texture
  *  @{ */
 
-/** An enumeration to hold texture wrapping modes
- *  @see SRPTexture */
+/** Holds texture wrapping modes @see SRPTexture */
 typedef enum
 {
 	TW_REPEAT,
 	TW_CLAMP_TO_EDGE
 } SRPTextureWrappingMode;
 
-/** An enumeration to hold texture filtering modes
- *  @see SRPTexture */
+/** Holds texture filtering modes @see SRPTexture */
 typedef enum
 {
 	TF_NEAREST
 } SRPTextureFilteringMode;
 
 /** A structure to represent a texture */
-typedef struct
-{
-	uint8_t* data;
-	int width, height;
-	SRPTextureWrappingMode wrappingModeX;
-	SRPTextureWrappingMode wrappingModeY;
-	SRPTextureFilteringMode filteringModeMagnifying;
-	SRPTextureFilteringMode filteringModeMinifying;
-} SRPTexture;
+typedef struct SRPTexture SRPTexture;
 
 /** Initialize a texture by loading an image
  *  @param[in] image A filesystem path to an image. Most popular image types
@@ -64,6 +54,27 @@ void srpFreeTexture(SRPTexture* this);
 void srpTextureGetFilteredColor(
 	const SRPTexture* this, double u, double v, double out[4]
 );
+
+/** Holds all possible arguments to SRPTexture getters and setters
+ *  @see srpTextureGet() srpTextureSet() */
+typedef enum SRPTextureParameter
+{
+	SRP_TEXTURE_WRAPPING_MODE_X,
+	SRP_TEXTURE_WRAPPING_MODE_Y,
+	SRP_TEXTURE_FILTERING_MODE_MAGNIFYING,
+	SRP_TEXTURE_FILTERING_MODE_MINIFYING,
+} SRPTextureParameter;
+
+ /** Get a parameter from existing SRPTexture
+  *  @param[in] this A pointer to texture
+  *  @param[in] parameter A struct member to get
+  *  @return Requested member, or -1 on failure */
+int srpTextureGet(SRPTexture* this, SRPTextureParameter parameter);
+ /** Set a parameter to existing SRPTexture
+  *  @param[in] this A pointer to texture
+  *  @param[in] parameter A struct member to set to
+  *  @param[in] data A value to set */
+void srpTextureSet(SRPTexture* this, SRPTextureParameter parameter, int data);
 
 /** @} */  // defgroup Texture
 

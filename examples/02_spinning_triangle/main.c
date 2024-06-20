@@ -38,7 +38,7 @@ void fragmentShader(SRPfsInput* in, SRPfsOutput* out);
 int main()
 {
 	srpNewContext(&srpContext);
-	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void*) messageCallback);
+	srpContextSetP(SRP_CONTEXT_MESSAGE_CALLBACK, (void*) messageCallback);
 
 	SRPFramebuffer* fb = srpNewFramebuffer(512, 512);
 
@@ -55,22 +55,23 @@ int main()
 		}
 	};
 
-	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPVertexBuffer* vb = srpNewVertexBuffer();
+	srpVertexBufferCopyData(vb, sizeof(Vertex), sizeof(data), data);
 
 	// Uniform requires a cast to an opaque `SRPUniform` type to avoid
 	// a compiler warning
 	Uniform uniform = {0};
 	SRPShaderProgram shaderProgram = {
 		.uniform = (SRPUniform*) &uniform,
-		.vs = {
+		.vs = &(SRPVertexShader) {
 			.shader = vertexShader,
 			.nOutputVariables = 1,
-			.outputVariables = (SRPVertexVariableInformation[]) {
+			.outputVariablesInfo = (SRPVertexVariableInformation[]) {
 				{.nItems = 3, .type = TYPE_DOUBLE}
 			},
 			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
-		.fs = {
+		.fs = &(SRPFragmentShader) {
 			.shader = fragmentShader
 		}
 	};
@@ -86,7 +87,7 @@ int main()
 		// top of this file (`SRP_INCLUDE_...`)
 		uniform.rotation = mat4dConstructRotate(0, 0, uniform.frameCount / 1000.);
 		framebufferClear(fb);
-		srpDrawVertexBuffer(vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 3);
+		srpDrawVertexBuffer(vb, fb, &shaderProgram, SRP_PRIM_TRIANGLES, 0, 3);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);

@@ -1,6 +1,7 @@
 // Software Rendering Pipeline (SRP) library
 // Licensed under GNU GPLv3
 
+#include "texture.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -11,7 +12,7 @@
 #include "stb_image.h"
 #include "utils.h"
 #include "vec.h"
-#include "texture.h"
+#include "texture_p.h"
 
 /** @file
  *  Texture implementation */
@@ -42,7 +43,7 @@ SRPTexture* srpNewTexture(
 	if (this->data == NULL)
 	{
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Failed to load image `%s`: %s", image, stbi_failure_reason()
 		);
 		return NULL;
@@ -122,5 +123,51 @@ static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y)
 		start[2] / 255.,
 		(N_CHANNELS_REQUESTED == 3) ? 1. : (start[3] / 255.)
 	};
+}
+
+int srpTextureGet(SRPTexture* this, SRPTextureParameter parameter)
+{
+	switch (parameter)
+	{
+	case SRP_TEXTURE_WRAPPING_MODE_X:
+		return this->wrappingModeX;
+	case SRP_TEXTURE_WRAPPING_MODE_Y:
+		return this->wrappingModeY;
+	case SRP_TEXTURE_FILTERING_MODE_MAGNIFYING:
+		return this->filteringModeMagnifying;
+	case SRP_TEXTURE_FILTERING_MODE_MINIFYING:
+		return this->filteringModeMinifying;
+	default:
+		srpMessageCallbackHelper(
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
+			"Unknown texture parameter (%i)", parameter
+		);
+		return -1;
+	}
+}
+
+void srpTextureSet(SRPTexture* this, SRPTextureParameter parameter, int data)
+{
+	switch (parameter)
+	{
+	case SRP_TEXTURE_WRAPPING_MODE_X:
+		this->wrappingModeX = data;
+		return;
+	case SRP_TEXTURE_WRAPPING_MODE_Y:
+		this->wrappingModeY = data;
+		return;
+	case SRP_TEXTURE_FILTERING_MODE_MAGNIFYING:
+		this->filteringModeMagnifying = data;
+		return;
+	case SRP_TEXTURE_FILTERING_MODE_MINIFYING:
+		this->filteringModeMinifying = data;
+		return;
+	default:
+		srpMessageCallbackHelper(
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
+			"Unknown texture parameter (%i)", parameter
+		);
+		return;
+	}
 }
 

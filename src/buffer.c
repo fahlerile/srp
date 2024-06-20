@@ -3,11 +3,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "buffer.h"
-#include "triangle.h"
+#include "buffer_p.h"
 #include "message_callback_p.h"
+#include "triangle.h"
+#include "type.h"
 #include "utils.h"
 #include "defines.h"
+#include "vertex.h"
 
 /** @file
  *  Buffer implementation */
@@ -47,10 +49,10 @@ static void drawBuffer(
 {
 	const bool isDrawingIndexBuffer = (ib != NULL);
 
-	if (primitive != PRIMITIVE_TRIANGLES)
+	if (primitive != SRP_PRIM_TRIANGLES)
 	{
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			"Only triangles are implemented"
 		);
 		return;
@@ -66,14 +68,14 @@ static void drawBuffer(
 			"Attempt to OOB access index buffer (read) at indices %i-%i (size: %i)\n" : \
 			"Attempt to OOB access vertex buffer (read) at indices %i-%i (size: %i)\n";
 		srpMessageCallbackHelper(
-			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+			SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 			errorMessage, startIndex, endIndex, bufferSize
 		);
 		return;
 	}
 
 	// Allocate memory for three vertex shader output variables (triangle = 3 vertices)
-	SRPVertexVariable* outputVertexVariables = SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
+	SRPVertexVariable* outputVertexVariables = SRP_MALLOC(sp->vs->nBytesPerOutputVariables * 3);
 	size_t primitiveID = 0;
 
 	for (size_t i = startIndex; i <= endIndex; i += 3)
@@ -89,7 +91,7 @@ static void drawBuffer(
 				vertexIndex = i+j;
 			SRPVertex* pVertex = indexVertexBuffer(vb, vertexIndex);
 			SRPVertexVariable* pOutputVertexVariables = (SRPVertexVariable*) \
-				INDEX_VOID_PTR(outputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
+				INDEX_VOID_PTR(outputVertexVariables, j, sp->vs->nBytesPerOutputVariables);
 
 			vsIn[j] = (SRPvsInput) {
 				.vertexID = i+j,
@@ -101,7 +103,7 @@ static void drawBuffer(
 				.pOutputVariables = pOutputVertexVariables
 			};
 
-			sp->vs.shader(&vsIn[j], &vsOut[j]);
+			sp->vs->shader(&vsIn[j], &vsOut[j]);
 
 			// Perspective divide
 			vsOut[j].position[0] = vsOut[j].position[0] / vsOut[j].position[3],
@@ -116,19 +118,31 @@ static void drawBuffer(
 	SRP_FREE(outputVertexVariables);
 }
 
-SRPVertexBuffer* srpNewVertexBuffer(
-	size_t nBytesPerVertex, size_t nBytesData, const void* data
-)
+SRPVertexBuffer* srpNewVertexBuffer()
 {
 	SRPVertexBuffer* this = SRP_MALLOC(sizeof(SRPVertexBuffer));
+	this->nBytesPerVertex = 0;
+	this->nVertices = 0;
+	this->nBytesAllocated = 0;
+	this->data = NULL;
+	return this;
+}
+
+void srpVertexBufferCopyData
+	(SRPVertexBuffer* this, size_t nBytesPerVertex, size_t nBytesData, const void* data)
+{
+	// Reallocate the buffer if there is not enough allocated space
+	if (nBytesData > this->nBytesAllocated)
+	{
+		SRP_FREE(this->data);
+		this->data = SRP_MALLOC(nBytesData);
+		this->nBytesAllocated = nBytesData;
+	}
 
 	this->nBytesPerVertex = nBytesPerVertex;
-	this->nBytesData = nBytesData;
 	this->nVertices = nBytesData / nBytesPerVertex;
-	this->data = SRP_MALLOC(nBytesData);
-	memcpy(this->data, data, nBytesData);
 
-	return this;
+	memcpy(this->data, data, nBytesData);
 }
 
 void srpFreeVertexBuffer(SRPVertexBuffer* this)
@@ -150,19 +164,34 @@ static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index)
 	return (SRPVertex*) INDEX_VOID_PTR(this->data, index, this->nBytesPerVertex);
 }
 
-SRPIndexBuffer* srpNewIndexBuffer(
-	SRPType indicesType, size_t nBytesData, const void* data
-)
+SRPIndexBuffer* srpNewIndexBuffer()
 {
 	SRPIndexBuffer* this = SRP_MALLOC(sizeof(SRPIndexBuffer));
+	this->indicesType = TYPE_UINT8;
+	this->nBytesPerIndex = srpSizeofType(this->indicesType);
+	this->nIndices = 0;
+	this->nBytesAllocated = 0;
+	this->data = NULL;
+	return this;
+}
+
+void srpIndexBufferCopyData(
+	SRPIndexBuffer* this, SRPType indicesType, size_t nBytesData, const void* data
+)
+{
+	// Reallocate the buffer if there is not enough allocated space
+	if (nBytesData > this->nBytesAllocated)
+	{
+		SRP_FREE(this->data);
+		this->data = SRP_MALLOC(nBytesData);
+		this->nBytesAllocated = nBytesData;
+	}
 
 	this->indicesType = indicesType;
 	this->nBytesPerIndex = srpSizeofType(indicesType);
 	this->nIndices = nBytesData / this->nBytesPerIndex;
-	this->data = SRP_MALLOC(nBytesData);
-	memcpy(this->data, data, nBytesData);
 
-	return this;
+	memcpy(this->data, data, nBytesData);
 }
 
 void srpFreeIndexBuffer(SRPIndexBuffer* this)
@@ -191,7 +220,7 @@ static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index)
 			break;
 		default:
 			srpMessageCallbackHelper(
-				MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
+				SRP_MESSAGE_ERROR, SRP_MESSAGE_SEVERITY_HIGH, __func__,
 				"Unexpected type (%i)", this->indicesType
 			);
 			ret = 0;

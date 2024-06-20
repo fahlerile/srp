@@ -42,7 +42,7 @@ int main()
 {
 	// Initializing the context
 	srpNewContext(&srpContext);
-	srpContextSetP(CTX_PARAM_MESSAGE_CALLBACK, (void*) &messageCallback);
+	srpContextSetP(SRP_CONTEXT_MESSAGE_CALLBACK, (void*) &messageCallback);
 
 	// Framebuffer object is necessary and stores the depth and
 	// color (RGBA8888) buffers
@@ -64,23 +64,24 @@ int main()
 	};
 
 	// Creating the vertex buffer object, it is similar to OpenGL's VBO
-	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPVertexBuffer* vb = srpNewVertexBuffer();
+	srpVertexBufferCopyData(vb, sizeof(Vertex), sizeof(data), data);
 
 	// Shader program is not actually a program, but named like this to
 	// be similar to OpenGL
 	SRPShaderProgram shaderProgram = {
 		.uniform = NULL,
-		.vs = {
+		.vs = &(SRPVertexShader) {
 			.shader = vertexShader,
 			// This stores the information about vertex shader's output variables
 			// that is necessary to interpolate them inside the primitive
 			.nOutputVariables = 1,
-			.outputVariables = (SRPVertexVariableInformation[]) {
+			.outputVariablesInfo = (SRPVertexVariableInformation[]) {
 				{.nItems = 3, .type = TYPE_DOUBLE}
 			},
 			.nBytesPerOutputVariables = sizeof(VSOutput)
 		},
-		.fs = {
+		.fs = &(SRPFragmentShader) {
 			.shader = fragmentShader
 		}
 	};
@@ -98,7 +99,7 @@ int main()
 
 		// Clear the framebuffer and draw the index buffer as triangles
 		framebufferClear(fb);
-		srpDrawVertexBuffer(vb, fb, &shaderProgram, PRIMITIVE_TRIANGLES, 0, 3);
+		srpDrawVertexBuffer(vb, fb, &shaderProgram, SRP_PRIM_TRIANGLES, 0, 3);
 
 		windowPollEvents(window);
 		windowPresent(window, fb);
