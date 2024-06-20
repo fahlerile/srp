@@ -69,7 +69,7 @@ And many, many more, all of which I will not find anymore...
 
 ### Portability/API design
 - [x] Separate constructors into two functions for buffer objects (create and copy data)
-- [ ] Getters and setters for `SRPTexture`
+- [x] Getters and setters for `SRPTexture`
 - [ ] Rename enum members to avoid namespace pollution
 
 ## What I learned
