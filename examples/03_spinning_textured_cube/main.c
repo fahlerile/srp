@@ -108,7 +108,7 @@ int main()
 		.vs = {
 			.shader = vertexShader,
 			.nOutputVariables = 1,
-			.outputVariables = (SRPVertexVariableInformation[])	{
+			.outputVariablesInfo = (SRPVertexVariableInformation[])	{
 				{.nItems = 2, .type = TYPE_DOUBLE}
 			},
 			.nBytesPerOutputVariables = sizeof(VSOutput)

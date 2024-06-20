@@ -44,7 +44,7 @@ typedef struct SRPVertexShader
 	size_t nOutputVariables;
 	/**< Pointer to an array of output variables' information.
 	 *   Should be SRPVertexShader.nOutputVariables elements long. */
-	SRPVertexVariableInformation* outputVariables;
+	SRPVertexVariableInformation* outputVariablesInfo;
 	/** Size of output variables in bytes */
 	size_t nBytesPerOutputVariables;
 } SRPVertexShader;

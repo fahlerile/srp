@@ -318,7 +318,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 	size_t attrOffsetBytes = 0;
 	for (size_t attrI = 0; attrI < sp->vs.nOutputVariables; attrI++)
 	{
-		SRPVertexVariableInformation* attr = &sp->vs.outputVariables[attrI];
+		SRPVertexVariableInformation* attr = &sp->vs.outputVariablesInfo[attrI];
 		size_t elemSize = 0;
 		switch (attr->type)
 		{
