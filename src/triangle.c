@@ -258,7 +258,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 	// Vertices' Z values without negatives, in preserved order
 	// Needed because perspective correction does not like negative values
 	double noNegativeZ[3];
-	if (srpContext.attributeInterpolation == SRP_ATTR_INTERPOLATION_PERSPECTIVE)
+	if (srpContext.interpolationMode == SRP_INTERPOLATION_MODE_PERSPECTIVE)
 	{
 		noNegativeZ[0] = (vertices[0].position[2] + 1) / 2;
 		noNegativeZ[1] = (vertices[1].position[2] + 1) / 2;
@@ -274,7 +274,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 			((double*) &vertices[2].position)[i] * barycentricCoordinates[2];
 	}
 	pInterpolatedPosition->w = 1;
-	if (srpContext.attributeInterpolation == SRP_ATTR_INTERPOLATION_PERSPECTIVE)
+	if (srpContext.interpolationMode == SRP_INTERPOLATION_MODE_PERSPECTIVE)
 	{
 		pInterpolatedPosition->z = 1 / (
 			(1 / noNegativeZ[0]) * barycentricCoordinates[0] + \
@@ -314,7 +314,7 @@ static void triangleInterpolatePositionAndVertexVariables(
 
 			for (size_t elemI = 0; elemI < attr->nItems; elemI++)
 			{
-				if (srpContext.attributeInterpolation == SRP_ATTR_INTERPOLATION_PERSPECTIVE)
+				if (srpContext.interpolationMode == SRP_INTERPOLATION_MODE_PERSPECTIVE)
 				{
 					pInterpolatedAttr[elemI] = pInterpolatedPosition->z * (
 						(AV0[elemI] / noNegativeZ[0]) * barycentricCoordinates[0] + \

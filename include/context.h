@@ -13,19 +13,24 @@
  *  @{ */
 
 /** Available attribute interpolation types */
-typedef enum SRPAttributeInterpolationType
+typedef enum SRPInterpolationMode
 {
-	SRP_ATTR_INTERPOLATION_PERSPECTIVE,
-	SRP_ATTR_INTERPOLATION_AFFINE
-} SRPAttributeInterpolationType;
+	SRP_INTERPOLATION_MODE_PERSPECTIVE,
+	SRP_INTERPOLATION_MODE_AFFINE
+} SRPInterpolationMode;
 
 /** Holds runtime settings. This always needs to be declared as `SRPContext
  *  srpContext` in user programs and initialized with srpNewContext() */
 typedef struct SRPContext
 {
+	/** Message callback function that is called whenever an
+	 *  error/warning/etc. occurs */
 	SRPMessageCallbackType messageCallback;
+	/** User pointer to pass to message callback function
+	 *  @see SRPContext.messageCallback */
 	void* messageCallbackUserParameter;
-	SRPAttributeInterpolationType attributeInterpolation;
+	/** How to interpolate vertex attributes inside the primitive */
+	SRPInterpolationMode interpolationMode;
 } SRPContext;
 
 /** Possible arguments to `srpContextSet...` */

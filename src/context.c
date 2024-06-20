@@ -8,7 +8,7 @@ void srpNewContext(SRPContext* pContext)
 {
 	pContext->messageCallback = NULL;
 	pContext->messageCallbackUserParameter = NULL;
-	pContext->attributeInterpolation = SRP_ATTR_INTERPOLATION_PERSPECTIVE;
+	pContext->interpolationMode = SRP_INTERPOLATION_MODE_PERSPECTIVE;
 }
 
 void srpContextSetP(SRPContextParameter contextParameter, const void* data)
@@ -36,7 +36,7 @@ void srpContextSetI(SRPContextParameter contextParameter, int data)
 	switch (contextParameter)
 	{
 	case CTX_PARAM_ATTRIBUTE_INTERPOLATION_TYPE:
-		srpContext.attributeInterpolation = data;
+		srpContext.interpolationMode = data;
 	default:
 		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,
