@@ -7,7 +7,6 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           sudo apt install doxygen graphviz -y
-          cd ${{ github.workspace }}
           mkdir -p build/docs
           doxygen ./Doxyfile
-          
+        working-directory: ${{ github.workspace }}
