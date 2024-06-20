@@ -1,12 +1,10 @@
 // Software Rendering Pipeline (SRP) library
 // Licensed under GNU GPLv3
 
-#define SRP_SOURCE
-
 #include <stdio.h>
 #include <assert.h>
 #include "framebuffer.h"
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "defines.h"
 
 static uint32_t* framebufferGetPixelPointer
@@ -36,7 +34,7 @@ void srpFreeFramebuffer(SRPFramebuffer* this)
 
 // The `const` qualifier is completely legal: only the buffer pointed to by
 // `framebuffer->color` is modified, not the structure itself!
-void framebufferDrawPixel(
+void srpFramebufferDrawPixel(
 	const SRPFramebuffer* this, size_t x, size_t y, double depth,
 	uint32_t color
 )
@@ -57,7 +55,7 @@ void framebufferDrawPixel(
 	*pDepth = depth;
 }
 
-void framebufferNDCToScreenSpace(
+void srpFramebufferNDCToScreenSpace(
 	const SRPFramebuffer* this, const double* NDC, double* SS
 )
 {

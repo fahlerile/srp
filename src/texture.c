@@ -1,13 +1,11 @@
 // Software Rendering Pipeline (SRP) library
 // Licensed under GNU GPLv3
 
-#define SRP_SOURCE
-
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "defines.h"
 #include "math_utils.h"
 #include "stb_image.h"
@@ -108,8 +106,7 @@ void srpTextureGetFilteredColor(
 
 static vec4d textureGetColor(const SRPTexture* this, size_t x, size_t y)
 {
-	// Each pixel is N_CHANNELS_REQUESTED bytes, and an image is stored
-	// row-major
+	// Each pixel is N_CHANNELS_REQUESTED bytes, and an image is stored row-major
 	uint8_t* start = \
 		INDEX_VOID_PTR(this->data, x + y * this->width, N_CHANNELS_REQUESTED);
 	return (vec4d) {

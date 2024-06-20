@@ -11,8 +11,9 @@
 /** @ingroup Matrix
  *  @{ */
 
-// ROW MAJOR
+/** Represents a 4x4 matrix of `float`s, stores data in row-major order */
 typedef struct mat4 { float data[4][4]; } mat4;
+/** Represents a 4x4 matrix of `double`s, stores data in row-major order */
 typedef struct mat4d { double data[4][4]; } mat4d;
 
 /** Get the `index`th column of the matrix A

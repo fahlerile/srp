@@ -12,10 +12,6 @@
 /** @ingroup Shaders
  *  @{ */
 
-/** Represents interpolated vertex shader's output variables
- *  @see SRPVertexVariable */
-typedef struct SRPInterpolated SRPInterpolated;
-
 /** Represents user's shader uniform
  *  @see SRPShaderProgram */
 typedef struct SRPUniform SRPUniform;

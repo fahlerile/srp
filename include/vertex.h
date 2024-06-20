@@ -9,6 +9,9 @@
 #include <stddef.h>
 #include "type.h"
 
+/** @ingroup Vertex
+ *  @{ */
+
 /** Represents the vertex as stored in `SRPVertexBuffer`
  *  @see `SRPVertexBuffer` */
 typedef struct SRPVertex SRPVertex;
@@ -22,6 +25,12 @@ typedef struct SRPVertexVariable SRPVertexVariable;
 typedef struct
 {
 	size_t nItems;
-	Type type;
+	SRPType type;
 } SRPVertexVariableInformation;
+
+/** Represents interpolated vertex shader's output variables
+ *  @see SRPVertexVariable */
+typedef struct SRPInterpolated SRPInterpolated;
+
+/** @} */  // ingroup Vertex
 

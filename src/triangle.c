@@ -1,19 +1,18 @@
 // Software Rendering Pipeline (SRP) library
 // Licensed under GNU GPLv3
 
-#define SRP_SOURCE
-
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include "triangle.h"
 #include "vertex.h"
-#include "message_callback.h"
-#include "math_utils.h"
+#include "framebuffer_p.h"
+#include "message_callback_p.h"
 #include "shaders.h"
 #include "color.h"
 #include "utils.h"
+#include "math_utils.h"
+#include "vec.h"
 
 static double signedAreaParallelogram(
 	const vec3d* restrict a, const vec3d* restrict b
@@ -54,7 +53,7 @@ void drawTriangle(
 
 	vec3d SSPositions[3], edgeVectors[3];
 	for (size_t i = 0; i < 3; i++)
-		framebufferNDCToScreenSpace(
+		srpFramebufferNDCToScreenSpace(
 			fb, (double*) &NDCPositions[i], (double*) &SSPositions[i]
 		);
 	for (size_t i = 0; i < 3; i++)
@@ -134,7 +133,7 @@ void drawTriangle(
 				};
 				double depth = (fsOut.fragDepth == 0) ? fsIn.fragCoord[2] : fsOut.fragDepth;
 
-				framebufferDrawPixel(fb, x, y, depth, SRP_COLOR_TO_UINT32_T(color));
+				srpFramebufferDrawPixel(fb, x, y, depth, SRP_COLOR_TO_UINT32_T(color));
 			}
 
 nextPixel:

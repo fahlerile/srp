@@ -6,11 +6,8 @@
 /** @file
  *  Triangle rasterization */
 
-#ifdef SRP_SOURCE
-
 #include "framebuffer.h"
 #include "shaders.h"
-#include "vec.h"
 
 /** Draw the triangle that is specified by three vertices to the framebuffer
  *  @param[in] `fb` The framebuffer to draw to
@@ -22,5 +19,4 @@ void drawTriangle(
 	const SRPShaderProgram* restrict sp, size_t primitiveID
 );
 
-#endif  // ifdef SRP_SOURCE
 

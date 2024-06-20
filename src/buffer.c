@@ -1,15 +1,12 @@
 // Software Rendering Pipeline (SRP) library
 // Licensed under GNU GPLv3
 
-#define SRP_SOURCE
-
 #include <stdio.h>
 #include <string.h>
 #include "buffer.h"
 #include "triangle.h"
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "utils.h"
-#include "vec.h"
 #include "defines.h"
 
 static void drawBuffer(
@@ -57,8 +54,7 @@ static void drawBuffer(
 	}
 
 	// Allocate memory for three vertex shader output variables (triangle = 3 vertices)
-	SRPVertexVariable* triangleOutputVertexVariables = \
-		SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
+	SRPVertexVariable* outputVertexVariables = SRP_MALLOC(sp->vs.nBytesPerOutputVariables * 3);
 	size_t primitiveID = 0;
 
 	for (size_t i = startIndex; i <= endIndex; i += 3)
@@ -74,7 +70,7 @@ static void drawBuffer(
 				vertexIndex = i+j;
 			SRPVertex* pVertex = indexVertexBuffer(vb, vertexIndex);
 			SRPVertexVariable* pOutputVertexVariables = (SRPVertexVariable*) \
-				INDEX_VOID_PTR(triangleOutputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
+				INDEX_VOID_PTR(outputVertexVariables, j, sp->vs.nBytesPerOutputVariables);
 
 			vsIn[j] = (SRPvsInput) {
 				.vertexID = i+j,
@@ -98,7 +94,7 @@ static void drawBuffer(
 		primitiveID++;
 	}
 
-	SRP_FREE(triangleOutputVertexVariables);
+	SRP_FREE(outputVertexVariables);
 }
 
 SRPVertexBuffer* srpNewVertexBuffer(
@@ -136,13 +132,13 @@ static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index)
 }
 
 SRPIndexBuffer* srpNewIndexBuffer(
-	Type indicesType, size_t nBytesData, const void* data
+	SRPType indicesType, size_t nBytesData, const void* data
 )
 {
 	SRPIndexBuffer* this = SRP_MALLOC(sizeof(SRPIndexBuffer));
 
 	this->indicesType = indicesType;
-	this->nBytesPerIndex = SIZEOF_TYPE(indicesType);
+	this->nBytesPerIndex = srpSizeofType(indicesType);
 	this->nIndices = nBytesData / this->nBytesPerIndex;
 	this->data = SRP_MALLOC(nBytesData);
 	memcpy(this->data, data, nBytesData);

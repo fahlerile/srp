@@ -11,7 +11,6 @@
 #include "texture.h"
 #include "color.h"
 #include "framebuffer.h"
-#include "primitive.h"
 #include "vertex.h"
 #include "shaders.h"
 

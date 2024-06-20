@@ -17,4 +17,9 @@ set(
 )
 
 add_library(srp STATIC ${SOURCES})
+target_include_directories(
+	srp PRIVATE
+	${CMAKE_SOURCE_DIR}/lib
+	${CMAKE_SOURCE_DIR}/include
+)
 

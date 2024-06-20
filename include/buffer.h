@@ -7,11 +7,23 @@
 #pragma once
 
 #include "framebuffer.h"
-#include "primitive.h"
 #include "shaders.h"
 
 /** @ingroup Buffer
  *  @{ */
+
+/** Specifies primitives that can be drawn
+ *  @see srpDrawVertexBuffer() srpDrawIndexBuffer() */
+typedef enum SRPPrimitive
+{
+	PRIMITIVE_POINTS,
+	PRIMITIVE_LINES,
+	PRIMITIVE_LINE_STRIP,
+	PRIMITIVE_LINE_LOOP,
+	PRIMITIVE_TRIANGLES,
+	PRIMITIVE_TRIANGLE_STRIP,
+	PRIMITIVE_TRIANGLE_FAN
+} SRPPrimitive;
 
 /** Stores vertex data, similarly to VBO in OpenGL */
 typedef struct SRPVertexBuffer
@@ -26,7 +38,7 @@ typedef struct SRPVertexBuffer
  *  similarly to EBO in OpenGL */
 typedef struct SRPIndexBuffer
 {
-	Type indicesType;
+	SRPType indicesType;
 	size_t nBytesPerIndex;
 	size_t nIndices;
 	void* data;
@@ -63,7 +75,7 @@ void srpDrawVertexBuffer(
  *  @param[in] data The pointer to an array of indices of type indicesType
  *  @return The pointer to constructed index buffer */
 SRPIndexBuffer* srpNewIndexBuffer
-	(Type indicesType, size_t nBytesData, const void* data);
+	(SRPType indicesType, size_t nBytesData, const void* data);
 
 /** Free the index buffer
  *  @param[in] this The pointer to index buffer, as returned from srpNewIndexBuffer() */

@@ -25,8 +25,7 @@ typedef enum
  *  @see SRPTexture */
 typedef enum
 {
-	TF_NEAREST,
-	// TF_LINEAR  // TODO
+	TF_NEAREST
 } SRPTextureFilteringMode;
 
 /** A structure to represent a texture */

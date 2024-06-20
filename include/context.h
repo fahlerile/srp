@@ -12,16 +12,15 @@
 /** @ingroup Context
  *  @{ */
 
-/** Holds runtime settings. 
- *	It always needs to be declared as `SRPContext srpContext` in user programs 
- *	and initialized with srpNewContext() */
+/** Holds runtime settings. This always needs to be declared as `SRPContext
+ *  srpContext` in user programs and initialized with srpNewContext() */
 typedef struct SRPContext
 {
 	SRPMessageCallbackType messageCallback;
 	void* messageCallbackUserParameter;
 } SRPContext;
 
-/** An enumeration to hold possible arguments for `srpContextSet...` */
+/** Possible arguments to `srpContextSet...` */
 typedef enum SRPContextParameter
 {
 	CTX_PARAM_MESSAGE_CALLBACK,
@@ -39,7 +38,5 @@ void srpContextSetP(SRPContextParameter contextParameter, const void* data);
 
 /** @} */  // defgroup Context
 
-#ifdef SRP_SOURCE
 extern SRPContext srpContext;
-#endif
 

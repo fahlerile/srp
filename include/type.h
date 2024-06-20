@@ -9,9 +9,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/** An enumeration to hold types. This is needed for internal handling of
- *  opaque types */
-typedef enum
+/** @ingroup Various
+ *  @{ */
+
+/** Represents data types, this is needed for internal handling of opaque types */
+typedef enum SRPType
 {
 	TYPE_UINT8 = 0,
 	TYPE_UINT16,
@@ -19,7 +21,9 @@ typedef enum
 	TYPE_UINT64,
 	TYPE_FLOAT,
 	TYPE_DOUBLE
-} Type;
+} SRPType;
 
-size_t SIZEOF_TYPE(Type type);
+size_t srpSizeofType(SRPType type);
+
+/** @} */  // ingroup Various
 

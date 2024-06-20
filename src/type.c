@@ -1,13 +1,11 @@
 // Software Rendering Pipeline (SRP) library
 // Licensed under GNU GPLv3
 
-#define SRP_SOURCE
-
 #include <stdio.h>
-#include "message_callback.h"
+#include "message_callback_p.h"
 #include "type.h"
 
-size_t SIZEOF_TYPE(Type type)
+size_t srpSizeofType(SRPType type)
 {
 	switch (type)
 	{
