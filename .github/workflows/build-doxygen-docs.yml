@@ -1,0 +1,13 @@
+name: Build documentation using Doxygen
+on: push
+jobs:
+  build-doxygen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt install doxygen graphviz ttf-freefont -y
+          cd ${{ github.workspace }}
+          mkdir -p build/docs
+          doxygen ./Doxyfile
+          
