@@ -9,13 +9,22 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/** @ingroup Various_internal
+ *  @{ */
+
 #ifndef M_PI
 	#define M_PI 3.14159265358979323846
 #endif
 
+/** Get the minimum of two values */
 #define MIN(a, b) ( (a) > (b) ? (b) : (a) )
+/** Get the maximum of two values */
 #define MAX(a, b) ( (a) > (b) ? (a) : (b) )
 
+/** Clamp the `value` between `min` and `max`
+ *  @return `min`, if `value` < `min`;
+ *          `max`, if `value` > `max`;
+ *          `value` otherwise */
 #define CLAMP(min, max, value) \
 	( \
 		(value < min) ? \
@@ -25,6 +34,8 @@
 				(value) \
 	)
 
+/** Get the fractional part of `float` or `double` */
 #define FRACTIONAL(x) ( (x) - floor(x) )
 
+/** @} */  // ingroup Various_internal
 

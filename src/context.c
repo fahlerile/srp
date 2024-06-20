@@ -18,7 +18,7 @@ void srpContextSetP(SRPContextParameter contextParameter, const void* data)
 		srpContext.messageCallback = data;
 		return;
 	case CTX_PARAM_MESSAGE_CALLBACK_USER_PARAMETER:
-		// TODO: is this cast OK?
+		/** @todo Is this cast OK? */
 		srpContext.messageCallbackUserParameter = (void*) data;
 		return;
 	default:

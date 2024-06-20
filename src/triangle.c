@@ -14,21 +14,62 @@
 #include "math_utils.h"
 #include "vec.h"
 
+/** @file
+ *  Triangle rasteization & data interpolation */
+
+/** @ingroup Rasterization
+ *  @{ */
+
+/** Get a parallelogram's signed area. The two vectors define a parallelogram.
+ *  Used for barycentric coordinates' initialization in
+ *  calculateBarycentricCoordinatesForPointAndBarycentricDeltas() */
 static double signedAreaParallelogram(
 	const vec3d* restrict a, const vec3d* restrict b
 );
+
+/** Calculate barycentric coordinates for a point and barycentric coordinates'
+ *  delta values.
+ *  @param[in] SSPositions Vertices' positions in screen-space
+ *  @param[in] edgeVectors Triangle's edge vectors, where 0th element is a vector
+ *                         pointing from vertex 0 to vertex 1, 1th - from vertex
+ *                         1 to vertex 2 and so on.
+ *  @param[in] point A point for which to calculate the barycentric coordinates
+ *  @param[out] barycentricCoordinates A pointer to 3-element `double` array to
+ *                                     where output barycentric coordinates to
+ *  @param[out] barycentricDeltaX,barycentricDeltaY
+ *              A pointer to 3-element `double` array to where to output the X
+ *              and Y barycentric delta values. These show how much does the
+ *              barycentric coordinates change if we move one pixel to the +X or
+ *              to the +Y direction. Used in incremental computation of
+ *              barycentric coordinates when looping over triangle's bounding
+ *              box */
 static void calculateBarycentricCoordinatesForPointAndBarycentricDeltas(
 	const vec3d* restrict SSPositions, const vec3d* restrict edgeVectors,
 	vec2d point, double* restrict barycentricCoordinates,
 	double* restrict barycentricDeltaX, double* restrict barycentricDeltaY
 );
+
+/** Check if a triangle's edge is flat top or left. Used in rasterization rules.
+ *  @param[in] A pointer to an edge vector (pointing from one vertex to the other)
+ *  @return Whether or not this edge is flat top or left
+ *  @todo Does it matter if I pass edge 0->1 or 1->0 (numbers = vertex indices)? */
 static bool triangleIsEdgeFlatTopOrLeft(const vec3d* restrict edgeVector);
 
+/** Interpolate the fragment position and vertex variables inside the triangle.
+ *  @param[in] vertices A pointer to an array of 3 vertices
+ *  @param[in] barycentricCoordinates Barycentric coordinates of the fragment
+ *  @param[in] sp A pointer to shader program to use
+ *  @param[out] pInterpolatedBuffer A pointer to the buffer where interpolated
+ *              variables will appear. Must be big enough to hold all of them
+ *  @param[out] interpolatedPosition A pointer to vec4d where interpolated
+ *              position will appear. */
 static void triangleInterpolatePositionAndVertexVariables(
 	const SRPvsOutput vertices[3], const double barycentricCoordinates[3],
 	const SRPShaderProgram* restrict sp, SRPInterpolated* pInterpolatedBuffer,
 	vec4d* interpolatedPosition
 );
+
+/** @} */  // ingroup Rasterization
 
 void drawTriangle(
 	const SRPFramebuffer* fb, const SRPvsOutput vertices[3],
@@ -44,7 +85,7 @@ void drawTriangle(
 		};
 
 	// Do not traverse triangles with clockwise vertices
-	// TODO: why compute these two edge vectors twice?
+	/** @todo Why compute these two edge vectors twice? */
 	vec3d e0 = vec3dSubtract(NDCPositions[1], NDCPositions[0]);
 	vec3d e1 = vec3dSubtract(NDCPositions[2], NDCPositions[1]);
 	double normal = signedAreaParallelogram(&e0, &e1);
@@ -89,7 +130,7 @@ void drawTriangle(
 		{
 			for (uint8_t i = 0; i < 3; i++)
 			{
-				// TODO are rasterization rules working? ROUGHLY_EQUAL here?
+				/** @todo Are rasterization rules working? Rough equality here? */
 				if (barycentricCoordinates[i] == 0 && isEdgeNotFlatTopOrLeft[i])
 					goto nextPixel;
 			}
@@ -98,7 +139,7 @@ void drawTriangle(
 				barycentricCoordinates[1] >= 0 && \
 				barycentricCoordinates[2] >= 0)
 			{
-				// TODO: avoid VLA (custom allocator?)
+				/** @todo Avoid VLA (custom allocator?) */
 				uint8_t interpolatedBuffer[sp->vs.nBytesPerOutputVariables];
 				SRPInterpolated* pInterpolated = (SRPInterpolated*) interpolatedBuffer;
 				vec4d interpolatedPosition = {0};
@@ -107,8 +148,8 @@ void drawTriangle(
 					&interpolatedPosition
 				);
 
-				// TODO: fix rasterizer to accept both cw and ccw vertices
-				// and add correct `frontFacing` here!
+				/** @todo fix rasterizer to accept both cw and ccw vertices
+				 *  and add correct `frontFacing` here! */
 				SRPfsInput fsIn = {
 					.uniform = sp->uniform,
 					.interpolated = pInterpolated,

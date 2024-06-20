@@ -7,10 +7,27 @@
 #include "message_callback_p.h"
 #include "defines.h"
 
+/** @file
+ *  Framebuffer implementation */
+
+/** @ingroup Framebuffer_internal
+ *  @{ */
+
+/** Get pointer to a pixel inside color buffer
+ *  @param[in] this Pointer to SRPFramebuffer
+ *  @param[in] x,y Position of requested pixel
+ *  @return Requested pointer */
 static uint32_t* framebufferGetPixelPointer
 	(const SRPFramebuffer* this, size_t x, size_t y);
+
+/** Get pointer to a pixel inside depth buffer
+ *  @param[in] this Pointer to SRPFramebuffer
+ *  @param[in] x,y Position of requested pixel
+ *  @return Requested pointer */
 static double* framebufferGetDepthPointer
 	(const SRPFramebuffer* this, size_t x, size_t y);
+
+/** @} */  // ingroup Framebuffer_internal
 
 SRPFramebuffer* srpNewFramebuffer(size_t width, size_t height)
 {
@@ -39,8 +56,8 @@ void srpFramebufferDrawPixel(
 	uint32_t color
 )
 {
-	// TODO: this is not the job of the framebuffer to check this,
-	// this should be deleted after the primitive clipping implementation
+	/** @todo This is not the job of the framebuffer to check this,
+	 *  this should be deleted after the primitive clipping implementation */
 	if (1 < depth || depth < -1)
 		srpMessageCallbackHelper(
 			MESSAGE_ERROR, MESSAGE_SEVERITY_HIGH, __func__,

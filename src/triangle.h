@@ -4,10 +4,13 @@
 #pragma once
 
 /** @file
- *  Triangle rasterization */
+ *  Triangle rasterization functions */
 
 #include "framebuffer.h"
 #include "shaders.h"
+
+/** @ingroup Rasterization
+ *  @{ */
 
 /** Draw the triangle that is specified by three vertices to the framebuffer
  *  @param[in] `fb` The framebuffer to draw to
@@ -19,4 +22,5 @@ void drawTriangle(
 	const SRPShaderProgram* restrict sp, size_t primitiveID
 );
 
+/** @} */  // ingroup Rasterization
 

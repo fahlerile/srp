@@ -9,18 +9,37 @@
 #include "utils.h"
 #include "defines.h"
 
+/** @file
+ *  Buffer implementation */
+
+/** @ingroup Buffer_internal
+ *  @{ */
+
+/** Draw either SRPIndexBuffer or SRPVertexBuffer.
+ *  If `ib == NULL`, draws the vertex buffer, else draws index buffer.
+ *  Created because vertex and index buffer drawing are very similar,
+ *  with an intent to avoid code duplication
+ *  @see srpDrawVertexBuffer() srpDrawIndexBuffer() for parameter documentation */
 static void drawBuffer(
 	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
 	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count
 );
-static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t index);
+
+/** Get an element stored in SRPIndexBuffer.
+ *  Needed because SRPIndexBuffer stores opaque index types.
+ *  @param[in] this Pointer to SRPIndexBuffer
+ *  @param[in] ibIndex Index of the element in the SRPIndexBuffer
+ *  @return Element upcasted to `uint64_t` */
+static uint64_t indexIndexBuffer(const SRPIndexBuffer* this, size_t ibIndex);
+
+/** Get a vertex stored in SRPVertexBuffer.
+ *  @param[in] this Pointer to SRPVertexBuffer
+ *  @param[in] index Index of the vertex to get
+ *  @return Requested vertex */
 static SRPVertex* indexVertexBuffer(const SRPVertexBuffer* this, size_t index);
 
-// An internal function to draw either index or vertex buffer
-// If `ib == NULL`, draws the vertex buffer, else draws index buffer
-// Used in `srpDrawVertexBuffer` and `srpDrawIndexBuffer`
-// Created because vertex and index buffer drawing are very similar,
-// with an intent to avoid code duplication
+/** @} */
+
 static void drawBuffer(
 	const SRPIndexBuffer* ib, const SRPVertexBuffer* vb, const SRPFramebuffer* fb,
 	const SRPShaderProgram* sp, SRPPrimitive primitive, size_t startIndex, size_t count

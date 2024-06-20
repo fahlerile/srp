@@ -32,8 +32,6 @@ if (ENABLE_GPROF)
 	add_link_options(-pg)
 endif()
 
-include_directories(lib/)
-
 add_subdirectory(src)
 if (BUILD_EXAMPLES)
 	add_subdirectory(examples)

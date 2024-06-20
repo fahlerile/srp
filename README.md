@@ -22,7 +22,7 @@ make
 cd bin
 ```
 
-You can also build the examples with `-D BUILD_EXAMPLES=1` and the documentation with `-D BUILD_DOCS=1` arguments passed to `cmake`.
+You can also build the examples with `-D BUILD_EXAMPLES=1` and the documentation with `-D BUILD_DOCS=1` arguments passed to `cmake`. Building the documentation requires having [`dot`](https://en.wikipedia.org/wiki/Graphviz) binary in `PATH`.
 
 ## Similar/related projects
 - https://github.com/rswinkle/PortableGL
@@ -52,8 +52,11 @@ And many, many more, all of which I will not find anymore...
 - [x] Add comments to the examples
 - [x] Prettify the API (think about convenience macros/functions)
 - [x] Write the API documentation in Doxygen
-- [ ] Build Doxygen docs with CMake
+- [x] Build Doxygen docs with CMake
 - [ ] Write the implementation documentation (data flow, static functions and etc.)
+- [ ] Use Github CI to host the documentation on Github Pages
+    - https://github.com/marketplace/actions/doxygen-action
+- [ ] Customize the examples' page to include images and explanations in text form (not in comments form)
 
 ### Features
 - [ ] Add interpolation with perspective correction

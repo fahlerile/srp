@@ -172,7 +172,7 @@ SRP_FORCEINLINE mat4d mat4dConstructOrthogonalProjection(
 	return res;
 }
 
-// TODO: avoid matmul here?
+/** @todo Avoid matmul here? */
 SRP_FORCEINLINE mat4d mat4dConstructPerspectiveProjection(
 	double x_min_near, double x_max_near,
 	double y_min_near, double y_max_near,

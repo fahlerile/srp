@@ -1,22 +1,68 @@
-/** @defgroup Context
- *  @brief SRPContext and its subtypes for runtime settings management */
+/** @defgroup API_reference API reference
+ *  @brief Things you need to know as a user of the library */
 
-/** @defgroup Buffer
+/** @defgroup Implementation Implementation
+ *  @brief Implementation details (internal functions, structs, etc.) */
+
+/** @defgroup Context Context
+ *  @ingroup API_reference
+ *  @brief Runtime state management. */
+
+/** @defgroup Buffer Buffer
+ *  @ingroup API_reference
  *  @brief VBO and EBO OpenGL-like objects to store vertex and other data
- *  which is used directly in the drawcalls. */
+ *         which is used directly in the drawcalls. */
 
-/** @defgroup Framebuffer
- *  @brief SRPFramebuffer and SRPColor for color and depth buffer management */
+/** @defgroup Framebuffer Framebuffer
+ *  @ingroup API_reference
+ *  @brief Color and depth buffer management. */
 
-/** @defgroup Shaders
- *  @brief SRPShaderProgram and its subtypes */
+/** @defgroup Shaders Shaders
+ *  @ingroup API_reference
+ *  @brief Typedefs representing vertex & fragment shaders, shader program. */
 
-/** @defgroup Texture
- *  @brief SRPTexture */
+/** @defgroup Vertex Vertex
+ *  @ingroup API_reference
+ *  @brief Typedefs representing vertex, vertex variables and etc. */
 
-/** @defgroup Vector
+/** @defgroup Texture Texture
+ *  @ingroup API_reference
+ *  @brief Texture mapping */
+
+/** @defgroup Vector Vector
+ *  @ingroup API_reference
  *  @brief Vector API, only included if you define `SRP_INCLUDE_VECTOR` */
 
-/** @defgroup Matrix
+/** @defgroup Matrix Matrix
+ *  @ingroup API_reference
  *  @brief Matrix API, only included if you define `SRP_INCLUDE_MAT` */
+
+/** @defgroup Various Various
+ *  @ingroup API_reference
+ *  @brief Stuff that cannot be easily grouped into other modules. */
+
+
+/** @defgroup Memory_allocation Memory allocation
+ *  @ingroup Implementation
+ *  @brief How memory allocation is done */
+
+/** @defgroup Various_internal Various
+ *  @ingroup Implementation
+ *  @brief Internal stuff that cannot be easity grouped into other modules. */
+
+/** @defgroup Buffer_internal Buffer
+ *  @ingroup Implementation
+ *  @brief Internals of the Buffer module. */
+
+/** @defgroup Framebuffer_internal Framebuffer
+ *  @ingroup Implementation
+ *  @brief Internals of the Framebuffer module. */
+
+/** @defgroup Texture_internal Texture
+ *  @ingroup Implementation
+ *  @brief Internals of the Texture module. */
+
+/** @defgroup Rasterization Rasterization
+ *  @ingroup Implementation
+ *  @brief Functions that perform primitive rasterization & data interpolation. */
 
