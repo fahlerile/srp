@@ -29,15 +29,7 @@ typedef enum
 } SRPTextureFilteringMode;
 
 /** A structure to represent a texture */
-typedef struct
-{
-	uint8_t* data;
-	int width, height;
-	SRPTextureWrappingMode wrappingModeX;
-	SRPTextureWrappingMode wrappingModeY;
-	SRPTextureFilteringMode filteringModeMagnifying;
-	SRPTextureFilteringMode filteringModeMinifying;
-} SRPTexture;
+typedef struct SRPTexture SRPTexture;
 
 /** Initialize a texture by loading an image
  *  @param[in] image A filesystem path to an image. Most popular image types

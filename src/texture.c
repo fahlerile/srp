@@ -11,7 +11,7 @@
 #include "stb_image.h"
 #include "utils.h"
 #include "vec.h"
-#include "texture.h"
+#include "texture_p.h"
 
 /** @file
  *  Texture implementation */
