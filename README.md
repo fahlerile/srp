@@ -68,7 +68,7 @@ And many, many more, all of which I will not find anymore...
 - [ ] Draw primitives in parallel (OpenMP)
 
 ### Portability/API design
-- [ ] Separate constructors into two functions for buffer objects (create and copy data)
+- [x] Separate constructors into two functions for buffer objects (create and copy data)
 - [ ] Getters and setters for `SRPTexture`
 - [ ] Rename enum members to avoid namespace pollution
 

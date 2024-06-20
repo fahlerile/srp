@@ -55,7 +55,8 @@ int main()
 		}
 	};
 
-	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPVertexBuffer* vb = srpNewVertexBuffer();
+	srpVertexBufferCopyData(vb, sizeof(Vertex), sizeof(data), data);
 
 	// Uniform requires a cast to an opaque `SRPUniform` type to avoid
 	// a compiler warning

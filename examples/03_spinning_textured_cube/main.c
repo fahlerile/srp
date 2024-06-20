@@ -1,3 +1,4 @@
+#include "type.h"
 #include "vertex.h"
 #define SRP_INCLUDE_VEC
 #define SRP_INCLUDE_MAT
@@ -84,8 +85,10 @@ int main()
 	};
 
 	// Create vertex and index buffers, these are similar to VBO and EBO
-	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
-	SRPIndexBuffer* ib = srpNewIndexBuffer(TYPE_UINT8, sizeof(indices), indices);
+	SRPVertexBuffer* vb = srpNewVertexBuffer();
+	SRPIndexBuffer* ib = srpNewIndexBuffer();
+	srpVertexBufferCopyData(vb, sizeof(Vertex), sizeof(data), data);
+	srpIndexBufferCopyData(ib, TYPE_UINT8, sizeof(indices), indices);
 
 	Uniform uniform = {
 		.model = mat4dConstructIdentity(),

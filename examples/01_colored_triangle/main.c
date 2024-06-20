@@ -64,7 +64,8 @@ int main()
 	};
 
 	// Creating the vertex buffer object, it is similar to OpenGL's VBO
-	SRPVertexBuffer* vb = srpNewVertexBuffer(sizeof(Vertex), sizeof(data), data);
+	SRPVertexBuffer* vb = srpNewVertexBuffer();
+	srpVertexBufferCopyData(vb, sizeof(Vertex), sizeof(data), data);
 
 	// Shader program is not actually a program, but named like this to
 	// be similar to OpenGL
